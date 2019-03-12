@@ -48,9 +48,10 @@ void evd_cyclic(const double* const X, int n, double* e, double* Q);
  * as Algorithm 8.4.1.
  *
  * @param X Symmetric matrix of size n times n, given in row-major order.
+ * @param n Number of rows/columns of input matrix X.
  * @param p First index that satisfies 0 <= p < n.
  * @param q Second index that satisfies p < q < n.
  * @param[out] c Cosine value.
  * @param[out] s Sine value.
  */
-void sym_schur2(const double* const X, int p, int q, double* c, double* s);
+void sym_schur2(const double* const X, int n, int p, int q, double* c, double* s);
