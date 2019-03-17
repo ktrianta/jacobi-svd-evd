@@ -2,21 +2,26 @@
 #include <iomanip>
 #include <vector>
 #include "svd.hpp"
+#include "types.hpp"
 
 int main() {
-    int n = 10, m = 10;
-    std::vector<double> X(n*m), s(std::min(m, n)), U(n*m), V(n*n);
-    for (int i = 0; i < n; ++i)
-        for (int j = 0; j < m; ++j)
+    int m = 10, n = 6;
+    std::vector<double> X(m*n), s(std::min(m, n)), U(m*n), V(n*n);
+    for (int i = 0; i < m; ++i)
+        for (int j = 0; j < n; ++j)
             X[n*i + j] = i + j;
 
-    svd(X.data(), m, n, &s[0], &U[0], &V[0], 100);
+    matrix_t Xmat = {&X[0], m, n};
+    vector_t svec = {&s[0], std::min(m, n)};
+    matrix_t Umat = {&U[0], m, n};
+    matrix_t Vmat = {&V[0], n, n};
+    svd(Xmat, svec, Umat, Vmat, 100);
 
     std::cout << "Original matrix (X)\n";
     std::cout << "-------------------\n";
     for (int i = 0; i < m; ++i) {
         for (int j = 0; j < n; ++j) {
-            std::cout << std::fixed << std::setw(7) << std::setprecision(4) << X[n*i + j] << ' ';
+            std::cout << std::fixed << std::setw(13) << std::setprecision(10) << X[n*i + j] << ' ';
         }
         std::cout << '\n';
     }
@@ -24,7 +29,7 @@ int main() {
     std::cout << "Singular values (S)\n";
     std::cout << "-------------------\n";
     for (int i = 0; i < std::min(m, n); ++i) {
-        std::cout << s[i] << ' ';
+        std::cout << std::fixed << std::setw(13) << std::setprecision(10) << s[i] << ' ';
     }
     std::cout << '\n';
 
@@ -32,7 +37,7 @@ int main() {
     std::cout << "-------------------------\n";
     for (int i = 0; i < m; ++i) {
         for (int j = 0; j < n; ++j) {
-            std::cout << std::fixed << std::setw(7) << std::setprecision(4) << U[n*i + j] << ' ';
+            std::cout << std::fixed << std::setw(13) << std::setprecision(10) << U[n*i + j] << ' ';
         }
         std::cout << '\n';
     }
@@ -41,7 +46,7 @@ int main() {
     std::cout << "---------------------------\n";
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
-            std::cout << std::fixed << std::setw(7) << std::setprecision(4) << V[n*i + j] << ' ';
+            std::cout << std::fixed << std::setw(13) << std::setprecision(10) << V[n*i + j] << ' ';
         }
         std::cout << '\n';
     }

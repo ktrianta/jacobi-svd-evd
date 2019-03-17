@@ -1,12 +1,33 @@
 #include <math.h>
+#include <assert.h>
 #include "util.hpp"
+#include "types.hpp"
 #include "svd.hpp"
 
 
-void svd(const double* const X, int m, int n, double* s, double* U, double* V, int n_iter) {
+void svd(struct matrix_t Xmat, struct vector_t svec, struct matrix_t Umat, struct matrix_t Vmat, int n_iter) {
+    const int m = Xmat.rows;
+    const int n = Xmat.cols;
+    const int n_singular_vals = svec.len;
+
+    assert(((m < n) ? m : n) == n_singular_vals);
+    assert(m == Umat.rows);
+    assert(n == Umat.cols);
+    assert(n == Vmat.rows);
+    assert(n == Vmat.cols);
+
+    double* X = Xmat.ptr;
+    double* s = svec.ptr;
+    double* U = Umat.ptr;
+    double* V = Vmat.ptr;
+
     for (int i = 0; i < m; ++i) {
         for (int j = 0; j < n; ++j) {
             U[n*i + j] = X[n*i + j];
+        }
+    }
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
             V[n*i + j] = 0.0;
             if (i == j) {
                 V[n*i + j] = 1.0;
@@ -49,7 +70,7 @@ void svd(const double* const X, int m, int n, double* s, double* U, double* V, i
         }
         sigma = sqrt(sigma);
 
-        if (i < (m < n ? m : n)) {
+        if (i < n_singular_vals) {
             s[i] = sigma;
         }
 
@@ -57,4 +78,7 @@ void svd(const double* const X, int m, int n, double* s, double* U, double* V, i
             U[n*k + i] /= sigma;
         }
     }
+
+    matrix_t matrices[2] = {Umat, Vmat};
+    reorder_decomposition(svec, matrices, 2, less);
 }
