@@ -6,7 +6,7 @@
  * Compare two double precision floating point values and return true if they
  * are close in the relative scale.
  *
- * Formally, the function does true if |x - y| < eps * |x + y| is satisfied.
+ * Formally, the function does true if |x - y| <= eps * |x + y| is satisfied.
  *
  * @param x Double value.
  * @param y Double value.
@@ -65,6 +65,6 @@ int greater(double x, double y);
  * @param cmp_fn A comparator to use when reordering the columns. This function
  * must be a total ordering, and must define the sorting order. For example,
  * if cmp_fn implements less-than operator, then the values will be ordered in
- * asceding order.
+ * ascending order.
  */
 void reorder_decomposition(struct vector_t vals, struct matrix_t* matrices, int n_matrices, comparator cmp_fn);

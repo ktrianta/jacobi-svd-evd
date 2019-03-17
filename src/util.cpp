@@ -4,7 +4,7 @@
 #include "types.hpp"
 
 bool isclose(double x, double y, double eps) {
-    return fabs(x - y) < eps * fabs(x + y);
+    return fabs(x - y) <= eps * fabs(x + y);
 }
 
 void sym_jacobi_coeffs(double x_ii, double x_ij, double x_jj, double* c, double* s) {
@@ -40,7 +40,7 @@ void reorder_decomposition(struct vector_t vals, struct matrix_t* matrices, int 
         double s_last = s[i];
         int i_last = i;
         for (int j = i + 1; j < n_vals; ++j) {
-            if (!cmp_fn(s[j], s_last)) {
+            if (cmp_fn(s[j], s_last)) {
                 s_last = s[j];
                 i_last = j;
             }
