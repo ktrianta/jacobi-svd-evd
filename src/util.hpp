@@ -1,5 +1,6 @@
 #pragma once
 #include <float.h>
+#include "types.hpp"
 
 /**
  * Compare two double precision floating point values and return true if they
@@ -29,3 +30,41 @@ bool isclose(double x, double y, double eps = DBL_EPSILON);
  * @param[out] s Sine value.
  */
 void sym_jacobi_coeffs(double x_ii, double x_ij, double x_jj, double* c, double* s);
+
+/**
+ * Comparator function that returns 1 (true) if the first element comes before
+ * the second element in the ordering implied by the comparison.
+ *
+ * For example, if the function implements '<' operator, and the inputs are
+ * 3 and 5, the function must return 1. In the same case, if the inputs are
+ * 8 and 3, the function must return 0. Similary, if the inputs are 5 and 5,
+ * the function must return 0.
+ */
+typedef int(*comparator)(double, double);
+
+/**
+ * Comparator that returns 1 if (x < y), and 0 otherwise.
+ */
+int less(double x, double y);
+
+/**
+ * Comparator that returns 1 if (x > y), and 0 otherwise.
+ */
+int greater(double x, double y);
+
+/**
+ * Reorder a given matrix decomposition according to the singular/eigen values
+ * and a comparison function.
+ *
+ * @param vals Singular/eigen values of the decomposition.
+ * @param An array of matrix types. For each matrix in the array, ith column of
+ * that matrix must correspond to the ith singular/eigen value. These columns
+ * will be reordered in the same manner as their corresponding singular/eigen
+ * values.
+ * @param n_matrices Number of matrices in the given matrix array.
+ * @param cmp_fn A comparator to use when reordering the columns. This function
+ * must be a total ordering, and must define the sorting order. For example,
+ * if cmp_fn implements less-than operator, then the values will be ordered in
+ * asceding order.
+ */
+void reorder_decomposition(struct vector_t vals, struct matrix_t* matrices, int n_matrices, comparator cmp_fn);
