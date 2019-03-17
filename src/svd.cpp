@@ -80,5 +80,5 @@ void svd(struct matrix_t Xmat, struct vector_t svec, struct matrix_t Umat, struc
     }
 
     matrix_t matrices[2] = {Umat, Vmat};
-    reorder_decomposition(svec, matrices, 2, less);
+    reorder_decomposition(svec, matrices, 2, greater);
 }
