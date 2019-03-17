@@ -33,6 +33,32 @@ int greater(double x, double y) {
     return x > y;
 }
 
+double sign(double x) {
+	if(x > 0.0)
+		return 1.0;
+	else
+		return -1.0;
+}
+
+void identity(double *P, int n) {
+	for(int i = 0; i < n; i++) {
+		for(int j = 0; j < n ;j++) {
+			if (i == j)
+				P[i*n + j] = 1.0;
+			else
+				P[i*n + j] = 0.0;
+		}
+	}
+}
+
+void transpose(double *P, double *Q, int n) {
+	for(int i = 0; i < n; i++) {
+		for(int j = 0; j < n; j++) {
+			Q[j*n + i] = P[i*n + j];
+		}
+	}
+}
+
 void reorder_decomposition(struct vector_t vals, struct matrix_t* matrices, int n_matrices, comparator cmp_fn) {
     double* s = vals.ptr;
     const int n_vals = vals.len;

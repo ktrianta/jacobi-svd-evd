@@ -53,6 +53,26 @@ int less(double x, double y);
 int greater(double x, double y);
 
 /**
+ * Return 1 if the number if positive and 0 otherwise.
+ */
+double sign(double x);
+
+/**
+ * @brief Initialize an identity matrix
+ * @param P Input matrix
+ * @param n Size of input matrix
+ */
+void identity(double *P, int n);
+
+/**
+ * @brief Generate the transpose of a matrix
+ * @param P Input matrix
+ * @param Q Output matrix - Transpose of input matrix
+ * @param n Size of input matrix
+ */
+void transpose(double *P, double *Q, int n);
+
+/**
  * Reorder a given matrix decomposition according to the singular/eigen values
  * and a comparison function.
  *
