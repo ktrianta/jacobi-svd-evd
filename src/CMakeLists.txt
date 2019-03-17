@@ -7,6 +7,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3")
 
 set(SRC_FILES
     evd.cpp
+    svd.cpp
     util.cpp
     main.cpp)
 
