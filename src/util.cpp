@@ -34,7 +34,7 @@ int greater(double x, double y) {
 }
 
 double sign(double x) {
-	if(x > 0.0)
+	if(greater(x, 0.0))
 		return 1.0;
 	else
 		return -1.0;
