@@ -20,7 +20,7 @@ TEST(evd, identity_matrix) {
     }
 }
 
-TEST(svd, random_square_matrix) {
+TEST(evd, random_square_matrix) {
     int n = 4;
     std::vector<double> A = {
        7.0,  3.0,  2.0,  1.0,
