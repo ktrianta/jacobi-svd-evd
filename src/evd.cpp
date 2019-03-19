@@ -1,6 +1,7 @@
 #include <math.h>
 #include "evd.hpp"
 #include "util.hpp"
+#include "types.hpp"
 #include <iostream>
 
 void sym_schur2(const double* const X, int n, int p, int q, double* c, double* s) {
@@ -21,42 +22,45 @@ void sym_schur2(const double* const X, int n, int p, int q, double* c, double* s
     }
 }
 
-void evd_classic(const double* const X, int n, double* e, double* Q) {
-
-    double offX2;
-    //Definition of off, however we use the square
-    for(int i = 0; i < n; ++i){
-        for(int j = i+1; j<n; ++j){
-            double a_ij = X[n*i+j];
-            offX2+=2*a_ij*a_ij;
-        }
-    }
-
-    double abs_a, eps = offX2;
-    //Frebonius norm
-    for(int i = 0; i < n; ++i){
-        eps += X[n*i+i]*X[n*i+i];
-    }
-    //tol*frebonius norm
-    double tol = 0.001;
-    eps = tol*tol*eps;
-
-    int p, q;
-    double c, s;
+void evd_classic_tol(struct matrix_t Xmat, struct vector_t evec, struct matrix_t Qmat, double tol) {
+    const int n = Xmat.cols;
+    double* X = Xmat.ptr;
+    double* e = evec.ptr;
+    double* Q = Qmat.ptr;
+    //A=QtXQ
     double *A = (double*)malloc(sizeof(double)*n*n);
 
+    double offA=0, abs_a, eps, c, s;
+    int p, q;
+
     for(int i = 0; i < n; ++i){
-        for(int j = i+1; j<n; ++j){
+        for(int j = 0; j<n; ++j){
             A[n*i+j] = X[n*i+j];
         }
     }
-
     for(int i = 0; i < n; ++i){
         Q[n*i+i] = 1.0;
     }
+    for(int i = 0; i < n; ++i){
+        for(int j = i+1; j<n; ++j){
+            double a_ij = A[n*i+j];
+            offA+=2*a_ij*a_ij;
+        }
+    }
+    for(int i = 0; i < n; ++i){
+        for(int j = i; j<n; ++j){
+            double a_ij = A[n*i+j];
+            if(i == j){
+                eps+=a_ij*a_ij;
+            } else {
+                eps+=2*a_ij*a_ij;
+            }
+        }
+    }
+    eps = tol*tol*eps;
 
-    std::cout << eps << "\n";
-    while(offX2 > eps){
+    while(offA > eps){
+
         abs_a = 0.0;
         for(int i = 0; i < n; ++i){
             for(int j = i+1; j<n; ++j){
@@ -68,28 +72,39 @@ void evd_classic(const double* const X, int n, double* e, double* Q) {
                 }
             }
         }
-        sym_schur2(A,n,p,q,&c,&s);
-        for(int i = 0; i < n; ++i){
 
+        sym_schur2(A,n,p,q,&c,&s);
+        double A_ip, A_iq;
+        for(int i = 0; i < n; ++i){
             Q[n*i+p] = c*Q[n*i+p]-s*Q[n*i+q];
             Q[n*i+q] = s*Q[n*i+p]+c*Q[n*i+q];
 
-            A[n*i+p] = c * A[n*i+p] - s * A[n*i+q];
-            A[n*i+q] = s * A[n*i+p] + c * A[n*i+q];
-            A[n*p+i] = c * A[n*i+p] - s * A[n*i+q];
-            A[n*q+i] = s * A[n*i+p] + c * A[n*i+q];
+            A_iq = A[n*i+p];
+            A_iq = A[n*i+q];
+
+            A[n*i+p] = c * A_ip - s * A_iq;
+            A[n*i+q] = s * A_ip + c * A_iq;
+
         }
-        offX2 = 0.0;
         for(int i = 0; i < n; ++i){
-            for(int j = i+1; j<n; ++j){
-                double a_ij = A[n*i+j];
-                offX2+=2*a_ij*a_ij;
+            double A_ip = A[n*p+i];
+            double A_iq = A[n*q+i];
+
+            A[n*p+i] = c * A_ip - s * A_iq;
+            A[n*q+i] = s * A_ip + c * A_iq;
+        }
+
+        offA = 0;
+        for(int i = 0; i < n; ++i){
+            for(int j = i; j < n; ++j){
+                double a_ij= A[n*i+j];
+                offA+=2*a_ij*a_ij;
             }
         }
-        std::cout << offX2 << "\n";
     }
-
     for(int i = 0; i < n; ++i){
         e[i]=A[n*i+i];
     }
+    reorder_decomposition(evec, &Qmat, 1, greater);
+
 }
