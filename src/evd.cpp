@@ -1,8 +1,6 @@
 #include <math.h>
 #include "evd.hpp"
 #include "util.hpp"
-#include "types.hpp"
-#include <iostream>
 
 void sym_schur2(const double* const X, int n, int p, int q, double* c, double* s) {
     if (not isclose(X[n*p + q], 0)) {
