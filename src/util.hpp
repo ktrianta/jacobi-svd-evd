@@ -57,7 +57,7 @@ int greater(double x, double y);
 /**
  * Return 1 if the number if positive and 0 otherwise.
  */
-double sign(double x);
+int sign(double x);
 
 /**
  * @brief Initialize an identity matrix
