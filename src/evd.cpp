@@ -71,13 +71,14 @@ void evd_classic_tol(struct matrix_t Xmat, struct vector_t evec, struct matrix_t
             }
         }
 
-        sym_schur2(A,n,p,q,&c,&s);
+        sym_jacobi_coeffs(A[p*n+p],A[p*n+q],A[q*n+q],&c,&s);
+
         double A_ip, A_iq;
         for(int i = 0; i < n; ++i){
             Q[n*i+p] = c*Q[n*i+p]-s*Q[n*i+q];
             Q[n*i+q] = s*Q[n*i+p]+c*Q[n*i+q];
 
-            A_iq = A[n*i+p];
+            A_ip = A[n*i+p];
             A_iq = A[n*i+q];
 
             A[n*i+p] = c * A_ip - s * A_iq;
@@ -85,16 +86,15 @@ void evd_classic_tol(struct matrix_t Xmat, struct vector_t evec, struct matrix_t
 
         }
         for(int i = 0; i < n; ++i){
-            double A_ip = A[n*p+i];
-            double A_iq = A[n*q+i];
+            A_ip = A[n*p+i];
+            A_iq = A[n*q+i];
 
             A[n*p+i] = c * A_ip - s * A_iq;
             A[n*q+i] = s * A_ip + c * A_iq;
         }
-
         offA = 0;
         for(int i = 0; i < n; ++i){
-            for(int j = i; j < n; ++j){
+            for(int j = i+1; j < n; ++j){
                 double a_ij= A[n*i+j];
                 offA+=2*a_ij*a_ij;
             }
