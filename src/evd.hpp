@@ -10,7 +10,8 @@
  *
  * @param A Matrix of size n times n, given in row-major order, whose EVD will
  * be computed.
- * @param[out] e Output array of size n. Eigenvalues of X will be written to array e,
+ * @param[out] e Output array of size n. Eigenvalues of X will be written to
+ * array e,
  * in order of ascending magnitude.
  * @param epoch Number of Jacobi iterations until convergence (default 100)
  */
