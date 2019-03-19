@@ -1,9 +1,5 @@
-#include <iostream>
-#include <iomanip>
-#include <vector>
-#include "evd.hpp"
-
 int main() {
+<<<<<<< HEAD
     int n = 5, m = 5;
     double *X = (double*)malloc(sizeof(double)*n*n);
     for (int i = 0; i < n; ++i)
@@ -15,4 +11,6 @@ int main() {
     evd_classic(X,n,e,Q);
     std::cout<<e;
 
+=======
+>>>>>>> 8cb34a755b4d49f5d756faecd4efd01b9e52401d
 }
