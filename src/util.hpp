@@ -55,7 +55,7 @@ int less(double x, double y);
 int greater(double x, double y);
 
 /**
- * Return 1 if the number if positive and 0 otherwise.
+ * Return 1 if the number if positive and -1 otherwise.
  */
 int sign(double x);
 
