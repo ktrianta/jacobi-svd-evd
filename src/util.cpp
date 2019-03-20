@@ -30,8 +30,8 @@ int less(double x, double y) { return x < y; }
 
 int greater(double x, double y) { return x > y; }
 
-int sign(double x) {
-	return (x > 0.0) ? 1 : -1;
+double sign(double x) {
+	return (x > 0.0) ? 1.0 : -1.0;
 }
 
 void identity(double* P, int n) {
