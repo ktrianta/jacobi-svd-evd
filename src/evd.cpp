@@ -13,6 +13,7 @@ void evd_classic(struct matrix_t Data_matr, struct vector_t Eigen_values,
     const int m = Data_matr.rows;
 
     double* E = Eigen_values.ptr;
+	int is_not_diagonal = 0;
 
     // Build the auxiliary matrices
 
@@ -38,9 +39,13 @@ void evd_classic(struct matrix_t Data_matr, struct vector_t Eigen_values,
                     i_max = i;
                     j_max = j;
                     val = A[i * m + j];
+					is_not_diagonal = 1;
                 }
             }
         }
+		
+		if(! is_not_diagonal)
+			break;
 
         // Compute cos_t and sin_t for the rotation matrix
 
