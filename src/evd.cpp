@@ -41,13 +41,13 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors,
                     i_max = i;
                     j_max = j;
                     val = A[i * m + j];
-					          is_not_diagonal = 1;
+		    is_not_diagonal = 1;
                 }
             }
         }
 
-		    if(! is_not_diagonal)
-          break;
+        if(! is_not_diagonal)
+            break;
 
         // Compute cos_t and sin_t for the rotation matrix
 
