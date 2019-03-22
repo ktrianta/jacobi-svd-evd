@@ -21,5 +21,11 @@ After the project has been build
 
 ```bash
 cd build
-cmake test
+ctest
+
+# Verbose output
+ctest -V
+
+# Verbose output with color
+GTEST_COLOR=1 ctest -V
 ```
