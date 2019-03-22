@@ -5,7 +5,7 @@
 #include <vector>
 
 TEST(evd, identity_matrix) {
-    int n;
+    int n = 10;
     std::vector<double> A(n * n, 0);
     for (int i = 0; i < n; ++i) {
         A[i*n + i] = 1.0;
