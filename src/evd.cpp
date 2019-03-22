@@ -160,6 +160,7 @@ void evd_classic_tol(struct matrix_t Xmat, struct vector_t evec, struct matrix_t
         e[i]=A[n*i+i];
     }
     reorder_decomposition(evec, &Qmat, 1, greater);
+    free(A);
 
 }
 void MatMul(double* P, double* Q, double* R, int n) {
