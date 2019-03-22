@@ -6,14 +6,16 @@
 
 void MatMul(double*, double*, double*, int);
 
-void evd_classic(struct matrix_t Data_matr, struct vector_t Eigen_values,
-                 int epoch) {
+void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors,
+                 struct vector_t Eigen_values, int epoch) {
 
     double* A = Data_matr.ptr;
     const int m = Data_matr.rows;
+    double* V = Eigen_vectors.ptr;
+    identity(V, m);
 
     double* E = Eigen_values.ptr;
-	int is_not_diagonal = 0;
+	  int is_not_diagonal = 0;
 
     // Build the auxiliary matrices
 
@@ -45,7 +47,7 @@ void evd_classic(struct matrix_t Data_matr, struct vector_t Eigen_values,
         }
 
 		    if(! is_not_diagonal)
-			     break;
+          break;
 
         // Compute cos_t and sin_t for the rotation matrix
 
@@ -68,16 +70,25 @@ void evd_classic(struct matrix_t Data_matr, struct vector_t Eigen_values,
         transpose(P, P_t, m);
         MatMul(temp, P_t, A, m);
         MatMul(A, temp, P, m);
+        MatMul(temp, V, P, m);
+
+        for (int i = 0; i < m; i++) {
+            for (int j = i + 1; j < m; j++) {
+                V[i * m + j] = temp[i * m + j];
+            }
+        }
     }
 
     free(P);
     free(P_t);
     free(temp);
-    
+
     // Store the generated eigen values in the vector
     for (int i = 0; i < m; i++) {
         E[i] = A[i * m + i];
     }
+
+    reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
 }
 
 void MatMul(double* P, double* Q, double* R, int n) {
