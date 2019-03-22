@@ -17,3 +17,4 @@ target_link_libraries(evd_test gtest_main sources_lib)
 
 add_test(NAME SVD COMMAND svd_test)
 add_test(NAME Utilities COMMAND util_test)
+add_test(NAME EVD COMMAND evd_test)
