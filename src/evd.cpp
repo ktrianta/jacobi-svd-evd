@@ -39,13 +39,13 @@ void evd_classic(struct matrix_t Data_matr, struct vector_t Eigen_values,
                     i_max = i;
                     j_max = j;
                     val = A[i * m + j];
-					is_not_diagonal = 1;
+					          is_not_diagonal = 1;
                 }
             }
         }
-		
-		if(! is_not_diagonal)
-			break;
+
+		    if(! is_not_diagonal)
+			     break;
 
         // Compute cos_t and sin_t for the rotation matrix
 
@@ -70,6 +70,10 @@ void evd_classic(struct matrix_t Data_matr, struct vector_t Eigen_values,
         MatMul(A, temp, P, m);
     }
 
+    free(P);
+    free(P_t);
+    free(temp);
+    
     // Store the generated eigen values in the vector
     for (int i = 0; i < m; i++) {
         E[i] = A[i * m + i];
