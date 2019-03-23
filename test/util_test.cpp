@@ -52,8 +52,8 @@ TEST(util, sym_jacobi_coeffs) {
 }
 
 TEST(util, reorder_decomposition) {
-    int n_cols = 10;
-    int n_rows[3] = {15, 5, 1};
+    size_t n_cols = 10;
+    size_t n_rows[3] = {15, 5, 1};
 
     // define ordered columns. Results of the shuffled inputs must be equal
     // to the original ones.

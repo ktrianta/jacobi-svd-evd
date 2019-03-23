@@ -5,7 +5,7 @@
 #include <vector>
 
 TEST(evd, identity_matrix) {
-    int n = 10;
+    size_t n = 10;
     std::vector<double> A(n * n, 0);
     for (int i = 0; i < n; ++i) {
         A[i*n + i] = 1.0;
@@ -21,7 +21,7 @@ TEST(evd, identity_matrix) {
 }
 
 TEST(evd, random_square_matrix) {
-    int n = 4;
+    size_t n = 4;
     std::vector<double> A = {
        7.0,  3.0,  2.0,  1.0,
        3.0,  9.0,  -2.0,  4.0,
