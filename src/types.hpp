@@ -1,5 +1,5 @@
 #pragma once
-#include<cstddef>
+#include <cstddef>
 
 /**
  * A simple vector type that holds the pointer to an already allocated array
