@@ -1,4 +1,5 @@
 #pragma once
+#include<cstddef>
 
 /**
  * A simple vector type that holds the pointer to an already allocated array
@@ -6,7 +7,7 @@
  */
 struct vector_t {
     double* ptr;
-    int len;
+    size_t len;
 };
 
 /**
@@ -15,6 +16,6 @@ struct vector_t {
  */
 struct matrix_t {
     double* ptr;
-    int rows;
-    int cols;
+    size_t rows;
+    size_t cols;
 };

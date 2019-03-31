@@ -6,7 +6,7 @@
 #include <random>
 
 TEST(svd, identity_matrix) {
-    int n_rows = 10, n_cols = 10;
+    size_t n_rows = 10, n_cols = 10;
     std::vector<double> X(n_rows * n_cols, 0);
     for (int i = 0; i < n_rows; ++i) {
         X[i*n_cols + i] = 1.0;
@@ -28,7 +28,7 @@ TEST(svd, identity_matrix) {
 }
 
 TEST(svd, tall_matrix) {
-    int m = 10, n = 6;
+    size_t m = 10, n = 6;
     std::vector<double> X(m*n), s(std::min(m, n)), U(m*n), V(n*n);
     for (int i = 0; i < m; ++i)
         for (int j = 0; j < n; ++j)
@@ -48,7 +48,7 @@ TEST(svd, tall_matrix) {
 }
 
 TEST(svd, random_square_matrix) {
-    int n = 3;
+    size_t n = 3;
     std::vector<double> X = {
        1.22214449,  0.20082589, -0.75672479,
        1.07593684,  0.20025264,  0.38234639,
