@@ -91,6 +91,93 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors,
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
 }
 
+void evd_classic_tol(struct matrix_t Xmat, struct vector_t evec, struct matrix_t Qmat, double tol) {
+    const int n = Xmat.cols;
+    double* X = Xmat.ptr;
+    double* e = evec.ptr;
+    double* Q = Qmat.ptr;
+    //A=QtXQ
+    double *A = (double*)malloc(sizeof(double)*n*n);
+
+    double offA=0, abs_a, eps, c, s;
+    int p, q;
+
+    for(int i = 0; i < n; ++i){
+        for(int j = 0; j<n; ++j){
+            A[n*i+j] = X[n*i+j];
+        }
+    }
+    for(int i = 0; i < n; ++i){
+        Q[n*i+i] = 1.0;
+    }
+    for(int i = 0; i < n; ++i){
+        for(int j = i+1; j<n; ++j){
+            double a_ij = A[n*i+j];
+            offA+=2*a_ij*a_ij;
+        }
+    }
+    for(int i = 0; i < n; ++i){
+        for(int j = i; j<n; ++j){
+            double a_ij = A[n*i+j];
+            if(i == j){
+                eps+=a_ij*a_ij;
+            } else {
+                eps+=2*a_ij*a_ij;
+            }
+        }
+    }
+    eps = tol*tol*eps;
+
+    while(offA > eps){
+
+        abs_a = 0.0;
+        for(int i = 0; i < n; ++i){
+            for(int j = i+1; j<n; ++j){
+                double abs_ij = abs(A[i*n+j]);
+                if(abs_ij > abs_a){
+                    abs_a = abs_ij;
+                    p = i;
+                    q = j;
+                }
+            }
+        }
+
+        sym_jacobi_coeffs(A[p*n+p],A[p*n+q],A[q*n+q],&c,&s);
+
+        double A_ip, A_iq;
+        for(int i = 0; i < n; ++i){
+            Q[n*i+p] = c*Q[n*i+p]-s*Q[n*i+q];
+            Q[n*i+q] = s*Q[n*i+p]+c*Q[n*i+q];
+
+            A_ip = A[n*i+p];
+            A_iq = A[n*i+q];
+
+            A[n*i+p] = c * A_ip - s * A_iq;
+            A[n*i+q] = s * A_ip + c * A_iq;
+
+        }
+        for(int i = 0; i < n; ++i){
+            A_ip = A[n*p+i];
+            A_iq = A[n*q+i];
+
+            A[n*p+i] = c * A_ip - s * A_iq;
+            A[n*q+i] = s * A_ip + c * A_iq;
+        }
+        offA = 0;
+        for(int i = 0; i < n; ++i){
+            for(int j = i+1; j < n; ++j){
+                double a_ij= A[n*i+j];
+                offA+=2*a_ij*a_ij;
+            }
+        }
+    }
+    for(int i = 0; i < n; ++i){
+        e[i]=A[n*i+i];
+    }
+    reorder_decomposition(evec, &Qmat, 1, greater);
+    free(A);
+
+}
 void MatMul(double* P, double* Q, double* R, int n) {
     double sum = 0.0;
     for (int i = 0; i < n; i++) {
