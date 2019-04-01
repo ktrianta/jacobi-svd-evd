@@ -6,20 +6,21 @@
 
 void MatMul(double*, double*, double*, int);
 
-void evd_classic(struct matrix_t Data_matr, struct vector_t Eigen_values,
-                 int epoch) {
+void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors,
+                 struct vector_t Eigen_values, int epoch) {
 
     double* A = Data_matr.ptr;
     const int m = Data_matr.rows;
+    double* V = Eigen_vectors.ptr;
+    identity(V, m);
 
     double* E = Eigen_values.ptr;
-	int is_not_diagonal = 0;
+	  int is_not_diagonal = 0;
 
     // Build the auxiliary matrices
 
-    double *P, *P_t, *temp;
+    double *P, *temp;
     P = (double*)malloc(sizeof(double) * m * m);
-    P_t = (double*)malloc(sizeof(double) * m * m);
     temp = (double*)malloc(sizeof(double) * m * m);
 
     for (int ep = 1; ep <= epoch; ep++) {
@@ -39,13 +40,13 @@ void evd_classic(struct matrix_t Data_matr, struct vector_t Eigen_values,
                     i_max = i;
                     j_max = j;
                     val = A[i * m + j];
-					is_not_diagonal = 1;
+		                is_not_diagonal = 1;
                 }
             }
         }
 
-		if(! is_not_diagonal)
-			break;
+        if(! is_not_diagonal)
+            break;
 
         // Compute cos_t and sin_t for the rotation matrix
 
@@ -62,18 +63,34 @@ void evd_classic(struct matrix_t Data_matr, struct vector_t Eigen_values,
         P[j_max * m + i_max] = sin_t;
         P[i_max * m + j_max] = -1 * sin_t;
 
-        // Perform the operation A(i) = P_t * A(i-1) * P
-        // corresponding to Jacobi iteration i
 
-        transpose(P, P_t, m);
-        MatMul(temp, P_t, A, m);
-        MatMul(A, temp, P, m);
+        // Corresponding to Jacobi iteration i :
+
+        // 1. Compute the eigen vectors by multiplying with V
+        MatMul(temp, V, P, m);
+        for (int i = 0; i < m; i++) {
+            for (int j = i + 1; j < m; j++) {
+                V[i * m + j] = temp[i * m + j];
+            }
+        }
+
+        // 2. Compute the eigen values by updating A by
+        // performing the operation A(i) = P_t * A(i-1) * P
+        MatMul(temp, A, P, m);
+        transpose(P, P, m);
+        MatMul(A, P, temp, m);
+
     }
+
+    free(P);
+    free(temp);
 
     // Store the generated eigen values in the vector
     for (int i = 0; i < m; i++) {
         E[i] = A[i * m + i];
     }
+
+    reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
 }
 
 void evd_classic_tol(struct matrix_t Xmat, struct vector_t evec, struct matrix_t Qmat, double tol) {
