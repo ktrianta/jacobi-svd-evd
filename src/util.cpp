@@ -41,9 +41,22 @@ void identity(double* P, int n) {
 }
 
 void transpose(double* P, double* Q, int n) {
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            Q[j * n + i] = P[i * n + j];
+    double temp;
+
+    // Swap for in-space transpose
+    if (P == Q) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < i; j++) {
+                temp = Q[i * n + j];
+                Q[i * n + j] = Q[j * n + i];
+                Q[j * n + i] = temp;
+            }
+        }
+    } else {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                Q[j * n + i] = P[i * n + j];
+            }
         }
     }
 }
