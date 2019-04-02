@@ -127,7 +127,7 @@ void evd_classic_tol(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t
         abs_a = 0.0;
         for (int i = 0; i < n; ++i) {
             for (int j = i + 1; j < n; ++j) {
-                double abs_ij = abs(A[i * n + j]);
+                double abs_ij = fabs(A[i * n + j]);
                 if (abs_ij > abs_a) {
                     abs_a = abs_ij;
                     p = i;
