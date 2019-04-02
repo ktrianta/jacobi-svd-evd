@@ -94,7 +94,7 @@ void evd_classic_tol(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t
     // A=QtXQ
     double* A = (double*)malloc(sizeof(double) * n * n);
 
-    double offA = 0, abs_a, eps, c, s;
+    double offA = 0, eps = 0, abs_a, c, s;
     int p, q;
 
     for (int i = 0; i < n; ++i) {
