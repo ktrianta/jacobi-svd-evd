@@ -20,7 +20,6 @@
  */
 void evd_classic(struct matrix_t A, struct matrix_t V, struct vector_t e, int epoch = 100);
 
-
 /**
  * Compute eigenvalue decomposition of a given symmetric, n times n matrix
  * using Jacobi rotations. This one is not bounded by the iterations but by a tolerance instead.
@@ -40,7 +39,6 @@ void evd_classic(struct matrix_t A, struct matrix_t V, struct vector_t e, int ep
  *@param tol, the tolerance we require. This is with regard to the off-diagonal norm.
  */
 void evd_classic_tol(struct matrix_t Xmat, struct vector_t evec, struct matrix_t Qmat, double tol);
-
 
 /**
  * Compute eigenvalue decomposition of a given symmetric, n times n matrix

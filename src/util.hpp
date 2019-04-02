@@ -1,6 +1,6 @@
 #pragma once
-#include "types.hpp"
 #include <float.h>
+#include "types.hpp"
 
 /**
  * Compare two double precision floating point values and return true if they
@@ -30,8 +30,7 @@ bool isclose(double x, double y, double eps = DBL_EPSILON);
  * @param[out] c Cosine value.
  * @param[out] s Sine value.
  */
-void sym_jacobi_coeffs(double x_ii, double x_ij, double x_jj, double* c,
-                       double* s);
+void sym_jacobi_coeffs(double x_ii, double x_ij, double x_jj, double* c, double* s);
 
 /**
  * Comparator function that returns 1 (true) if the first element comes before
@@ -89,5 +88,4 @@ void transpose(double* P, double* Q, int n);
  * if cmp_fn implements less-than operator, then the values will be ordered in
  * ascending order.
  */
-void reorder_decomposition(struct vector_t vals, struct matrix_t* matrices,
-                           int n_matrices, comparator cmp_fn);
+void reorder_decomposition(struct vector_t vals, struct matrix_t* matrices, int n_matrices, comparator cmp_fn);
