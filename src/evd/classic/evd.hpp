@@ -38,7 +38,7 @@ void evd_classic(struct matrix_t A, struct matrix_t V, struct vector_t e, int ep
  * X.
  *@param tol, the tolerance we require. This is with regard to the off-diagonal norm.
  */
-void evd_classic_tol(struct matrix_t Xmat, struct vector_t evec, struct matrix_t Qmat, double tol);
+void evd_classic_tol(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t evec, double tol);
 
 /**
  * Compute eigenvalue decomposition of a given symmetric, n times n matrix
