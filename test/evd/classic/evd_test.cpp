@@ -37,6 +37,6 @@ TEST(evd, random_square_matrix) {
     std::vector<double> e_expect = {12.71986, 5.78305, 2.09733, -5.60024};
 
     for (int i = 0; i < n; ++i) {
-        ASSERT_NEAR(e[i], e_expect[i], 1e-2);
+        ASSERT_NEAR(e[i], e_expect[i], 1e-7);
     }
 }
