@@ -86,7 +86,7 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struc
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
 }
 
-void evd_classic_tol(struct matrix_t Xmat,  struct matrix_t Qmat, struct vector_t evec, double tol) {
+void evd_classic_tol(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t evec, double tol) {
     const int n = Xmat.cols;
     double* X = Xmat.ptr;
     double* e = evec.ptr;
