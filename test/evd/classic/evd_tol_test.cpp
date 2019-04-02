@@ -1,8 +1,8 @@
+#include "evd.hpp"
 #include <math.h>
 #include <vector>
-#include "../src/evd.hpp"
-#include "../src/types.hpp"
 #include "gtest/gtest.h"
+#include "types.hpp"
 
 TEST(evd, identity_matrix) {
     size_t n = 10;

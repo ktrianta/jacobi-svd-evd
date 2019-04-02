@@ -1,9 +1,9 @@
-#include "../src/svd.hpp"
+#include "svd.hpp"
 #include <math.h>
 #include <random>
 #include <vector>
-#include "../src/types.hpp"
 #include "gtest/gtest.h"
+#include "types.hpp"
 
 TEST(svd, identity_matrix) {
     size_t n_rows = 10, n_cols = 10;
