@@ -86,7 +86,7 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struc
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
 }
 
-void evd_classic_tol(struct matrix_t Xmat, struct vector_t evec, struct matrix_t Qmat, double tol) {
+void evd_classic_tol(struct matrix_t Xmat,  struct matrix_t Qmat, struct vector_t evec, double tol) {
     const int n = Xmat.cols;
     double* X = Xmat.ptr;
     double* e = evec.ptr;
@@ -140,8 +140,10 @@ void evd_classic_tol(struct matrix_t Xmat, struct vector_t evec, struct matrix_t
 
         double A_ip, A_iq;
         for (int i = 0; i < n; ++i) {
-            Q[n * i + p] = c * Q[n * i + p] - s * Q[n * i + q];
-            Q[n * i + q] = s * Q[n * i + p] + c * Q[n * i + q];
+            double Q_ip = Q[n * i + p];
+            double Q_iq = Q[n * i + q];
+            Q[n * i + p] = c * Q_ip - s * Q_iq;
+            Q[n * i + q] = s * Q_ip + c * Q_iq;
 
             A_ip = A[n * i + p];
             A_iq = A[n * i + q];
@@ -167,6 +169,7 @@ void evd_classic_tol(struct matrix_t Xmat, struct vector_t evec, struct matrix_t
     for (int i = 0; i < n; ++i) {
         e[i] = A[n * i + i];
     }
+
     reorder_decomposition(evec, &Qmat, 1, greater);
     free(A);
 }
