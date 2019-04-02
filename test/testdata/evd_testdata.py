@@ -1,6 +1,7 @@
 import numpy as np
+import sys
 
-n = 4
+n = int(sys.argv[1])
 
 data = np.random.randint(0,10,size=(n,n))
 data = (data + data.T)/2

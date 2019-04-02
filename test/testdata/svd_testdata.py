@@ -1,7 +1,11 @@
 import numpy as np
+import sys
 
-n = 4
-m = 5
+n = int(sys.argv[1])
+if len(sys.argv) >= 3:
+    m = int(sys.argv[2])
+else:
+    m = n
 
 data = np.random.randint(0,10,size=(n,m))
 u, s, v = np.linalg.svd(data)
