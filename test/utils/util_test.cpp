@@ -1,9 +1,9 @@
-#include "../src/util.hpp"
+#include "util.hpp"
 #include <math.h>
 #include <random>
 #include <vector>
-#include "../src/types.hpp"
 #include "gtest/gtest.h"
+#include "types.hpp"
 
 TEST(util, isclose) {
     ASSERT_TRUE(isclose(0, 0)) << "basic sanity check";
