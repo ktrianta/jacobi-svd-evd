@@ -33,10 +33,11 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struc
 
         for (int i = 0; i < m; i++) {
             for (int j = i + 1; j < m; j++) {
-                if (fabs(A[i * m + j]) > val) {
+                alpha = fabs(A[i * m + j]);
+                if (alpha > val) {
                     i_max = i;
                     j_max = j;
-                    val = A[i * m + j];
+                    val = alpha;
                     is_not_diagonal = 1;
                 }
             }
