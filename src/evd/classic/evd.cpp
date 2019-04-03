@@ -173,7 +173,7 @@ void evd_classic_tol(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t
     reorder_decomposition(evec, &Qmat, 1, greater);
     free(A);
 }
-void evd_cyclic(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t evec, double tol) {
+void evd_cyclic_tol(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t evec, double tol) {
     const int n = Xmat.cols;
     double* X = Xmat.ptr;
     double* e = evec.ptr;

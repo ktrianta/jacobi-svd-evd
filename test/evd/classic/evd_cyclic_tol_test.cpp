@@ -4,7 +4,7 @@
 #include "gtest/gtest.h"
 #include "types.hpp"
 
-TEST(evd_cyclic, identity_matrix) {
+TEST(evd_cyclic_tol, identity_matrix) {
     size_t n = 10;
     std::vector<double> A(n * n, 0);
     for (int i = 0; i < n; ++i) {
@@ -22,7 +22,7 @@ TEST(evd_cyclic, identity_matrix) {
     }
 }
 
-TEST(evd_cyclic, random_square_matrix) {
+TEST(evd_cyclic_tol, random_square_matrix) {
     size_t n = 4;
     std::vector<double> A = {7.0, 3.0, 2.0, 1.0, 3.0, 9.0, -2.0, 4.0, 2.0, -2.0, -4.0, 2.0, 1.0, 4.0, 2.0, 3.0};
     std::vector<double> e(n);
@@ -41,7 +41,7 @@ TEST(evd_cyclic, random_square_matrix) {
     }
 }
 
-TEST(evd_cyclic, svd_eigvalues_crosscheck) {
+TEST(evd_cyclic_tol, svd_eigvalues_crosscheck) {
     size_t n = 5;
     std::vector<double> A = {
         2.000000000000000000e+00, 6.000000000000000000e+00, 4.000000000000000000e+00, 6.000000000000000000e+00,
@@ -68,7 +68,7 @@ TEST(evd_cyclic, svd_eigvalues_crosscheck) {
     }
 }
 
-TEST(evd_cyclic, eigenvector_check) {
+TEST(evd_cyclic_tol, eigenvector_check) {
     size_t n = 5;
     std::vector<double> A = {
         2.000000000000000000e+00, 6.000000000000000000e+00, 4.000000000000000000e+00, 6.000000000000000000e+00,
