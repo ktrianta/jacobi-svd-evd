@@ -1,6 +1,6 @@
-#include "evd.hpp"
 #include <math.h>
 #include <vector>
+#include "evd.hpp"
 #include "gtest/gtest.h"
 #include "types.hpp"
 

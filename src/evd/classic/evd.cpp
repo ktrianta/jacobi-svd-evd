@@ -210,8 +210,8 @@ void evd_cyclic(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t evec
     eps = tol * tol * eps;
 
     while (offA > eps) {
-        for(int p = 0; p < n;++p){
-            for(int q = p+1; q < n;++q){
+        for (int p = 0; p < n; ++p) {
+            for (int q = p + 1; q < n; ++q) {
                 sym_jacobi_coeffs(A[p * n + p], A[p * n + q], A[q * n + q], &c, &s);
 
                 double A_ip, A_iq;
@@ -251,7 +251,6 @@ void evd_cyclic(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t evec
     reorder_decomposition(evec, &Qmat, 1, greater);
     free(A);
 }
-
 
 void MatMul(double* P, double* Q, double* R, int n) {
     double sum = 0.0;
