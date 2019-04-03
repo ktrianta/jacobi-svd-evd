@@ -57,4 +57,4 @@ void evd_classic_tol(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t
  * order.  Columns of U form an orthonormal eigenbasis for the column space of
  * X.
  */
-void evd_cyclic(const double* const X, int n, double* e, double* Q);
+void evd_cyclic(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t evec, double tol);
