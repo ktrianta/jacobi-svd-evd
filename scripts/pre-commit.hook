@@ -45,7 +45,5 @@ EOF
 	exit 1
 fi
 
-staged_files=$(git diff --name-only --cached)
 scripts/format.sh
-git add ${staged_files}
 scripts/lint.sh
