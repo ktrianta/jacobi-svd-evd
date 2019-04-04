@@ -23,14 +23,14 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struct
 
     for (int i = 0; i < m; i++) {
         for (int j = i + 1; j < m; j++) {
-            if(A[i * m + j] != 0.0) {
+            if (A[i * m + j] != 0.0) {
               is_not_diagonal = 1;
               break;
             }
         }
     }
 
-    if(is_not_diagonal) {
+    if (is_not_diagonal) {
         for (int ep = 1; ep <= epoch; ep++) {
             double alpha, beta, cos_t, sin_t;
             for (int row = 0; row < m; row++) {
