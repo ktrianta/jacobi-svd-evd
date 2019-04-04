@@ -3,11 +3,11 @@
 
 /**
  * Compute eigenvalue decomposition of a given symmetric, n times n matrix
- * using Jacobi rotations.
+ * using cyclic Jacobi rotations.
  *
  * The algorithm is described in
  * http://web.mit.edu/ehliu/Public/sclark/Golub%20G.H.,%20Van%20Loan%20C.F.-%20Matrix%20Computations.pdf
- * as Algorithm 8.4.2.
+ * as Algorithm 8.4.3.
  *
  * @param A Matrix of size n times n, given in row-major order, whose EVD will
  * be computed.
@@ -16,7 +16,7 @@
  * @param[out] e Output array of size n. Eigenvalues of X will be written to
  * array e,
  * in order of ascending magnitude.
- * @param epoch Number of Jacobi iterations until convergence (default 100)
+ * @param epoch Number of Jacobi iterations until convergence (default 20)
  */
 void evd_cyclic(struct matrix_t A, struct matrix_t V, struct vector_t e, int epoch = 20);
 
