@@ -73,7 +73,7 @@ before_install:
     - eval "${MATRIX_EVAL}"
 
 install:
-    - pip install --user cpplint
+    - pip install --user cpplint numpy
 
 script:
     - chmod +x scripts/build.sh scripts/lint.sh
