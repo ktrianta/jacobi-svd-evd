@@ -4,7 +4,7 @@
 /**
  * Run an external command given by cmd, and return the results outputted to STDOUT as a string.
  */
-std::string exec(const char* cmd);
+std::string exec_cmd(const char* cmd);
 
 /**
  * Read a certain number of whitespace separated T types into the array beginning at out.

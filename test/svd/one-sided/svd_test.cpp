@@ -117,7 +117,7 @@ TEST(svd, random_matrix_big) {
     std::vector<double> V(k * n), VT_expect(k * n);
 
     std::string cmd = "python scripts/svd_testdata.py " + std::to_string(m) + " " + std::to_string(n);
-    std::stringstream ss(exec(cmd.c_str()));
+    std::stringstream ss(exec_cmd(cmd.c_str()));
     read_into(ss, &X[0], m * n);
     read_into(ss, &s_expect[0], k);
     read_into(ss, &U_expect[0], m * k);

@@ -7,7 +7,7 @@
 #include <string>
 
 // https://stackoverflow.com/questions/478898/how-do-i-execute-a-command-and-get-output-of-command-within-c-using-posix
-std::string exec(const char* cmd) {
+std::string exec_cmd(const char* cmd) {
     std::array<char, 128> buffer;
     std::string result;
     std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
