@@ -46,3 +46,17 @@ scripts/format.sh
 scripts/lint.sh
 ```
 bash scripts from the project root directory.
+
+## Debugging Utilities
+
+A C++ [pretty printing header library](https://github.com/louisdx/cxx-prettyprint)
+is being used to print debugging information. The library has been extended to handle
+our custom types, such as the matrix and vector types.
+
+Usage examples:
+
+```C++
+debug("Matrix X", matrix_x);                        // default 5 precision
+debug<10>("Matrix X", matrix_x);                    // 10 precision
+debug("Matrix X", matrix_x, "Vector v", vector_v);  // multiple arguments
+```
