@@ -2,6 +2,7 @@
 #include <math.h>
 #include <random>
 #include <vector>
+#include "debug.hpp"
 #include "gtest/gtest.h"
 #include "types.hpp"
 
@@ -18,6 +19,7 @@ TEST(svd, identity_matrix) {
     matrix_t Vmat = {&V[0], n_rows, n_rows};
 
     svd(Xmat, svec, Umat, Vmat, 100);
+
     for (size_t i = 0; i < n_rows; ++i) {
         ASSERT_DOUBLE_EQ(s[i], 1.0);
     }
@@ -38,6 +40,10 @@ TEST(svd, tall_matrix) {
     matrix_t Umat = {&U[0], m, n};
     matrix_t Vmat = {&V[0], n, n};
     svd(Xmat, svec, Umat, Vmat, 1000);
+
+    // Example debug usage
+    // debug("Xmat", Xmat);      // default 5 precision
+    // debug<10>("svec", svec);  // 10 precision
 
     ASSERT_NEAR(s[0], 59.88190459, 1e-8);
     ASSERT_NEAR(s[1], 4.915028256, 1e-8);
