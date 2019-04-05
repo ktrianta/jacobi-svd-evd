@@ -129,13 +129,13 @@ TEST(svd, random_matrix_big) {
     matrix_t Vmat = {&V[0], k, n};
     svd(Xmat, svec, Umat, Vmat, 100);
 
-    for (int i = 0; i < n; ++i) {
+    for (size_t i = 0; i < n; ++i) {
         ASSERT_NEAR(s[i], s_expect[i], 1e-7);
     }
-    for (int j = 0; j < n; ++j) {
+    for (size_t j = 0; j < n; ++j) {
         // equal up to sign
         int sign = (U[j] / U_expect[j] < 0) ? -1 : 1;
-        for (int i = 0; i < n; ++i) {
+        for (size_t i = 0; i < n; ++i) {
             ASSERT_NEAR(sign * U[i * n + j], U_expect[i * n + j], 1e-7);
             // transpose
             ASSERT_NEAR(sign * V[i * n + j], VT_expect[j * n + i], 1e-7);

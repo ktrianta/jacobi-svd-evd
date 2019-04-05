@@ -11,5 +11,5 @@ std::string exec_cmd(const char* cmd);
  */
 template <typename T>
 void read_into(std::istream& stream, T* out, size_t n) {
-    for (int i = 0; i < n; ++i) stream >> out[i];
+    for (size_t i = 0; i < n; ++i) stream >> out[i];
 }
