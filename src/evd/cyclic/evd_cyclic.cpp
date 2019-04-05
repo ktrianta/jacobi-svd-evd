@@ -24,8 +24,8 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struct
     for (int i = 0; i < m; i++) {
         for (int j = i + 1; j < m; j++) {
             if (A[i * m + j] != 0.0) {
-              is_not_diagonal = 1;
-              break;
+                is_not_diagonal = 1;
+                break;
             }
         }
     }

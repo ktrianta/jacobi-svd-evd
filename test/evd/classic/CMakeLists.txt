@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.9.2)
 add_executable(evd_test evd_test.cpp)
 add_executable(evd_tol_test evd_tol_test.cpp)
 
