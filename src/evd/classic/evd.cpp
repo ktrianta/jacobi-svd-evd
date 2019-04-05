@@ -18,8 +18,8 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struc
     // Build the auxiliary matrices
 
     double *P, *temp;
-    P = (double*)malloc(sizeof(double) * m * m);
-    temp = (double*)malloc(sizeof(double) * m * m);
+    P = (double*) malloc(sizeof(double) * m * m);
+    temp = (double*) malloc(sizeof(double) * m * m);
 
     for (int ep = 1; ep <= epoch; ep++) {
         double val = 0.0;
@@ -93,7 +93,7 @@ void evd_classic_tol(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t
     double* e = evec.ptr;
     double* Q = Qmat.ptr;
     // A=QtXQ
-    double* A = (double*)malloc(sizeof(double) * n * n);
+    double* A = (double*) malloc(sizeof(double) * n * n);
 
     double offA = 0, eps = 0, abs_a, c, s;
     int p, q;

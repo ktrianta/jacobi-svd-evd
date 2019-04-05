@@ -18,8 +18,8 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struct
     // Build the auxiliary matrices
 
     double *P, *temp;
-    P = (double*)malloc(sizeof(double) * m * m);
-    temp = (double*)malloc(sizeof(double) * m * m);
+    P = (double*) malloc(sizeof(double) * m * m);
+    temp = (double*) malloc(sizeof(double) * m * m);
 
     for (int i = 0; i < m; i++) {
         for (int j = i + 1; j < m; j++) {
@@ -88,7 +88,7 @@ void evd_cyclic_tol(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t 
     double* e = evec.ptr;
     double* Q = Qmat.ptr;
     // A=QtXQ
-    double* A = (double*)malloc(sizeof(double) * n * n);
+    double* A = (double*) malloc(sizeof(double) * n * n);
 
     double offA = 0, eps = 0, c, s;
 
