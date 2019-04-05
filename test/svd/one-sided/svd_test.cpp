@@ -1,7 +1,10 @@
 #include "svd.hpp"
 #include <math.h>
 #include <random>
+#include <sstream>
+#include <string>
 #include <vector>
+#include "../../test_utils.hpp"
 #include "debug.hpp"
 #include "gtest/gtest.h"
 #include "types.hpp"
@@ -84,7 +87,7 @@ TEST(svd, random_square_matrix) {
     }
 }
 
-TEST(svd, evd_eigvalues_crosscheck) {
+TEST(svd, svd_singvalues_crosscheck) {
     size_t n = 5;
     std::vector<double> X = {
         2.000000000000000000e+00, 6.000000000000000000e+00, 4.000000000000000000e+00, 6.000000000000000000e+00,
@@ -107,5 +110,41 @@ TEST(svd, evd_eigvalues_crosscheck) {
 
     for (size_t i = 0; i < n; ++i) {
         ASSERT_NEAR(s[i], s_expect[i], 1e-7);
+    }
+}
+
+TEST(svd, random_matrix_big) {
+    size_t m = 100;
+    size_t n = 78;
+    size_t k = std::min(m, n);
+    std::vector<double> X(m * n);
+    std::vector<double> s(k), s_expect(k);
+    std::vector<double> U(m * k), U_expect(m * k);
+    std::vector<double> V(k * n), VT_expect(k * n);
+
+    std::string cmd = "python scripts/svd_testdata.py " + std::to_string(m) + " " + std::to_string(n);
+    std::stringstream ss(exec_cmd(cmd.c_str()));
+    read_into(ss, &X[0], m * n);
+    read_into(ss, &s_expect[0], k);
+    read_into(ss, &U_expect[0], m * k);
+    read_into(ss, &VT_expect[0], k * n);
+
+    matrix_t Xmat = {&X[0], m, n};
+    vector_t svec = {&s[0], k};
+    matrix_t Umat = {&U[0], m, k};
+    matrix_t Vmat = {&V[0], k, n};
+    svd(Xmat, svec, Umat, Vmat, 100);
+
+    for (size_t i = 0; i < n; ++i) {
+        ASSERT_NEAR(s[i], s_expect[i], 1e-7);
+    }
+    for (size_t j = 0; j < n; ++j) {
+        // equal up to sign
+        int sign = (U[j] / U_expect[j] < 0) ? -1 : 1;
+        for (size_t i = 0; i < n; ++i) {
+            ASSERT_NEAR(sign * U[i * n + j], U_expect[i * n + j], 1e-7);
+            // transpose
+            ASSERT_NEAR(sign * V[i * n + j], VT_expect[j * n + i], 1e-7);
+        }
     }
 }
