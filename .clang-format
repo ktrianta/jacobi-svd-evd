@@ -3,7 +3,11 @@ BasedOnStyle: Google
 IndentWidth: 4
 
 Language: Cpp
+
 DerivePointerAlignment: false
 PointerAlignment: Left
+SpaceAfterCStyleCast: true
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens: ControlStatements
 
 ColumnLimit: 120
