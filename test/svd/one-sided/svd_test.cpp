@@ -1,14 +1,18 @@
 #include "svd.hpp"
 #include <math.h>
 #include <random>
+#include <sstream>
+#include <string>
 #include <vector>
+#include "../../test_utils.hpp"
+#include "debug.hpp"
 #include "gtest/gtest.h"
 #include "types.hpp"
 
 TEST(svd, identity_matrix) {
     size_t n_rows = 10, n_cols = 10;
     std::vector<double> X(n_rows * n_cols, 0);
-    for (int i = 0; i < n_rows; ++i) {
+    for (size_t i = 0; i < n_rows; ++i) {
         X[i * n_cols + i] = 1.0;
     }
     std::vector<double> s(n_rows), U(n_rows * n_cols), V(n_cols * n_cols);
@@ -18,10 +22,11 @@ TEST(svd, identity_matrix) {
     matrix_t Vmat = {&V[0], n_rows, n_rows};
 
     svd(Xmat, svec, Umat, Vmat, 100);
-    for (int i = 0; i < n_rows; ++i) {
+
+    for (size_t i = 0; i < n_rows; ++i) {
         ASSERT_DOUBLE_EQ(s[i], 1.0);
     }
-    for (int i = 0; i < n_rows * n_cols; ++i) {
+    for (size_t i = 0; i < n_rows * n_cols; ++i) {
         ASSERT_DOUBLE_EQ(X[i], U[i]);
         ASSERT_DOUBLE_EQ(X[i], V[i]);
     }
@@ -30,8 +35,8 @@ TEST(svd, identity_matrix) {
 TEST(svd, tall_matrix) {
     size_t m = 10, n = 6;
     std::vector<double> X(m * n), s(std::min(m, n)), U(m * n), V(n * n);
-    for (int i = 0; i < m; ++i)
-        for (int j = 0; j < n; ++j) X[n * i + j] = i + j;
+    for (size_t i = 0; i < m; ++i)
+        for (size_t j = 0; j < n; ++j) X[n * i + j] = i + j;
 
     matrix_t Xmat = {&X[0], m, n};
     vector_t svec = {&s[0], std::min(m, n)};
@@ -39,9 +44,13 @@ TEST(svd, tall_matrix) {
     matrix_t Vmat = {&V[0], n, n};
     svd(Xmat, svec, Umat, Vmat, 1000);
 
+    // Example debug usage
+    // debug("Xmat", Xmat);      // default 5 precision
+    // debug<10>("svec", svec);  // 10 precision
+
     ASSERT_NEAR(s[0], 59.88190459, 1e-8);
     ASSERT_NEAR(s[1], 4.915028256, 1e-8);
-    for (int i = 2; i < std::min(m, n); ++i) {
+    for (size_t i = 2; i < std::min(m, n); ++i) {
         ASSERT_NEAR(s[i], 0.0, 1e-8);
     }
 }
@@ -64,13 +73,13 @@ TEST(svd, random_square_matrix) {
                                     -0.81382255, -0.20755303, -0.94406926, 0.25623228};
     std::vector<double> VT_expect = {-0.93419518, -0.28848231, 0.20989835, 0.20286303, -0.91350772,
                                      -0.35263329, -0.29347223, 0.28684771, -0.9119169};
-    for (int i = 0; i < n; ++i) {
+    for (size_t i = 0; i < n; ++i) {
         ASSERT_NEAR(s[i], s_expect[i], 1e-7);
     }
-    for (int j = 0; j < n; ++j) {
+    for (size_t j = 0; j < n; ++j) {
         // equal up to sign
         int sign = (U[j] / U_expect[j] < 0) ? -1 : 1;
-        for (int i = 0; i < n; ++i) {
+        for (size_t i = 0; i < n; ++i) {
             ASSERT_NEAR(sign * U[i * n + j], U_expect[i * n + j], 1e-7);
             // transpose
             ASSERT_NEAR(sign * V[i * n + j], VT_expect[j * n + i], 1e-7);
@@ -78,7 +87,7 @@ TEST(svd, random_square_matrix) {
     }
 }
 
-TEST(svd, evd_eigvalues_crosscheck) {
+TEST(svd, svd_singvalues_crosscheck) {
     size_t n = 5;
     std::vector<double> X = {
         2.000000000000000000e+00, 6.000000000000000000e+00, 4.000000000000000000e+00, 6.000000000000000000e+00,
@@ -99,7 +108,43 @@ TEST(svd, evd_eigvalues_crosscheck) {
     std::vector<double> s_expect = {2.415032147975995969e+01, 5.881509290566617310e+00, 4.001355036163166012e+00,
                                     3.262428878677021693e+00, 1.007738346679503572e+00};
 
-    for (int i = 0; i < n; ++i) {
+    for (size_t i = 0; i < n; ++i) {
         ASSERT_NEAR(s[i], s_expect[i], 1e-7);
+    }
+}
+
+TEST(svd, random_matrix_big) {
+    size_t m = 100;
+    size_t n = 78;
+    size_t k = std::min(m, n);
+    std::vector<double> X(m * n);
+    std::vector<double> s(k), s_expect(k);
+    std::vector<double> U(m * k), U_expect(m * k);
+    std::vector<double> V(k * n), VT_expect(k * n);
+
+    std::string cmd = "python scripts/svd_testdata.py " + std::to_string(m) + " " + std::to_string(n);
+    std::stringstream ss(exec_cmd(cmd.c_str()));
+    read_into(ss, &X[0], m * n);
+    read_into(ss, &s_expect[0], k);
+    read_into(ss, &U_expect[0], m * k);
+    read_into(ss, &VT_expect[0], k * n);
+
+    matrix_t Xmat = {&X[0], m, n};
+    vector_t svec = {&s[0], k};
+    matrix_t Umat = {&U[0], m, k};
+    matrix_t Vmat = {&V[0], k, n};
+    svd(Xmat, svec, Umat, Vmat, 100);
+
+    for (size_t i = 0; i < n; ++i) {
+        ASSERT_NEAR(s[i], s_expect[i], 1e-7);
+    }
+    for (size_t j = 0; j < n; ++j) {
+        // equal up to sign
+        int sign = (U[j] / U_expect[j] < 0) ? -1 : 1;
+        for (size_t i = 0; i < n; ++i) {
+            ASSERT_NEAR(sign * U[i * n + j], U_expect[i * n + j], 1e-7);
+            // transpose
+            ASSERT_NEAR(sign * V[i * n + j], VT_expect[j * n + i], 1e-7);
+        }
     }
 }

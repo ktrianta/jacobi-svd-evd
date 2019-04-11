@@ -20,4 +20,4 @@
  * correspond to the ith singular value in s.
  * @param n_iter Number of diagonalization iterations to perform.
  */
-void svd(struct matrix_t X, struct vector_t s, struct matrix_t U, struct matrix_t V, int n_iter = 1000);
+void svd(struct matrix_t X, struct vector_t s, struct matrix_t U, struct matrix_t V, size_t n_iter = 1000);

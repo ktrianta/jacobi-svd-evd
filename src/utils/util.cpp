@@ -29,38 +29,6 @@ int greater(double x, double y) { return x > y; }
 
 double sign(double x) { return (x > 0.0) ? 1.0 : -1.0; }
 
-void identity(double* P, int n) {
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            if (i == j)
-                P[i * n + j] = 1.0;
-            else
-                P[i * n + j] = 0.0;
-        }
-    }
-}
-
-void transpose(double* P, double* Q, int n) {
-    double temp;
-
-    // Swap for in-space transpose
-    if (P == Q) {
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < i; j++) {
-                temp = Q[i * n + j];
-                Q[i * n + j] = Q[j * n + i];
-                Q[j * n + i] = temp;
-            }
-        }
-    } else {
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                Q[j * n + i] = P[i * n + j];
-            }
-        }
-    }
-}
-
 void reorder_decomposition(struct vector_t vals, struct matrix_t* matrices, int n_matrices, comparator cmp_fn) {
     double* s = vals.ptr;
     const int n_vals = vals.len;

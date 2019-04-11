@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.9.2)
+
 set(SOURCES
     svd.cpp
     svd.hpp
