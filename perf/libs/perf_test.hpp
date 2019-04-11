@@ -36,6 +36,18 @@
 #include <vector>
 #include "tsc_x86.h"
 
+/**
+ * A template variadic runtime measurement function which runs the given function with the given arguments a number
+ * of times, and returns all the measured cycle values. Before performing the actual benchmarking, this function runs
+ * the given function a couple of times to adjust the measured cycles.
+ *
+ * @tparam n_reps Number of times the function will run. This is also the size of the returned vector.
+ * @tparam cycles_required The code will be executed for at least this number of cycles. This reduces timing overhead
+ * when measuring small runtimes.
+ * @param fn Any function to benchmark.
+ * @param Args All the arguments to be passed when calling fn.
+ * @return std::vector containing n_reps many measured cycle values.
+ */
 template <size_t n_reps = 100, size_t cycles_required = static_cast<size_t>(1e7), typename Func, typename... Args>
 std::vector<double> measure_cycles(Func fn, Args... args) {
     double cycles = 0.;
