@@ -60,12 +60,8 @@ TEST(evd, svd_crosscheck) {
 
     evd_classic(Data_matr, E_vecs, E_vals, 100);
 
-    std::vector<double> e_expect = {
-        2.415032147975995969e+01,
-        4.001355036163166012e+00,
-        -1.007738346679503572e+00,
-        -3.262428878677021693e+00,
-        -5.881509290566617310e+00};
+    std::vector<double> e_expect = {2.415032147975995969e+01, 4.001355036163166012e+00, -1.007738346679503572e+00,
+                                    -3.262428878677021693e+00, -5.881509290566617310e+00};
 
     for (int i = 0; i < n; ++i) {
         ASSERT_NEAR(e[i], e_expect[i], 1e-7);
@@ -103,7 +99,7 @@ TEST(evd, eigenvector_check) {
     for (int j = 0; j < n; ++j) {
         int sign = (V[j] / V_expect[j] < 0) ? -1 : 1;
         for (int i = 0; i < n; ++i) {
-            ASSERT_NEAR(sign*V[n*i +j], V_expect[n*i+j], 1e-7);
+            ASSERT_NEAR(sign * V[n * i + j], V_expect[n * i + j], 1e-7);
         }
     }
 }
