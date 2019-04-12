@@ -7,8 +7,8 @@
 #include "types.hpp"
 #include "util.hpp"
 
-void matrix_frobenius(matrix_t m, double* norm, double* off_norm);
-void matrix_off_frobenius(matrix_t m, double* off_norm);
+static void matrix_frobenius(matrix_t m, double* norm, double* off_norm);
+static void matrix_off_frobenius(matrix_t m, double* off_norm);
 
 size_t svd(struct matrix_t Amat, struct vector_t svec, struct matrix_t Bmat, struct matrix_t Umat,
            struct matrix_t Vmat) {
@@ -92,7 +92,7 @@ size_t svd(struct matrix_t Amat, struct vector_t svec, struct matrix_t Bmat, str
     return iter;
 }
 
-void matrix_frobenius(matrix_t m, double* norm, double* off_norm) {
+static void matrix_frobenius(matrix_t m, double* norm, double* off_norm) {
     const size_t M = m.rows;
     const size_t N = m.cols;
     double* data = m.ptr;
@@ -113,7 +113,7 @@ void matrix_frobenius(matrix_t m, double* norm, double* off_norm) {
     *off_norm = sqrt(*off_norm);
 }
 
-void matrix_off_frobenius(matrix_t m, double* off_norm) {
+static void matrix_off_frobenius(matrix_t m, double* off_norm) {
     const size_t M = m.rows;
     const size_t N = m.cols;
     double* data = m.ptr;
