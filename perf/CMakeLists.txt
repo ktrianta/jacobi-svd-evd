@@ -7,3 +7,4 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -march=avx2 -mfma -fno-tree-
 
 add_subdirectory(libs)
 add_subdirectory(evd)
+add_subdirectory(svd)

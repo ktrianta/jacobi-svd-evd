@@ -32,6 +32,7 @@
  *  along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
+#include <string>
 #include <utility>
 #include <vector>
 #include "tsc_x86.h"
@@ -84,4 +85,18 @@ std::vector<double> measure_cycles(Func fn, Args... args) {
     }
 
     return cycles_vec;
+}
+
+/**
+ * Benchmark all the given functions using the same set of parameters.
+ */
+template <typename FuncType, typename... Args>
+void run_all(const std::vector<FuncType>& fn_vec, const std::vector<std::string>& fn_names, Args... args) {
+    assert(fn_vec.size() == fn_names.size());
+    for (size_t i = 0; i < fn_vec.size(); ++i) {
+        std::vector<double> cycles = measure_cycles(fn_vec[i], std::forward<Args>(args)...);
+        auto median_it = cycles.begin() + cycles.size() / 2;
+        std::nth_element(cycles.begin(), median_it, cycles.end());
+        std::cout << fn_names[i] << " requires " << *median_it << " cycles (median)" << std::endl;
+    }
 }
