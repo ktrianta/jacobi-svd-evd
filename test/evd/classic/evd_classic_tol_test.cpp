@@ -1,10 +1,10 @@
-#include "evd.hpp"
 #include <math.h>
 #include <vector>
+#include "evd_classic.hpp"
 #include "gtest/gtest.h"
 #include "types.hpp"
 
-TEST(evd, identity_matrix) {
+TEST(evd_tol, identity_matrix) {
     size_t n = 10;
     std::vector<double> A(n * n, 0);
     for (int i = 0; i < n; ++i) {
@@ -16,13 +16,13 @@ TEST(evd, identity_matrix) {
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
 
-    evd_classic(Data_matr, E_vecs, E_vals, 100);
+    evd_classic_tol(Data_matr, E_vecs, E_vals, 1e-7);
     for (int i = 0; i < n; ++i) {
         ASSERT_DOUBLE_EQ(e[i], 1.0);
     }
 }
 
-TEST(evd, random_square_matrix) {
+TEST(evd_tol, random_square_matrix) {
     size_t n = 4;
     std::vector<double> A = {7.0, 3.0, 2.0, 1.0, 3.0, 9.0, -2.0, 4.0, 2.0, -2.0, -4.0, 2.0, 1.0, 4.0, 2.0, 3.0};
     std::vector<double> e(n);
@@ -32,16 +32,16 @@ TEST(evd, random_square_matrix) {
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
 
-    evd_classic(Data_matr, E_vecs, E_vals, 100);
+    evd_classic_tol(Data_matr, E_vecs, E_vals, 1e-7);
 
     std::vector<double> e_expect = {12.71986, 5.78305, 2.09733, -5.60024};
 
     for (int i = 0; i < n; ++i) {
-        ASSERT_NEAR(e[i], e_expect[i], 1e-5);
+        ASSERT_NEAR(e[i], e_expect[i], 1e-2);
     }
 }
 
-TEST(evd, svd_crosscheck) {
+TEST(evd_tol, svd_eigvalues_crosscheck) {
     size_t n = 5;
     std::vector<double> A = {
         2.000000000000000000e+00, 6.000000000000000000e+00, 4.000000000000000000e+00, 6.000000000000000000e+00,
@@ -58,7 +58,7 @@ TEST(evd, svd_crosscheck) {
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
 
-    evd_classic(Data_matr, E_vecs, E_vals, 100);
+    evd_classic_tol(Data_matr, E_vecs, E_vals, 1e-7);
 
     std::vector<double> e_expect = {2.415032147975995969e+01, 4.001355036163166012e+00, -1.007738346679503572e+00,
                                     -3.262428878677021693e+00, -5.881509290566617310e+00};
@@ -68,7 +68,7 @@ TEST(evd, svd_crosscheck) {
     }
 }
 
-TEST(evd, eigenvector_check) {
+TEST(evd_tol, eigenvector_check) {
     size_t n = 5;
     std::vector<double> A = {
         2.000000000000000000e+00, 6.000000000000000000e+00, 4.000000000000000000e+00, 6.000000000000000000e+00,
@@ -85,7 +85,7 @@ TEST(evd, eigenvector_check) {
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
 
-    evd_classic(Data_matr, E_vecs, E_vals, 100);
+    evd_classic_tol(Data_matr, E_vecs, E_vals, 1e-7);
 
     std::vector<double> V_expect = {
         4.183471639051151714e-01,  4.111245337904025771e-02,  7.089492553079320691e-01,  -2.465472573146875179e-01,
