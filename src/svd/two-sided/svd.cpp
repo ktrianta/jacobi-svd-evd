@@ -10,10 +10,8 @@
 static void matrix_frobenius(matrix_t m, double* norm, double* off_norm);
 static void matrix_off_frobenius(matrix_t m, double* off_norm);
 
-size_t svd(struct matrix_t Amat, struct vector_t svec, struct matrix_t Bmat, struct matrix_t Umat,
-           struct matrix_t Vmat) {
+size_t svd(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, struct matrix_t Vmat) {
     assert(Amat.rows == Amat.cols);  // Matrix A should be square
-    assert(Amat.rows == svec.len);
     assert(Amat.rows == Bmat.rows && Amat.cols == Bmat.cols);
     assert(Amat.rows == Umat.rows && Amat.cols == Umat.cols);
     assert(Amat.rows == Vmat.rows && Amat.cols == Vmat.cols);
@@ -22,7 +20,6 @@ size_t svd(struct matrix_t Amat, struct vector_t svec, struct matrix_t Bmat, str
     const double tol = 1e-15;  // convergence tolerance
     const size_t n = Amat.rows;
     double* B = Bmat.ptr;
-    double* s = svec.ptr;
     double* U = Umat.ptr;
     double* V = Vmat.ptr;
     double norm = 0.0;      // frobenius norm of matrix
@@ -83,10 +80,6 @@ size_t svd(struct matrix_t Amat, struct vector_t svec, struct matrix_t Bmat, str
 
         matrix_off_frobenius(Bmat, &off_norm);
         iter += 1;
-    }
-
-    for (size_t i = 0; i < n; ++i) {
-        s[i] = B[n * i + i];
     }
 
     return iter;

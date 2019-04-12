@@ -37,18 +37,14 @@ TEST(two_sided_svd, identity_matrix) {
     for (size_t i = 0; i < n_rows; ++i) {
         X[i * n_cols + i] = 1.0;
     }
-    std::vector<double> s(n_rows), B(n_rows * n_cols), U(n_rows * n_cols), V(n_cols * n_cols);
-    vector_t svec = {&s[0], n_rows};
+    std::vector<double> B(n_rows * n_cols), U(n_rows * n_cols), V(n_cols * n_cols);
     matrix_t Xmat = {&X[0], n_rows, n_cols};
     matrix_t Bmat = {&B[0], n_rows, n_cols};
     matrix_t Umat = {&U[0], n_rows, n_cols};
     matrix_t Vmat = {&V[0], n_rows, n_rows};
 
-    svd(Xmat, svec, Bmat, Umat, Vmat);
+    svd(Xmat, Bmat, Umat, Vmat);
 
-    for (size_t i = 0; i < n_rows; ++i) {
-        ASSERT_DOUBLE_EQ(s[i], 1.0);
-    }
     for (size_t i = 0; i < n_rows * n_cols; ++i) {
         ASSERT_DOUBLE_EQ(X[i], B[i]);
         ASSERT_DOUBLE_EQ(X[i], V[i]);
@@ -57,7 +53,7 @@ TEST(two_sided_svd, identity_matrix) {
 
 TEST(two_sided_svd, random_square_matrix) {
     size_t n = 3;
-    std::vector<double> s(n), B(n * n), U(n * n), V(n * n);
+    std::vector<double> B(n * n), U(n * n), V(n * n);
     std::vector<double> X = {1.22214449, 0.20082589, -0.75672479, 1.07593684, 0.20025264,
                              0.38234639, 0.07532444, 1.06219307,  0.10030849};
     std::vector<double> s_expect = {1.7139574, 1.0490895, 0.74584282};
@@ -66,13 +62,12 @@ TEST(two_sided_svd, random_square_matrix) {
     std::vector<double> VT_expect = {-0.93419518, -0.28848231, 0.20989835,  0.20286303, -0.91350772,
                                      -0.35263329, 0.29347223,  -0.28684771, 0.9119169};
 
-    vector_t svec = {&s[0], n};
     matrix_t Xmat = {&X[0], n, n};
     matrix_t Bmat = {&B[0], n, n};
     matrix_t Umat = {&U[0], n, n};
     matrix_t Vmat = {&V[0], n, n};
 
-    svd(Xmat, svec, Bmat, Umat, Vmat);
+    svd(Xmat, Bmat, Umat, Vmat);
 
     for (size_t i = 0; i < n; ++i) {
         ASSERT_NEAR(B[i * n + i], s_expect[i], 1e-7);
@@ -98,21 +93,20 @@ TEST(two_sided_svd, svd_singvalues_crosscheck) {
         5.500000000000000000e+00, 6.000000000000000000e+00, 1.000000000000000000e+00, 2.000000000000000000e+00,
         4.500000000000000000e+00, 4.500000000000000000e+00, 4.000000000000000000e+00, 2.000000000000000000e+00,
         7.000000000000000000e+00};
-    std::vector<double> s(n), B(n * n), U(n * n), V(n * n);
+    std::vector<double> B(n * n), U(n * n), V(n * n);
 
     matrix_t Xmat = {&X[0], n, n};
-    vector_t svec = {&s[0], n};
     matrix_t Bmat = {&B[0], n, n};
     matrix_t Umat = {&U[0], n, n};
     matrix_t Vmat = {&V[0], n, n};
 
-    svd(Xmat, svec, Bmat, Umat, Vmat);
+    svd(Xmat, Bmat, Umat, Vmat);
 
     std::vector<double> s_expect = {2.415032147975995969e+01, 5.881509290566617310e+00, 4.001355036163166012e+00,
                                     3.262428878677021693e+00, 1.007738346679503572e+00};
 
     for (size_t i = 0; i < n; ++i) {
-        ASSERT_NEAR(s[i], s_expect[i], 1e-7);
+        ASSERT_NEAR(B[i * n + i], s_expect[i], 1e-7);
     }
 }
 
@@ -120,7 +114,7 @@ TEST(two_sided_svd, random_matrix_big) {
     size_t n = 100;
     std::vector<double> X(n * n);
     std::vector<double> B(n * n);
-    std::vector<double> s(n), s_expect(n);
+    std::vector<double> s_expect(n);
     std::vector<double> U(n * n), U_expect(n * n);
     std::vector<double> V(n * n), VT_expect(n * n);
 
@@ -132,14 +126,13 @@ TEST(two_sided_svd, random_matrix_big) {
     read_into(ss, &VT_expect[0], n * n);
 
     matrix_t Xmat = {&X[0], n, n};
-    vector_t svec = {&s[0], n};
     matrix_t Bmat = {&B[0], n, n};
     matrix_t Umat = {&U[0], n, n};
     matrix_t Vmat = {&V[0], n, n};
-    svd(Xmat, svec, Bmat, Umat, Vmat);
+    svd(Xmat, Bmat, Umat, Vmat);
 
     for (size_t i = 0; i < n; ++i) {
-        ASSERT_NEAR(s[i], s_expect[i], 1e-7);
+        ASSERT_NEAR(B[i * n + i], s_expect[i], 1e-7);
     }
     for (size_t j = 0; j < n; ++j) {
         // equal up to sign
@@ -151,4 +144,3 @@ TEST(two_sided_svd, random_matrix_big) {
         }
     }
 }
-
