@@ -67,7 +67,7 @@ std::vector<double> measure_cycles(Func fn, Args... args) {
         }
         end = stop_tsc(start);
 
-        cycles = (double)end;
+        cycles = (double) end;
         multiplier = (cycles_required) / (cycles);
     } while (multiplier > 2);
 
@@ -80,7 +80,7 @@ std::vector<double> measure_cycles(Func fn, Args... args) {
             fn(std::forward<Args>(args)...);
         }
         end = stop_tsc(start);
-        cycles = ((double)end) / num_runs;
+        cycles = ((double) end) / num_runs;
         cycles_vec.push_back(cycles);
     }
 

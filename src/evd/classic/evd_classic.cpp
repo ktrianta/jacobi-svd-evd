@@ -1,38 +1,41 @@
 #include "evd_classic.hpp"
 #include <math.h>
 #include <stdlib.h>
+#include <cassert>
+#include "matrix.hpp"
 #include "types.hpp"
 #include "util.hpp"
 
-void MatMul(double*, double*, double*, int);
-
 void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
-    double* A = Data_matr.ptr;
-    const int m = Data_matr.rows;
-    double* V = Eigen_vectors.ptr;
-    identity(V, m);
+    assert(Data_matr.rows == Data_matr.cols);
 
+    double* A = Data_matr.ptr;
+    double* V = Eigen_vectors.ptr;
     double* E = Eigen_values.ptr;
+    const size_t m = Data_matr.rows;
+
+    matrix_identity(Eigen_vectors);
+
     int is_not_diagonal = 0;
 
     // Build the auxiliary matrices
 
     double *P, *temp;
-    P = (double*)malloc(sizeof(double) * m * m);
-    temp = (double*)malloc(sizeof(double) * m * m);
+    P = (double*) malloc(sizeof(double) * m * m);
+    temp = (double*) malloc(sizeof(double) * m * m);
 
     for (int ep = 1; ep <= epoch; ep++) {
         double val = 0.0;
         int i_max, j_max;
         double alpha, beta, cos_t, sin_t;
 
-        identity(P, m);
+        matrix_identity({P, m, m});
 
         // Find the larget non-diagonal element in the
         // upper triangular matrix
 
-        for (int i = 0; i < m; i++) {
-            for (int j = i + 1; j < m; j++) {
+        for (size_t i = 0; i < m; i++) {
+            for (size_t j = i + 1; j < m; j++) {
                 alpha = fabs(A[i * m + j]);
                 if (alpha > val) {
                     i_max = i;
@@ -62,25 +65,25 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struc
         // Corresponding to Jacobi iteration i :
 
         // 1. Compute the eigen vectors by multiplying with V
-        MatMul(temp, V, P, m);
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < m; j++) {
+        matrix_mult({temp, m, m}, {V, m, m}, {P, m, m});
+        for (size_t i = 0; i < m; i++) {
+            for (size_t j = 0; j < m; j++) {
                 V[i * m + j] = temp[i * m + j];
             }
         }
 
         // 2. Compute the eigen values by updating A by
         // performing the operation A(i) = P_t * A(i-1) * P
-        MatMul(temp, A, P, m);
-        transpose(P, P, m);
-        MatMul(A, P, temp, m);
+        matrix_mult({temp, m, m}, {A, m, m}, {P, m, m});
+        matrix_transpose({P, m, m}, {P, m, m});
+        matrix_mult({A, m, m}, {P, m, m}, {temp, m, m});
     }
 
     free(P);
     free(temp);
 
     // Store the generated eigen values in the vector
-    for (int i = 0; i < m; i++) {
+    for (size_t i = 0; i < m; i++) {
         E[i] = A[i * m + i];
     }
 
@@ -93,7 +96,7 @@ void evd_classic_tol(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t
     double* e = evec.ptr;
     double* Q = Qmat.ptr;
     // A=QtXQ
-    double* A = (double*)malloc(sizeof(double) * n * n);
+    double* A = (double*) malloc(sizeof(double) * n * n);
 
     double offA = 0, eps = 0, abs_a, c, s;
     int p, q;
@@ -173,17 +176,4 @@ void evd_classic_tol(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t
 
     reorder_decomposition(evec, &Qmat, 1, greater);
     free(A);
-}
-
-void MatMul(double* P, double* Q, double* R, int n) {
-    double sum = 0.0;
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            for (int k = 0; k < n; k++) {
-                sum += Q[i * n + k] * R[k * n + j];
-            }
-            P[i * n + j] = sum;
-            sum = 0.0;
-        }
-    }
 }

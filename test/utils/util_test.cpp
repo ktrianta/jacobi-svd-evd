@@ -63,9 +63,9 @@ TEST(util, reorder_decomposition) {
     std::vector<double> orig_mats[3] = {std::vector<double>(n_rows[0] * n_cols),
                                         std::vector<double>(n_rows[1] * n_cols),
                                         std::vector<double>(n_rows[2] * n_cols)};
-    for (int i = 0; i < n_cols; ++i) {
-        for (int j = 0; j < 3; ++j) {
-            for (int k = 0; k < n_rows[j]; ++k) {
+    for (size_t i = 0; i < n_cols; ++i) {
+        for (size_t j = 0; j < 3; ++j) {
+            for (size_t k = 0; k < n_rows[j]; ++k) {
                 orig_mats[j][k * n_cols + i] = i;
             }
         }
@@ -76,9 +76,9 @@ TEST(util, reorder_decomposition) {
     std::random_shuffle(s_copy.begin(), s_copy.end());
     std::vector<double> copy_mats[3] = {std::vector<double>(orig_mats[0]), std::vector<double>(orig_mats[1]),
                                         std::vector<double>(orig_mats[2])};
-    for (int i = 0; i < n_cols; ++i) {
-        for (int j = 0; j < 3; ++j) {
-            for (int k = 0; k < n_rows[j]; ++k) {
+    for (size_t i = 0; i < n_cols; ++i) {
+        for (size_t j = 0; j < 3; ++j) {
+            for (size_t k = 0; k < n_rows[j]; ++k) {
                 copy_mats[j][k * n_cols + i] = orig_mats[j][k * n_cols + s_copy[i]];
             }
         }
@@ -92,12 +92,12 @@ TEST(util, reorder_decomposition) {
     reorder_decomposition(svec, matrices, 3, less);
 
     // assert that we recover the original ordering in every cell.
-    for (int i = 0; i < n_cols; ++i) {
+    for (size_t i = 0; i < n_cols; ++i) {
         ASSERT_DOUBLE_EQ(s[i], s_copy[i]) << "singular values are ordered";
     }
-    for (int i = 0; i < n_cols; ++i) {
-        for (int j = 0; j < 3; ++j) {
-            for (int k = 0; k < n_rows[j]; ++k) {
+    for (size_t i = 0; i < n_cols; ++i) {
+        for (size_t j = 0; j < 3; ++j) {
+            for (size_t k = 0; k < n_rows[j]; ++k) {
                 ASSERT_DOUBLE_EQ(orig_mats[j][k * n_cols + i], copy_mats[j][k * n_cols + i])
                     << "columns are in the same ordering";
             }

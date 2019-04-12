@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.9.2)
 set(SOURCES
     evd_classic.cpp
     evd_classic.hpp

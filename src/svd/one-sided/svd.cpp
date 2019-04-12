@@ -4,11 +4,14 @@
 #include "types.hpp"
 #include "util.hpp"
 
-void svd(struct matrix_t Xmat, struct vector_t svec, struct matrix_t Umat, struct matrix_t Vmat, int n_iter) {
-    const int m = Xmat.rows;
-    const int n = Xmat.cols;
-    const int n_singular_vals = svec.len;
+void svd(struct matrix_t Xmat, struct vector_t svec, struct matrix_t Umat, struct matrix_t Vmat, size_t n_iter) {
+    const size_t m = Xmat.rows;
+    const size_t n = Xmat.cols;
+    const size_t n_singular_vals = svec.len;
 
+    assert(m > 0);
+    assert(n > 0);
+    assert(n_singular_vals > 0);
     assert(((m < n) ? m : n) == n_singular_vals);
     assert(m == Umat.rows);
     assert(n == Umat.cols);
@@ -20,13 +23,13 @@ void svd(struct matrix_t Xmat, struct vector_t svec, struct matrix_t Umat, struc
     double* U = Umat.ptr;
     double* V = Vmat.ptr;
 
-    for (int i = 0; i < m; ++i) {
-        for (int j = 0; j < n; ++j) {
+    for (size_t i = 0; i < m; ++i) {
+        for (size_t j = 0; j < n; ++j) {
             U[n * i + j] = X[n * i + j];
         }
     }
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
+    for (size_t i = 0; i < n; ++i) {
+        for (size_t j = 0; j < n; ++j) {
             V[n * i + j] = 0.0;
             if (i == j) {
                 V[n * i + j] = 1.0;
@@ -34,11 +37,11 @@ void svd(struct matrix_t Xmat, struct vector_t svec, struct matrix_t Umat, struc
         }
     }
 
-    while (n_iter--) {
-        for (int i = 0; i < n - 1; ++i) {
-            for (int j = i + 1; j < n; ++j) {
+    for (size_t iter = 0; iter < n_iter; ++iter) {
+        for (size_t i = 0; i < n - 1; ++i) {
+            for (size_t j = i + 1; j < n; ++j) {
                 double dot_ii = 0, dot_jj = 0, dot_ij = 0;
-                for (int k = 0; k < m; ++k) {
+                for (size_t k = 0; k < m; ++k) {
                     dot_ii += U[n * k + i] * U[n * k + i];
                     dot_ij += U[n * k + i] * U[n * k + j];
                     dot_jj += U[n * k + j] * U[n * k + j];
@@ -46,13 +49,13 @@ void svd(struct matrix_t Xmat, struct vector_t svec, struct matrix_t Umat, struc
 
                 double cosine, sine;
                 sym_jacobi_coeffs(dot_ii, dot_ij, dot_jj, &cosine, &sine);
-                for (int k = 0; k < m; ++k) {
+                for (size_t k = 0; k < m; ++k) {
                     double left = cosine * U[n * k + i] - sine * U[n * k + j];
                     double right = sine * U[n * k + i] + cosine * U[n * k + j];
                     U[n * k + i] = left;
                     U[n * k + j] = right;
                 }
-                for (int k = 0; k < n; ++k) {
+                for (size_t k = 0; k < n; ++k) {
                     double left = cosine * V[n * k + i] - sine * V[n * k + j];
                     double right = sine * V[n * k + i] + cosine * V[n * k + j];
                     V[n * k + i] = left;
@@ -62,9 +65,9 @@ void svd(struct matrix_t Xmat, struct vector_t svec, struct matrix_t Umat, struc
         }
     }
 
-    for (int i = 0; i < n; ++i) {
+    for (size_t i = 0; i < n; ++i) {
         double sigma = 0.0;
-        for (int k = 0; k < m; ++k) {
+        for (size_t k = 0; k < m; ++k) {
             sigma += U[n * k + i] * U[n * k + i];
         }
         sigma = sqrt(sigma);
@@ -73,7 +76,7 @@ void svd(struct matrix_t Xmat, struct vector_t svec, struct matrix_t Umat, struc
             s[i] = sigma;
         }
 
-        for (int k = 0; k < m; ++k) {
+        for (size_t k = 0; k < m; ++k) {
             U[n * k + i] /= sigma;
         }
     }

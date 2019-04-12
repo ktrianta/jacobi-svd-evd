@@ -1,4 +1,5 @@
 #include <math.h>
+
 #include <vector>
 #include "evd_classic.hpp"
 #include "gtest/gtest.h"
@@ -7,7 +8,7 @@
 TEST(evd_tol, identity_matrix) {
     size_t n = 10;
     std::vector<double> A(n * n, 0);
-    for (int i = 0; i < n; ++i) {
+    for (size_t i = 0; i < n; ++i) {
         A[i * n + i] = 1.0;
     }
     std::vector<double> e(n);
@@ -17,7 +18,7 @@ TEST(evd_tol, identity_matrix) {
     matrix_t E_vecs = {&V[0], n, n};
 
     evd_classic_tol(Data_matr, E_vecs, E_vals, 1e-7);
-    for (int i = 0; i < n; ++i) {
+    for (size_t i = 0; i < n; ++i) {
         ASSERT_DOUBLE_EQ(e[i], 1.0);
     }
 }
@@ -36,7 +37,7 @@ TEST(evd_tol, random_square_matrix) {
 
     std::vector<double> e_expect = {12.71986, 5.78305, 2.09733, -5.60024};
 
-    for (int i = 0; i < n; ++i) {
+    for (size_t i = 0; i < n; ++i) {
         ASSERT_NEAR(e[i], e_expect[i], 1e-2);
     }
 }
@@ -63,7 +64,7 @@ TEST(evd_tol, svd_eigvalues_crosscheck) {
     std::vector<double> e_expect = {2.415032147975995969e+01, 4.001355036163166012e+00, -1.007738346679503572e+00,
                                     -3.262428878677021693e+00, -5.881509290566617310e+00};
 
-    for (int i = 0; i < n; ++i) {
+    for (size_t i = 0; i < n; ++i) {
         ASSERT_NEAR(e[i], e_expect[i], 1e-7);
     }
 }
@@ -96,9 +97,9 @@ TEST(evd_tol, eigenvector_check) {
         4.054155274334266257e-01,  -8.939067476844743121e-01, -4.386986686600086172e-02, 1.219523138088823705e-01,
         1.406131021557419369e-01};
 
-    for (int j = 0; j < n; ++j) {
+    for (size_t j = 0; j < n; ++j) {
         int sign = (V[j] / V_expect[j] < 0) ? -1 : 1;
-        for (int i = 0; i < n; ++i) {
+        for (size_t i = 0; i < n; ++i) {
             ASSERT_NEAR(sign * V[n * i + j], V_expect[n * i + j], 1e-7);
         }
     }
