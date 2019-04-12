@@ -8,7 +8,7 @@
 #include "types.hpp"
 #include "../../test_utils.hpp"
 
-TEST(svd, usvd) {
+TEST(two_sided_svd, usvd) {
     std::vector<double> X;
     struct svd_2x2_params params;
 
@@ -31,7 +31,7 @@ TEST(svd, usvd) {
     ASSERT_NEAR(params.d2, 1.93243, 1e-7);
 }
 
-TEST(svd, identity_matrix) {
+TEST(two_sided_svd, identity_matrix) {
     size_t n_rows = 100, n_cols = 100;
     std::vector<double> X(n_rows * n_cols, 0);
     for (size_t i = 0; i < n_rows; ++i) {
@@ -55,7 +55,7 @@ TEST(svd, identity_matrix) {
     }
 }
 
-TEST(svd, random_square_matrix) {
+TEST(two_sided_svd, random_square_matrix) {
     size_t n = 3;
     std::vector<double> s(n), B(n * n), U(n * n), V(n * n);
     std::vector<double> X = {1.22214449, 0.20082589, -0.75672479, 1.07593684, 0.20025264,
@@ -88,7 +88,7 @@ TEST(svd, random_square_matrix) {
     }
 }
 
-TEST(svd, evd_eigvalues_crosscheck) {
+TEST(two_sided_svd, svd_singvalues_crosscheck) {
     size_t n = 5;
     std::vector<double> X = {
         2.000000000000000000e+00, 6.000000000000000000e+00, 4.000000000000000000e+00, 6.000000000000000000e+00,
@@ -116,7 +116,7 @@ TEST(svd, evd_eigvalues_crosscheck) {
     }
 }
 
-TEST(svd, random_matrix_big) {
+TEST(two_sided_svd, random_matrix_big) {
     size_t n = 100;
     std::vector<double> X(n * n);
     std::vector<double> B(n * n);
