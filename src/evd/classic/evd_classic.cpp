@@ -1,11 +1,11 @@
 #include "evd_classic.hpp"
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 #include <cassert>
 #include "matrix.hpp"
 #include "types.hpp"
 #include "util.hpp"
-#include <string.h>
 
 void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
     assert(Data_matr.rows == Data_matr.cols);

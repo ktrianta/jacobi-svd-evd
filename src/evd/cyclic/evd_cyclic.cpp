@@ -1,6 +1,7 @@
 #include "evd_cyclic.hpp"
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 #include <cassert>
 #include "matrix.hpp"
 #include "types.hpp"
