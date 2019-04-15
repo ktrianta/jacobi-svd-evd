@@ -5,11 +5,15 @@
 #include "matrix.hpp"
 #include "types.hpp"
 #include "util.hpp"
+#include <string.h>
 
 void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
     assert(Data_matr.rows == Data_matr.cols);
 
-    double* A = Data_matr.ptr;
+    // Create a copy of the matrix to prevent modification of the original matrix
+    double* A = (double*) malloc(sizeof(double) * Data_matr.rows * Data_matr.cols);
+    memcpy(A, Data_matr.ptr, Data_matr.rows * Data_matr.cols * sizeof(double));
+
     double* V = Eigen_vectors.ptr;
     double* E = Eigen_values.ptr;
     const size_t m = Data_matr.rows;
@@ -86,6 +90,7 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struc
     for (size_t i = 0; i < m; i++) {
         E[i] = A[i * m + i];
     }
+    free(A);
 
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
 }
