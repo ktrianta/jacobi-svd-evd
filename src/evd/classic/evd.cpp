@@ -1,6 +1,7 @@
 #include "evd.hpp"
 #include <math.h>
 #include <stdlib.h>
+#include<stdio.h>
 #include <cassert>
 #include "matrix.hpp"
 #include "types.hpp"
@@ -16,9 +17,10 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struc
 
     matrix_identity(Eigen_vectors);
 
+    int is_not_diagonal = 0;
+
     for (int ep = 1; ep <= epoch; ep++) {
         double val = 0.0;
-        int is_not_diagonal = 0;
         int i_max, j_max;
         double alpha, beta, cos_t, sin_t;
 
@@ -27,10 +29,11 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struc
 
         for (size_t i = 0; i < m; i++) {
             for (size_t j = i + 1; j < m; j++) {
-                if (fabs(A[i * m + j]) > val) {
+                alpha = fabs(A[i * m + j]);
+                if (alpha > val) {
                     i_max = i;
                     j_max = j;
-                    val = A[i * m + j];
+                    val = alpha;
                     is_not_diagonal = 1;
                 }
             }
@@ -38,7 +41,7 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struc
 
         if (!is_not_diagonal) break;
 
-        // Compute cos_t and sin_t for the rotation
+        // Compute cos_t and sin_t for the rotation matrix
 
         alpha = 2.0 * sign(A[i_max * m + i_max] - A[j_max * m + j_max]) * A[i_max * m + j_max];
         beta = fabs(A[i_max * m + i_max] - A[j_max * m + j_max]);
@@ -47,25 +50,29 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struc
         sin_t = sign(alpha) * sqrt(1 - cos_t * cos_t);
 
         // Corresponding to Jacobi iteration i :
+        // Corresponding to the largest off-diagonal entry
 
         for (size_t i = 0; i < m; i++) {
-            // Compute the eigen values by updating the rows and columns
-            // corresponding to the largest off-diagonal entry until convergence
+            // Compute the eigen values by updating the rows until convergence
+            double A_i_imax = A[m * i + i_max];
 
-            double A_i_imax = A[m * i + i_max], A_imax_i = A[m * i_max + i];
+            A[m * i + i_max] = cos_t * A[m * i + i_max] + sin_t * A[m * i + j_max];
+            A[m * i + j_max] = cos_t * A[m * i + j_max] - sin_t * A_i_imax;
+        }
 
-            A[m * i + i_max] = cos_t * A[m * i + i_max] - sin_t * A[m * i + j_max];
-            A[m * i + j_max] = sin_t * A_i_imax + cos_t * A[m * i + j_max];
-            A[m * i_max + i] = cos_t * A[m * i_max + i] - sin_t * A[m * j_max + i];
-            A[m * j_max + i] = sin_t * A_imax_i + cos_t * A[m * j_max + i];
+        for (size_t i = 0; i < m; i++) {
+            // Compute the eigen values by updating the rows until convergence
+            double A_imax_i = A[m * i_max + i];
+            A[m * i_max + i] = cos_t * A[m * i_max + i] + sin_t * A[m * j_max + i];
+            A[m * j_max + i] = cos_t * A[m * j_max + i] - sin_t * A_imax_i;
 
             // Compute the eigen vectors similarly by updating the eigen vector matrix
-
             double V_i_imax = V[m * i + i_max];
 
-            V[m * i + i_max] = cos_t * V[m * i + i_max] - sin_t * V[m * i + j_max];
-            V[m * i + j_max] = sin_t * V_i_imax + cos_t * V[m * i + j_max];
+            V[m * i + i_max] = cos_t * V[m * i + i_max] + sin_t * V[m * i + j_max];
+            V[m * i + j_max] = cos_t * V[m * i + j_max] - sin_t * V_i_imax;
         }
+        is_not_diagonal = 0;
     }
 
     // Store the generated eigen values in the vector

@@ -35,7 +35,6 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struct
 
         for (size_t row = 0; row < m; row++) {
             for (size_t col = row + 1; col < m; col++) {
-
                 // Compute cos_t and sin_t for the rotation
 
                 alpha = 2.0 * sign(A[row * m + row] - A[col * m + col]) * A[row * m + col];
@@ -60,7 +59,6 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struct
                     A[m * col + i] = cos_t * A[m * col + i] - sin_t * A_r_i;
 
                     // Compute the eigen vectors similarly by updating the eigen vector matrix
-
                     double V_i_r = V[m * i + row];
                     V[m * i + row] = cos_t * V[m * i + row] + sin_t * V[m * i + col];
                     V[m * i + col] = cos_t * V[m * i + col] - sin_t * V_i_r;
