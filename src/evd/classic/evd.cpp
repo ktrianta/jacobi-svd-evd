@@ -49,7 +49,6 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struc
         // Corresponding to Jacobi iteration i :
 
         for (size_t i = 0; i < m; i++) {
-
             // Compute the eigen values by updating the rows and columns
             // corresponding to the largest off-diagonal entry until convergence
 
@@ -57,7 +56,6 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struc
 
             A[m * i + i_max] = cos_t * A[m * i + i_max] - sin_t * A[m * i + j_max];
             A[m * i + j_max] = sin_t * A_i_imax + cos_t * A[m * i + j_max];
-
             A[m * i_max + i] = cos_t * A[m * i_max + i] - sin_t * A[m * j_max + i];
             A[m * j_max + i] = sin_t * A_imax_i + cos_t * A[m * j_max + i];
 
@@ -67,7 +65,6 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struc
 
             V[m * i + i_max] = cos_t * V[m * i + i_max] - sin_t * V[m * i + j_max];
             V[m * i + j_max] = sin_t * V_i_imax + cos_t * V[m * i + j_max];
-
         }
     }
 
