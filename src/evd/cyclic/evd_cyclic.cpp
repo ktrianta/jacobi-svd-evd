@@ -18,12 +18,6 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struct
 
     int is_not_diagonal = 0;
 
-    // Build the auxiliary matrices
-
-    double *P, *temp;
-    P = (double*) malloc(sizeof(double) * m * m);
-    temp = (double*) malloc(sizeof(double) * m * m);
-
     for (size_t i = 0; i < m; i++) {
         for (size_t j = i + 1; j < m; j++) {
             if (A[i * m + j] != 0.0) {
@@ -38,9 +32,8 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struct
             double alpha, beta, cos_t, sin_t;
             for (size_t row = 0; row < m; row++) {
                 for (size_t col = row + 1; col < m; col++) {
-                    matrix_identity({P, m, m});
 
-                    // Compute cos_t and sin_t for the rotation matrix
+                    // Compute cos_t and sin_t for the rotation
 
                     alpha = 2.0 * sign(A[row * m + row] - A[col * m + col]) * A[row * m + col];
                     beta = fabs(A[row * m + row] - A[col * m + col]);
@@ -48,34 +41,33 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struct
                     // sin_t = (1 / 2*cos_t) * (alpha / sqrt(alpha*alpha + beta*beta));
                     sin_t = sign(alpha) * sqrt(1 - cos_t * cos_t);
 
-                    // Initialize the rotation parameters in the identity matrix
-
-                    P[row * m + row] = P[col * m + col] = cos_t;
-                    P[col * m + row] = sin_t;
-                    P[row * m + col] = -1 * sin_t;
-
                     // Corresponding to Jacobi iteration i :
 
-                    // 1. Compute the eigen vectors by multiplying with V
-                    matrix_mult({temp, m, m}, {V, m, m}, {P, m, m});
                     for (size_t i = 0; i < m; i++) {
-                        for (size_t j = 0; j < m; j++) {
-                            V[i * m + j] = temp[i * m + j];
-                        }
-                    }
 
-                    // 2. Compute the eigen values by updating A by
-                    // performing the operation A(i) = P_t * A(i-1) * P
-                    matrix_mult({temp, m, m}, {A, m, m}, {P, m, m});
-                    matrix_transpose({P, m, m}, {P, m, m});
-                    matrix_mult({A, m, m}, {P, m, m}, {temp, m, m});
+                        // Compute the eigen values by updating the rows and columns
+                        // corresponding to the largest off-diagonal entry until convergence
+
+                        double A_i_imax = A[m * i + i_max], A_imax_i = A[m * i_max + i];
+
+                        A[m * i + i_max] = cos_t * A[m * i + i_max] - sin_t * A[m * i + j_max];
+                        A[m * i + j_max] = sin_t * A_i_imax + cos_t * A[m * i + j_max];
+
+                        A[m * i_max + i] = cos_t * A[m * i_max + i] - sin_t * A[m * j_max + i];
+                        A[m * j_max + i] = sin_t * A_imax_i + cos_t * A[m * j_max + i];
+
+                        // Compute the eigen vectors similarly by updating the eigen vector matrix
+
+                        double V_i_imax = V[m * i + i_max];
+
+                        V[m * i + i_max] = cos_t * V[m * i + i_max] - sin_t * V[m * i + j_max];
+                        V[m * i + j_max] = sin_t * V_i_imax + cos_t * V[m * i + j_max];
+
+                    }
                 }
             }
         }
     }
-
-    free(P);
-    free(temp);
 
     // Store the generated eigen values in the vector
     for (size_t i = 0; i < m; i++) {
