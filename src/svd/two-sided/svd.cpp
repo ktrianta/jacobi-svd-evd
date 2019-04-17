@@ -92,37 +92,40 @@ static void matrix_frobenius(matrix_t m, double* norm, double* off_norm) {
     const size_t M = m.rows;
     const size_t N = m.cols;
     double* data = m.ptr;
+    double elems_sum = 0.0;  // sum m[i][j]^2 for 0 < i < M and 0 < j < N
+    double off_diag_elems_sum = 0.0;  // sum m[i][j]^2 for 0 < i < M and 0 < j < N and i == j
 
     for (size_t i = 0; i < M; ++i) {
         for (size_t j = 0; j < N; ++j) {
-            *norm += data[N * i + j] * data[N * i + j];
+            elems_sum += data[N * i + j] * data[N * i + j];
 
             if (i == j) {
                 continue;
             } else {
-                *off_norm += data[N * i + j] * data[N * i + j];
+                off_diag_elems_sum += data[N * i + j] * data[N * i + j];
             }
         }
     }
 
-    *norm = sqrt(*norm);
-    *off_norm = sqrt(*off_norm);
+    *norm = sqrt(elems_sum);
+    *off_norm = sqrt(off_diag_elems_sum);
 }
 
 static void matrix_off_frobenius(matrix_t m, double* off_norm) {
     const size_t M = m.rows;
     const size_t N = m.cols;
     double* data = m.ptr;
+    double off_diag_elems_sum = 0.0;  // sum m[i][j]^2 for 0 < i < M and 0 < j < N and i == j
 
-    *off_norm = 0.0;
     for (size_t i = 0; i < M; ++i) {
         for (size_t j = 0; j < N; ++j) {
             if (i == j) {
                 continue;
             } else {
-                *off_norm += data[N * i + j] * data[N * i + j];
+                off_diag_elems_sum += data[N * i + j] * data[N * i + j];
             }
         }
     }
-    *off_norm = sqrt(*off_norm);
+
+    *off_norm = sqrt(off_diag_elems_sum);
 }
