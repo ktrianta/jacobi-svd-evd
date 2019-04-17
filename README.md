@@ -74,3 +74,8 @@ When running the tests using ```ctest -V```, lots of output is created, and find
 output may be problematic. For this reason, all debugging functions print ```//``` as the first
 two characters of every line they print. Therefore, finding your debug output can be done by
 ```ctest -V | grep //```.
+
+## Performance Benchmarking
+
+Performance benchmarks are installed in ```bin/benchmark``` by executing ```make install```.
+To run the performance benchmarks execute script ```scripts/benchmark``` from the base project directory.
