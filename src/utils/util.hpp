@@ -14,6 +14,8 @@
  */
 bool isclose(double x, double y, double eps = DBL_EPSILON);
 
+bool is_normalized(double v);
+
 /**
  * Given three entries of a symmetric matrix X, compute a cosine-sine pair (c,
  * s)
