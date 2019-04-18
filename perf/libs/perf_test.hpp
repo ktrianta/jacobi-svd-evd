@@ -45,14 +45,17 @@
  * @tparam n_reps Number of times the function will run. This is also the size of the returned vector.
  * @tparam cycles_required The code will be executed for at least this number of cycles. This reduces timing overhead
  * when measuring small runtimes.
+ * @tparam num_runs_initial Initial value of num_runs which is used to determine how many times the given function
+ * should be run so that it takes at least cycles_required cycles.
  * @param fn Any function to benchmark.
  * @param Args All the arguments to be passed when calling fn.
  * @return std::vector containing n_reps many measured cycle values.
  */
-template <size_t n_reps = 100, size_t cycles_required = static_cast<size_t>(1e7), typename Func, typename... Args>
+template <size_t n_reps = 100, size_t cycles_required = static_cast<size_t>(1e7), size_t num_runs_initial = 5,
+          typename Func, typename... Args>
 std::vector<double> measure_cycles(Func fn, Args... args) {
     double cycles = 0.;
-    size_t num_runs = 100;
+    size_t num_runs = num_runs_initial;
     double multiplier = 1;
     myInt64 start, end;
 
