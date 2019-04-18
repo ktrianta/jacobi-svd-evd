@@ -1,4 +1,5 @@
 #include "matrix.hpp"
+#include <algorithm>
 #include <cassert>
 #include <utility>
 
@@ -61,4 +62,11 @@ void matrix_mult(matrix_t Pmat, matrix_t Qmat, matrix_t Rmat) {
             P[i * N + j] = sum;
         }
     }
+}
+
+void matrix_copy(matrix_t Bmat, matrix_t Amat) {
+    assert(Amat.rows == Bmat.rows);
+    assert(Amat.cols == Amat.cols);
+
+    std::copy(Amat.ptr, Amat.ptr + Amat.rows * Amat.cols, Bmat.ptr);
 }

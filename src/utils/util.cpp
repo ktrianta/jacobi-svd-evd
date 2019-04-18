@@ -1,9 +1,12 @@
 #include "util.hpp"
 #include <assert.h>
 #include <math.h>
+#include <limits>
 #include "types.hpp"
 
 bool isclose(double x, double y, double eps) { return fabs(x - y) <= eps * fabs(x + y); }
+
+bool is_normalized(double v) { return fabs(v) >= std::numeric_limits<double>::min(); }
 
 void sym_jacobi_coeffs(double x_ii, double x_ij, double x_jj, double* c, double* s) {
     if (!isclose(x_ij, 0)) {
