@@ -75,7 +75,7 @@ void matrix_frobenius(matrix_t m, double* norm, double* off_norm) {
     const size_t M = m.rows;
     const size_t N = m.cols;
     double* data = m.ptr;
-    double elems_sum = 0.0;  // sum m[i][j]^2 for 0 < i < M and 0 < j < N
+    double elems_sum = 0.0;           // sum m[i][j]^2 for 0 < i < M and 0 < j < N
     double off_diag_elems_sum = 0.0;  // sum m[i][j]^2 for 0 < i < M and 0 < j < N and i == j
 
     for (size_t i = 0; i < M; ++i) {

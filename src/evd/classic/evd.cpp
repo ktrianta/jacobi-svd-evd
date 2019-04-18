@@ -1,7 +1,7 @@
 #include "evd.hpp"
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include<stdio.h>
 #include <cassert>
 #include "matrix.hpp"
 #include "types.hpp"
@@ -83,7 +83,8 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struc
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
 }
 
-void evd_classic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t Qmat, struct vector_t evec, double tol) {
+void evd_classic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t Qmat, struct vector_t evec,
+                     double tol) {
     const int n = Xmat.cols;
     double* e = evec.ptr;
     double* Q = Qmat.ptr;
@@ -93,7 +94,7 @@ void evd_classic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t
 
     matrix_identity(Qmat);
     matrix_copy(Amat, Xmat);
-    matrix_frobenius(Amat,&eps,&offA);
+    matrix_frobenius(Amat, &eps, &offA);
 
     eps = tol * tol * eps;
 
@@ -133,7 +134,7 @@ void evd_classic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t
             A[n * q + i] = s * A_ip + c * A_iq;
         }
 
-        matrix_off_frobenius(Amat,&offA);
+        matrix_off_frobenius(Amat, &offA);
     }
     for (int i = 0; i < n; ++i) {
         e[i] = A[n * i + i];

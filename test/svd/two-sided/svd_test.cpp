@@ -3,10 +3,10 @@
 #include <iostream>
 #include <random>
 #include <vector>
+#include "../../test_utils.hpp"
 #include "gtest/gtest.h"
 #include "nsvd.hpp"
 #include "types.hpp"
-#include "../../test_utils.hpp"
 
 TEST(two_sided_svd, usvd) {
     std::vector<double> X;

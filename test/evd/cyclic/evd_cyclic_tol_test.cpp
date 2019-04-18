@@ -18,7 +18,6 @@ TEST(evd_tol_cyclic, identity_matrix) {
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
 
-
     evd_cyclic_tol(Data_matr, Out_matr, E_vecs, E_vals, 1e-7);
     for (size_t i = 0; i < n; ++i) {
         ASSERT_DOUBLE_EQ(e[i], 1.0);
@@ -37,7 +36,7 @@ TEST(evd_tol_cyclic, random_square_matrix) {
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
 
-    evd_cyclic_tol(Data_matr,Out_matr, E_vecs, E_vals, 1e-7);
+    evd_cyclic_tol(Data_matr, Out_matr, E_vecs, E_vals, 1e-7);
 
     std::vector<double> e_expect = {12.71986, 5.78305, 2.09733, -5.60024};
 
@@ -64,7 +63,7 @@ TEST(evd_tol_cyclic, svd_eigvalues_crosscheck) {
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
 
-    evd_cyclic_tol(Data_matr,Out_matr, E_vecs, E_vals, 1e-7);
+    evd_cyclic_tol(Data_matr, Out_matr, E_vecs, E_vals, 1e-7);
 
     std::vector<double> e_expect = {2.415032147975995969e+01, 4.001355036163166012e+00, -1.007738346679503572e+00,
                                     -3.262428878677021693e+00, -5.881509290566617310e+00};

@@ -1,7 +1,7 @@
 #include "evd_cyclic.hpp"
 #include <math.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <cassert>
 #include "matrix.hpp"
 #include "types.hpp"
@@ -76,7 +76,8 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struct
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
 }
 
-void evd_cyclic_tol(struct matrix_t Xmat,struct matrix_t Amat, struct matrix_t Qmat, struct vector_t evec, double tol) {
+void evd_cyclic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t Qmat, struct vector_t evec,
+                    double tol) {
     const size_t n = Xmat.cols;
     double* e = evec.ptr;
     double* Q = Qmat.ptr;
@@ -84,10 +85,9 @@ void evd_cyclic_tol(struct matrix_t Xmat,struct matrix_t Amat, struct matrix_t Q
     double offA = 0, eps = 0, c, s;
     // A=QtXQ
 
-
     matrix_identity(Qmat);
     matrix_copy(Amat, Xmat);
-    matrix_frobenius(Amat,&eps,&offA);
+    matrix_frobenius(Amat, &eps, &offA);
 
     eps = tol * tol * eps;
 
@@ -118,7 +118,7 @@ void evd_cyclic_tol(struct matrix_t Xmat,struct matrix_t Amat, struct matrix_t Q
                 }
             }
         }
-        matrix_off_frobenius(Amat,&offA);
+        matrix_off_frobenius(Amat, &offA);
     }
     for (size_t i = 0; i < n; ++i) {
         e[i] = A[n * i + i];

@@ -29,7 +29,7 @@ size_t svd(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, str
 
     // Repeat while the frobenius norm of the off-diagonal elements of matrix B, which is updated in every
     // iteration, is smaller than the forbenius norm of the original matrix B (or A) times the tolerance
-    while (off_norm >= tol *tol* norm) {
+    while (off_norm >= tol * tol * norm) {
         for (size_t i = 0; i < n - 1; ++i) {
             for (size_t j = i + 1; j < n; ++j) {
                 const double bii = B[n * i + i];  // B[i][i]
