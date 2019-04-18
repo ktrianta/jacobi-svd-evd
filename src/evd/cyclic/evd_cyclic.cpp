@@ -76,40 +76,19 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struct
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
 }
 
-void evd_cyclic_tol(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t evec, double tol) {
+void evd_cyclic_tol(struct matrix_t Xmat,struct matrix_t Amat, struct matrix_t Qmat, struct vector_t evec, double tol) {
     const size_t n = Xmat.cols;
-    double* X = Xmat.ptr;
     double* e = evec.ptr;
     double* Q = Qmat.ptr;
-    // A=QtXQ
-    double* A = (double*) malloc(sizeof(double) * n * n);
-
+    double* A = Amat.ptr;
     double offA = 0, eps = 0, c, s;
+    // A=QtXQ
 
-    for (size_t i = 0; i < n; ++i) {
-        for (size_t j = 0; j < n; ++j) {
-            A[n * i + j] = X[n * i + j];
-        }
-    }
-    for (size_t i = 0; i < n; ++i) {
-        Q[n * i + i] = 1.0;
-    }
-    for (size_t i = 0; i < n; ++i) {
-        for (size_t j = i + 1; j < n; ++j) {
-            double a_ij = A[n * i + j];
-            offA += 2 * a_ij * a_ij;
-        }
-    }
-    for (size_t i = 0; i < n; ++i) {
-        for (size_t j = i; j < n; ++j) {
-            double a_ij = A[n * i + j];
-            if (i == j) {
-                eps += a_ij * a_ij;
-            } else {
-                eps += 2 * a_ij * a_ij;
-            }
-        }
-    }
+
+    matrix_identity(Qmat);
+    matrix_copy(Amat, Xmat);
+    matrix_frobenius(Amat,&eps,&offA);
+
     eps = tol * tol * eps;
 
     while (offA > eps) {
@@ -139,18 +118,11 @@ void evd_cyclic_tol(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t 
                 }
             }
         }
-        offA = 0;
-        for (size_t i = 0; i < n; ++i) {
-            for (size_t j = i + 1; j < n; ++j) {
-                double a_ij = A[n * i + j];
-                offA += 2 * a_ij * a_ij;
-            }
-        }
+        matrix_off_frobenius(Amat,&offA);
     }
     for (size_t i = 0; i < n; ++i) {
         e[i] = A[n * i + i];
     }
 
     reorder_decomposition(evec, &Qmat, 1, greater);
-    free(A);
 }

@@ -7,9 +7,6 @@
 #include "types.hpp"
 #include "util.hpp"
 
-static void matrix_frobenius(matrix_t m, double* norm, double* off_norm);
-static void matrix_off_frobenius(matrix_t m, double* off_norm);
-
 size_t svd(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, struct matrix_t Vmat) {
     assert(Amat.rows == Amat.cols);  // Matrix A should be square
     assert(Amat.rows == Bmat.rows && Amat.cols == Bmat.cols);
@@ -32,7 +29,7 @@ size_t svd(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, str
 
     // Repeat while the frobenius norm of the off-diagonal elements of matrix B, which is updated in every
     // iteration, is smaller than the forbenius norm of the original matrix B (or A) times the tolerance
-    while (off_norm >= tol * norm) {
+    while (off_norm >= tol *tol* norm) {
         for (size_t i = 0; i < n - 1; ++i) {
             for (size_t j = i + 1; j < n; ++j) {
                 const double bii = B[n * i + i];  // B[i][i]
@@ -86,46 +83,4 @@ size_t svd(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, str
     }
 
     return iter;
-}
-
-static void matrix_frobenius(matrix_t m, double* norm, double* off_norm) {
-    const size_t M = m.rows;
-    const size_t N = m.cols;
-    double* data = m.ptr;
-    double elems_sum = 0.0;  // sum m[i][j]^2 for 0 < i < M and 0 < j < N
-    double off_diag_elems_sum = 0.0;  // sum m[i][j]^2 for 0 < i < M and 0 < j < N and i == j
-
-    for (size_t i = 0; i < M; ++i) {
-        for (size_t j = 0; j < N; ++j) {
-            elems_sum += data[N * i + j] * data[N * i + j];
-
-            if (i == j) {
-                continue;
-            } else {
-                off_diag_elems_sum += data[N * i + j] * data[N * i + j];
-            }
-        }
-    }
-
-    *norm = sqrt(elems_sum);
-    *off_norm = sqrt(off_diag_elems_sum);
-}
-
-static void matrix_off_frobenius(matrix_t m, double* off_norm) {
-    const size_t M = m.rows;
-    const size_t N = m.cols;
-    double* data = m.ptr;
-    double off_diag_elems_sum = 0.0;  // sum m[i][j]^2 for 0 < i < M and 0 < j < N and i == j
-
-    for (size_t i = 0; i < M; ++i) {
-        for (size_t j = 0; j < N; ++j) {
-            if (i == j) {
-                continue;
-            } else {
-                off_diag_elems_sum += data[N * i + j] * data[N * i + j];
-            }
-        }
-    }
-
-    *off_norm = sqrt(off_diag_elems_sum);
 }
