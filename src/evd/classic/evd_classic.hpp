@@ -11,6 +11,7 @@
  *
  * @param A Matrix of size n times n, given in row-major order, whose EVD will
  * be computed.
+ * @param A_copy copy of A in order to retain A for performance measures
  * @param[out] V Matrix of size n times n, given in row-major order, contining
  * the eigenvectors.
  * @param[out] e Output array of size n. Eigenvalues of X will be written to
@@ -18,7 +19,7 @@
  * in order of ascending magnitude.
  * @param epoch Number of Jacobi iterations until convergence (default 100)
  */
-void evd_classic(struct matrix_t A, struct matrix_t V, struct vector_t e, int epoch = 100);
+void evd_classic(struct matrix_t A, struct matrix_t A_copy, struct matrix_t V, struct vector_t e, int epoch = 100);
 
 /**
  * Compute eigenvalue decomposition of a given symmetric, n times n matrix

@@ -3,16 +3,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <cassert>
+#include <algorithm>
 #include "matrix.hpp"
 #include "types.hpp"
 #include "util.hpp"
 
-void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
+void evd_classic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
     assert(Data_matr.rows == Data_matr.cols);
 
     // Create a copy of the matrix to prevent modification of the original matrix
-    double* A = (double*) malloc(sizeof(double) * Data_matr.rows * Data_matr.cols);
-    memcpy(A, Data_matr.ptr, Data_matr.rows * Data_matr.cols * sizeof(double));
+    // double* A = (double*) malloc(sizeof(double) * Data_matr.rows * Data_matr.cols);
+    double* A = Data_matr_copy.ptr;
+    std::copy(Data_matr.ptr, Data_matr.ptr + Data_matr.rows * Data_matr.cols, A);
 
     double* V = Eigen_vectors.ptr;
     double* E = Eigen_values.ptr;
@@ -90,7 +92,6 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struc
     for (size_t i = 0; i < m; i++) {
         E[i] = A[i * m + i];
     }
-    free(A);
 
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
 }
