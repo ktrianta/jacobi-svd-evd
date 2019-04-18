@@ -22,3 +22,5 @@ void matrix_transpose(matrix_t Pmat, matrix_t Qmat);
  * @param Pmat Output matrix
  */
 void matrix_mult(matrix_t Pmat, matrix_t Qmat, matrix_t Rmat);
+
+void matrix_copy(matrix_t Bmat, matrix_t Amat);

@@ -1,5 +1,6 @@
 #include "evd_cyclic.hpp"
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <cassert>
@@ -22,64 +23,54 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struct
 
     int is_not_diagonal = 0;
 
-    // Build the auxiliary matrices
+    for (int ep = 1; ep <= epoch; ep++) {
+        double alpha, beta, cos_t, sin_t;
 
-    double *P, *temp;
-    P = (double*) malloc(sizeof(double) * m * m);
-    temp = (double*) malloc(sizeof(double) * m * m);
-
-    for (size_t i = 0; i < m; i++) {
-        for (size_t j = i + 1; j < m; j++) {
-            if (A[i * m + j] != 0.0) {
-                is_not_diagonal = 1;
-                break;
-            }
-        }
-    }
-
-    if (is_not_diagonal) {
-        for (int ep = 1; ep <= epoch; ep++) {
-            double alpha, beta, cos_t, sin_t;
-            for (size_t row = 0; row < m; row++) {
-                for (size_t col = row + 1; col < m; col++) {
-                    matrix_identity({P, m, m});
-
-                    // Compute cos_t and sin_t for the rotation matrix
-
-                    alpha = 2.0 * sign(A[row * m + row] - A[col * m + col]) * A[row * m + col];
-                    beta = fabs(A[row * m + row] - A[col * m + col]);
-                    cos_t = sqrt(0.5 * (1 + beta / sqrt(alpha * alpha + beta * beta)));
-                    // sin_t = (1 / 2*cos_t) * (alpha / sqrt(alpha*alpha + beta*beta));
-                    sin_t = sign(alpha) * sqrt(1 - cos_t * cos_t);
-
-                    // Initialize the rotation parameters in the identity matrix
-
-                    P[row * m + row] = P[col * m + col] = cos_t;
-                    P[col * m + row] = sin_t;
-                    P[row * m + col] = -1 * sin_t;
-
-                    // Corresponding to Jacobi iteration i :
-
-                    // 1. Compute the eigen vectors by multiplying with V
-                    matrix_mult({temp, m, m}, {V, m, m}, {P, m, m});
-                    for (size_t i = 0; i < m; i++) {
-                        for (size_t j = 0; j < m; j++) {
-                            V[i * m + j] = temp[i * m + j];
-                        }
-                    }
-
-                    // 2. Compute the eigen values by updating A by
-                    // performing the operation A(i) = P_t * A(i-1) * P
-                    matrix_mult({temp, m, m}, {A, m, m}, {P, m, m});
-                    matrix_transpose({P, m, m}, {P, m, m});
-                    matrix_mult({A, m, m}, {P, m, m}, {temp, m, m});
+        for (size_t i = 0; i < m; i++) {
+            for (size_t j = i + 1; j < m; j++) {
+                if (A[i * m + j] != 0.0) {
+                    is_not_diagonal = 1;
+                    break;
                 }
             }
         }
-    }
 
-    free(P);
-    free(temp);
+        if (!is_not_diagonal) break;
+
+        for (size_t row = 0; row < m; row++) {
+            for (size_t col = row + 1; col < m; col++) {
+                // Compute cos_t and sin_t for the rotation
+
+                alpha = 2.0 * sign(A[row * m + row] - A[col * m + col]) * A[row * m + col];
+                beta = fabs(A[row * m + row] - A[col * m + col]);
+                cos_t = sqrt(0.5 * (1 + beta / sqrt(alpha * alpha + beta * beta)));
+                // sin_t = (1 / 2*cos_t) * (alpha / sqrt(alpha*alpha + beta*beta));
+                sin_t = sign(alpha) * sqrt(1 - cos_t * cos_t);
+
+                for (size_t i = 0; i < m; i++) {
+                    // Compute the eigen values by updating the rows until convergence
+
+                    double A_i_r = A[m * i + row];
+                    A[m * i + row] = cos_t * A[m * i + row] + sin_t * A[m * i + col];
+                    A[m * i + col] = cos_t * A[m * i + col] - sin_t * A_i_r;
+                }
+
+                for (size_t i = 0; i < m; i++) {
+                    // Compute the eigen values by updating the columns until convergence
+
+                    double A_r_i = A[m * row + i];
+                    A[m * row + i] = cos_t * A[m * row + i] + sin_t * A[m * col + i];
+                    A[m * col + i] = cos_t * A[m * col + i] - sin_t * A_r_i;
+
+                    // Compute the eigen vectors similarly by updating the eigen vector matrix
+                    double V_i_r = V[m * i + row];
+                    V[m * i + row] = cos_t * V[m * i + row] + sin_t * V[m * i + col];
+                    V[m * i + col] = cos_t * V[m * i + col] - sin_t * V_i_r;
+                }
+            }
+        }
+        is_not_diagonal = 0;
+    }
 
     // Store the generated eigen values in the vector
     for (size_t i = 0; i < m; i++) {
