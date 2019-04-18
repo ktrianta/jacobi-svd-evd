@@ -26,7 +26,7 @@ std::vector<std::string> tol_based_names = {
 int main() {
     size_t n = 4;
     std::vector<double> A = {7.0, 3.0, 2.0, 1.0, 3.0, 9.0, -2.0, 4.0, 2.0, -2.0, -4.0, 2.0, 1.0, 4.0, 2.0, 3.0};
-    std::vector<double> A_copy(n*n);
+    std::vector<double> A_copy(n * n);
     std::vector<double> e(n);
     std::vector<double> V(n * n, 0);
     matrix_t Data_matr = {&A[0], n, n};
@@ -34,6 +34,8 @@ int main() {
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
 
-    run_all(epoch_based_versions, epoch_based_names, Data_matr, Data_matr_copy, E_vecs, E_vals, 100);
-    run_all(tol_based_versions, tol_based_names, Data_matr, E_vecs, E_vals, 1e-8);
+    std::vector<double> costs(1, 10000);
+
+    run_all(epoch_based_versions, epoch_based_names, costs, Data_matr, Data_matr_copy, E_vecs, E_vals, 100);
+    run_all(tol_based_versions, tol_based_names, costs, Data_matr, E_vecs, E_vals, 1e-8);
 }

@@ -4,4 +4,5 @@ mkdir -p build
 cd build
 cmake "$@" ..
 make
+make install
 ctest -V

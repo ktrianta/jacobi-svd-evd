@@ -32,6 +32,8 @@ int main() {
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
 
-    run_all(epoch_based_versions, epoch_based_names, Data_matr, E_vecs, E_vals, 100);
-    run_all(tol_based_versions, tol_based_names, Data_matr, E_vecs, E_vals, 1e-8);
+    std::vector<double> costs(1, 10000);
+
+    run_all(epoch_based_versions, epoch_based_names, costs, Data_matr, E_vecs, E_vals, 100);
+    run_all(tol_based_versions, tol_based_names, costs, Data_matr, E_vecs, E_vals, 1e-8);
 }
