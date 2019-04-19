@@ -1,15 +1,22 @@
-#include "evd.hpp"
+#include "evd_classic.hpp"
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 #include <cassert>
+#include <algorithm>
 #include "matrix.hpp"
 #include "types.hpp"
 #include "util.hpp"
 
-void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
+void evd_classic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
+                 struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
     assert(Data_matr.rows == Data_matr.cols);
 
-    double* A = Data_matr.ptr;
+    // Create a copy of the matrix to prevent modification of the original matrix
+    // double* A = (double*) malloc(sizeof(double) * Data_matr.rows * Data_matr.cols);
+    double* A = Data_matr_copy.ptr;
+    std::copy(Data_matr.ptr, Data_matr.ptr + Data_matr.rows * Data_matr.cols, A);
+
     double* V = Eigen_vectors.ptr;
     double* E = Eigen_values.ptr;
     const size_t m = Data_matr.rows;
@@ -18,10 +25,18 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struc
 
     int is_not_diagonal = 0;
 
+    // Build the auxiliary matrices
+
+    double *P, *temp;
+    P = (double*) malloc(sizeof(double) * m * m);
+    temp = (double*) malloc(sizeof(double) * m * m);
+
     for (int ep = 1; ep <= epoch; ep++) {
         double val = 0.0;
         int i_max, j_max;
         double alpha, beta, cos_t, sin_t;
+
+        matrix_identity({P, m, m});
 
         // Find the larget non-diagonal element in the
         // upper triangular matrix
@@ -48,31 +63,31 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Eigen_vectors, struc
         // sin_t = (1 / 2*cos_t) * (alpha / sqrt(alpha*alpha + beta*beta));
         sin_t = sign(alpha) * sqrt(1 - cos_t * cos_t);
 
+        // Initialize the rotation parameters in the identity matrix
+
+        P[i_max * m + i_max] = P[j_max * m + j_max] = cos_t;
+        P[j_max * m + i_max] = sin_t;
+        P[i_max * m + j_max] = -1 * sin_t;
+
         // Corresponding to Jacobi iteration i :
-        // Corresponding to the largest off-diagonal entry
 
+        // 1. Compute the eigen vectors by multiplying with V
+        matrix_mult({temp, m, m}, {V, m, m}, {P, m, m});
         for (size_t i = 0; i < m; i++) {
-            // Compute the eigen values by updating the rows until convergence
-            double A_i_imax = A[m * i + i_max];
-
-            A[m * i + i_max] = cos_t * A[m * i + i_max] + sin_t * A[m * i + j_max];
-            A[m * i + j_max] = cos_t * A[m * i + j_max] - sin_t * A_i_imax;
+            for (size_t j = 0; j < m; j++) {
+                V[i * m + j] = temp[i * m + j];
+            }
         }
 
-        for (size_t i = 0; i < m; i++) {
-            // Compute the eigen values by updating the rows until convergence
-            double A_imax_i = A[m * i_max + i];
-            A[m * i_max + i] = cos_t * A[m * i_max + i] + sin_t * A[m * j_max + i];
-            A[m * j_max + i] = cos_t * A[m * j_max + i] - sin_t * A_imax_i;
-
-            // Compute the eigen vectors similarly by updating the eigen vector matrix
-            double V_i_imax = V[m * i + i_max];
-
-            V[m * i + i_max] = cos_t * V[m * i + i_max] + sin_t * V[m * i + j_max];
-            V[m * i + j_max] = cos_t * V[m * i + j_max] - sin_t * V_i_imax;
-        }
-        is_not_diagonal = 0;
+        // 2. Compute the eigen values by updating A by
+        // performing the operation A(i) = P_t * A(i-1) * P
+        matrix_mult({temp, m, m}, {A, m, m}, {P, m, m});
+        matrix_transpose({P, m, m}, {P, m, m});
+        matrix_mult({A, m, m}, {P, m, m}, {temp, m, m});
     }
+
+    free(P);
+    free(temp);
 
     // Store the generated eigen values in the vector
     for (size_t i = 0; i < m; i++) {
