@@ -7,7 +7,8 @@
 #include "types.hpp"
 #include "util.hpp"
 
-void evd_cyclic(struct matrix_t Data_matr,struct matrix_t Data_matr_copy, struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
+void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t Eigen_vectors,
+                struct vector_t Eigen_values, int epoch) {
     assert(Data_matr.rows == Data_matr.cols);
     double* A = Data_matr_copy.ptr;
     // Create a copy of the matrix to prevent modification of the original matrix

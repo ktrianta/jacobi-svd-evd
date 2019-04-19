@@ -18,7 +18,8 @@
  * in order of ascending magnitude.
  * @param epoch Number of Jacobi iterations until convergence (default 20)
  */
-void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V, struct vector_t e, int epoch = 20);
+void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V, struct vector_t e,
+                int epoch = 20);
 
 /**
  * Compute eigenvalue decomposition of a given symmetric, n times n matrix
