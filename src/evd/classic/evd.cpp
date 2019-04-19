@@ -1,6 +1,5 @@
 #include "evd.hpp"
 #include <math.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <cassert>
 #include "matrix.hpp"
