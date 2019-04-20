@@ -70,3 +70,45 @@ void matrix_copy(matrix_t Bmat, matrix_t Amat) {
 
     std::copy(Amat.ptr, Amat.ptr + Amat.rows * Amat.cols, Bmat.ptr);
 }
+
+void matrix_frobenius(matrix_t m, double* norm, double* off_norm) {
+    const size_t M = m.rows;
+    const size_t N = m.cols;
+    double* data = m.ptr;
+    double elems_sum = 0.0;           // sum m[i][j]^2 for 0 < i < M and 0 < j < N
+    double off_diag_elems_sum = 0.0;  // sum m[i][j]^2 for 0 < i < M and 0 < j < N and i == j
+
+    for (size_t i = 0; i < M; ++i) {
+        for (size_t j = 0; j < N; ++j) {
+            elems_sum += data[N * i + j] * data[N * i + j];
+
+            if (i == j) {
+                continue;
+            } else {
+                off_diag_elems_sum += data[N * i + j] * data[N * i + j];
+            }
+        }
+    }
+
+    *norm = elems_sum;
+    *off_norm = off_diag_elems_sum;
+}
+
+void matrix_off_frobenius(matrix_t m, double* off_norm) {
+    const size_t M = m.rows;
+    const size_t N = m.cols;
+    double* data = m.ptr;
+    double off_diag_elems_sum = 0.0;  // sum m[i][j]^2 for 0 < i < M and 0 < j < N and i == j
+
+    for (size_t i = 0; i < M; ++i) {
+        for (size_t j = 0; j < N; ++j) {
+            if (i == j) {
+                continue;
+            } else {
+                off_diag_elems_sum += data[N * i + j] * data[N * i + j];
+            }
+        }
+    }
+
+    *off_norm = off_diag_elems_sum;
+}

@@ -23,4 +23,26 @@ void matrix_transpose(matrix_t Pmat, matrix_t Qmat);
  */
 void matrix_mult(matrix_t Pmat, matrix_t Qmat, matrix_t Rmat);
 
+/**
+ * @brief Copies a matrix Amat to matrix Bmat
+ * @param Bmat Output matrix, copy of input matrix
+ * @param Amat Input matrix
+ */
+
 void matrix_copy(matrix_t Bmat, matrix_t Amat);
+
+/**
+ * @brief Calcluates the oof frebonius norm of matrix m
+ * @param m Intput matrix
+ * @param off_norm, output value, the off diagonal frbonius norm.
+ */
+
+void matrix_off_frobenius(matrix_t m, double* off_norm);
+
+/**
+ * @brief Calcluates the frebonius norm of matrix m
+ * @param m Intput matrix
+ * @param off_norm, output value, the frbonius norm.
+ */
+
+void matrix_frobenius(matrix_t m, double* norm, double* off_norm);
