@@ -18,7 +18,8 @@
  * in order of ascending magnitude.
  * @param epoch Number of Jacobi iterations until convergence (default 20)
  */
-void evd_cyclic(struct matrix_t A, struct matrix_t V, struct vector_t e, int epoch = 20);
+void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V, struct vector_t e,
+                int epoch = 20);
 
 /**
  * Compute eigenvalue decomposition of a given symmetric, n times n matrix
@@ -37,4 +38,4 @@ void evd_cyclic(struct matrix_t A, struct matrix_t V, struct vector_t e, int epo
  * order.  Columns of U form an orthonormal eigenbasis for the column space of
  * X.
  */
-void evd_cyclic_tol(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t evec, double tol);
+void evd_cyclic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t Qmat, struct vector_t evec, double tol);

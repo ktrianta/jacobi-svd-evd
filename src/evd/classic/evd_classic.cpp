@@ -97,41 +97,19 @@ void evd_classic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, stru
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
 }
 
-void evd_classic_tol(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t evec, double tol) {
+void evd_classic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t Qmat, struct vector_t evec,
+                     double tol) {
     const int n = Xmat.cols;
-    double* X = Xmat.ptr;
     double* e = evec.ptr;
     double* Q = Qmat.ptr;
-    // A=QtXQ
-    double* A = (double*) malloc(sizeof(double) * n * n);
-
+    double* A = Amat.ptr;
     double offA = 0, eps = 0, abs_a, c, s;
     int p, q;
 
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            A[n * i + j] = X[n * i + j];
-        }
-    }
-    for (int i = 0; i < n; ++i) {
-        Q[n * i + i] = 1.0;
-    }
-    for (int i = 0; i < n; ++i) {
-        for (int j = i + 1; j < n; ++j) {
-            double a_ij = A[n * i + j];
-            offA += 2 * a_ij * a_ij;
-        }
-    }
-    for (int i = 0; i < n; ++i) {
-        for (int j = i; j < n; ++j) {
-            double a_ij = A[n * i + j];
-            if (i == j) {
-                eps += a_ij * a_ij;
-            } else {
-                eps += 2 * a_ij * a_ij;
-            }
-        }
-    }
+    matrix_identity(Qmat);
+    matrix_copy(Amat, Xmat);
+    matrix_frobenius(Amat, &eps, &offA);
+
     eps = tol * tol * eps;
 
     while (offA > eps) {
@@ -169,18 +147,12 @@ void evd_classic_tol(struct matrix_t Xmat, struct matrix_t Qmat, struct vector_t
             A[n * p + i] = c * A_ip - s * A_iq;
             A[n * q + i] = s * A_ip + c * A_iq;
         }
-        offA = 0;
-        for (int i = 0; i < n; ++i) {
-            for (int j = i + 1; j < n; ++j) {
-                double a_ij = A[n * i + j];
-                offA += 2 * a_ij * a_ij;
-            }
-        }
+
+        matrix_off_frobenius(Amat, &offA);
     }
     for (int i = 0; i < n; ++i) {
         e[i] = A[n * i + i];
     }
 
     reorder_decomposition(evec, &Qmat, 1, greater);
-    free(A);
 }

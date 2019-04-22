@@ -37,5 +37,5 @@ int main() {
     std::vector<double> costs(1, 10000);
 
     run_all(epoch_based_versions, epoch_based_names, costs, Data_matr, Data_matr_copy, E_vecs, E_vals, 100);
-    run_all(tol_based_versions, tol_based_names, costs, Data_matr, E_vecs, E_vals, 1e-8);
+    run_all(tol_based_versions, tol_based_names, costs, Data_matr, Data_matr_copy, E_vecs, E_vals, 1e-8);
 }
