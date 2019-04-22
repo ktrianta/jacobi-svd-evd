@@ -27,9 +27,13 @@ add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
                  ${CMAKE_BINARY_DIR}/googletest-build
                  EXCLUDE_FROM_ALL)
 
+# Set C++ standard and compiler flags
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -std=c++11")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -mavx2 -mfma -fno-tree-vectorize")
+
 # Project subdirectories
 add_subdirectory(src)
-
+add_subdirectory(perf)
 enable_testing()
 add_subdirectory(test)
-add_subdirectory(perf)
