@@ -24,8 +24,12 @@ std::vector<std::string> tol_based_names = {
 };
 
 int main() {
-    size_t n = 4;
-    std::vector<double> A = {7.0, 3.0, 2.0, 1.0, 3.0, 9.0, -2.0, 4.0, 2.0, -2.0, -4.0, 2.0, 1.0, 4.0, 2.0, 3.0};
+    size_t n;
+
+    std::cin >> n;
+    std::cout << "Performance benchmark on array of size " << n << " by " << n << std::endl;
+
+    std::vector<double> A(n * n);
     std::vector<double> A_copy(n * n);
     std::vector<double> e(n);
     std::vector<double> V(n * n, 0);
@@ -33,6 +37,10 @@ int main() {
     matrix_t Data_matr_copy = {&A_copy[0], n, n};
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
+
+    for (size_t i = 0; i < n * n; ++i) {
+        std::cin >> A[i];
+    }
 
     std::vector<double> costs(1, 10000);
 

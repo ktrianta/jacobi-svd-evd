@@ -7,5 +7,7 @@ for bin in bin/benchmark/svd/*; do
 done
 
 for bin in bin/benchmark/evd/*; do
-    [ -f "$bin" ] && [ -x "$bin" ] && "$bin"
+    for input in `ls -v perf/resources/evd/*`; do
+        [ -f "$bin" ] && [ -x "$bin" ] && "$bin" < "$input"
+    done
 done

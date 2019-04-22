@@ -32,7 +32,7 @@ int main() {
     size_t n_iter = 100;
 
     std::cin >> m >> n;
-    std::cout << "Performance benchmark on array of size " <<  m << " by " << n << std::endl;
+    std::cout << "Performance benchmark on array of size " << m << " by " << n << std::endl;
 
     std::vector<double> A(m * n);
     std::vector<double> s(n);
