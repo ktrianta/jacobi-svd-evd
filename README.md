@@ -80,6 +80,20 @@ two characters of every line they print. Therefore, finding your debug output ca
 ```ctest -V | grep //```.
 
 ## Performance Benchmarking
-
 Performance benchmarks are installed in ```bin/benchmark``` by executing ```make install```.
 To run the performance benchmarks execute script ```scripts/benchmark``` from the base project directory.
+
+## Performance Plots
+Performance plots are currently obtained using ```scripts/plot_perf.py```. To obtain a plot, you need to have at least
+two files:
+
+1. An ```input_sizes``` file that contains the size of the input in each line.
+2. A performance ```perf1``` file that contains the performance value corresponding to each line in ```input_sizes```.
+3. Possibly more similar performance files such as ```perf2```, ```perf3```, etc.
+
+To get a plot that contains all these performance curves, you can run
+```
+python scripts/plot_perf.py input_sizes perf1 perf2 perf3
+```
+
+To save the resulting plot as a .eps file, you can remove the comment at the last line of the script.

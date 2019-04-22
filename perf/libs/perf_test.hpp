@@ -94,12 +94,20 @@ std::vector<double> measure_cycles(Func fn, Args... args) {
  * Benchmark all the given functions using the same set of parameters.
  */
 template <typename FuncType, typename... Args>
-void run_all(const std::vector<FuncType>& fn_vec, const std::vector<std::string>& fn_names, Args... args) {
+void run_all(const std::vector<FuncType>& fn_vec, const std::vector<std::string>& fn_names,
+             const std::vector<double>& costs, Args... args) {
     assert(fn_vec.size() == fn_names.size());
     for (size_t i = 0; i < fn_vec.size(); ++i) {
         std::vector<double> cycles = measure_cycles(fn_vec[i], std::forward<Args>(args)...);
         auto median_it = cycles.begin() + cycles.size() / 2;
         std::nth_element(cycles.begin(), median_it, cycles.end());
-        std::cout << fn_names[i] << " requires " << *median_it << " cycles (median)" << std::endl;
+        double runtime = *median_it;
+
+        std::cout << fn_names[i] << '\n';
+        std::cout << "Runtime:     " << runtime << " cycles (median)\n";
+        std::cout << "Performance: " << costs[i] / runtime << " flops/cycle (median)" << '\n';
+
+        for (size_t j = 0; j < 10; ++j) std::cout << '-';
+        std::cout << '\n' << std::endl;
     }
 }
