@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.9.2)
 
 # Performance benchmarks install directory
-set(BENCHMARK_BIN_DIR "${PROJECT_SOURCE_DIR}/bin/benchmark")
+set(SVD_BENCHMARK_BIN_DIR "${PROJECT_SOURCE_DIR}/bin/benchmark/svd")
+set(EVD_BENCHMARK_BIN_DIR "${PROJECT_SOURCE_DIR}/bin/benchmark/evd")
 
 add_subdirectory(libs)
 add_subdirectory(evd)
