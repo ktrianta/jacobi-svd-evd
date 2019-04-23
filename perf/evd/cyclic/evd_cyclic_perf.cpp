@@ -26,6 +26,9 @@ std::vector<std::string> tol_based_names = {
 int main() {
     size_t n;
 
+    std::ios_base::sync_with_stdio(false);  // disable synchronization between C and C++ standard streams
+    std::cin.tie(NULL);  // untie cin from cout
+
     std::cin >> n;
     std::cout << "Performance benchmark on array of size " << n << " by " << n << std::endl;
 

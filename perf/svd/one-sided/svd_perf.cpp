@@ -31,6 +31,9 @@ int main() {
     size_t m, n;
     size_t n_iter = 100;
 
+    std::ios_base::sync_with_stdio(false);  // disable synchronization between C and C++ standard streams
+    std::cin.tie(NULL);  // untie cin from cout
+
     std::cin >> m >> n;
     std::cout << "Performance benchmark on array of size " << m << " by " << n << std::endl;
 
