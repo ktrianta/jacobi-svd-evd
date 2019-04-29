@@ -28,20 +28,31 @@ std::vector<std::string> epoch_based_names = {
 std::vector<CostFuncType> epoch_based_cost_fns = {base_cost};
 
 int main() {
-    size_t n = 4;
+    size_t m, n;
     size_t n_iter = 100;
-    std::vector<double> A = {7.0, 3.0, 2.0, 1.0, 3.0, 9.0, -2.0, 4.0, 2.0, -2.0, -4.0, 2.0, 1.0, 4.0, 2.0, 3.0};
+
+    std::ios_base::sync_with_stdio(false);  // disable synchronization between C and C++ standard streams
+    std::cin.tie(NULL);  // untie cin from cout
+
+    std::cin >> m >> n;
+    std::cout << "Performance benchmark on array of size " << m << " by " << n << std::endl;
+
+    std::vector<double> A(m * n);
     std::vector<double> s(n);
-    std::vector<double> U(n * n, 0);
+    std::vector<double> U(m * n, 0);
     std::vector<double> V(n * n, 0);
-    matrix_t Data_matr = {&A[0], n, n};
+    matrix_t Data_matr = {&A[0], m, n};
     vector_t s_vals = {&s[0], n};
-    matrix_t U_mat = {&U[0], n, n};
+    matrix_t U_mat = {&U[0], m, n};
     matrix_t V_mat = {&V[0], n, n};
+
+    for (size_t i = 0; i < m * n; ++i) {
+        std::cin >> A[i];
+    }
 
     std::vector<double> costs;
     for (const auto& cost_fn : epoch_based_cost_fns) {
-        costs.push_back(cost_fn(n, n, n_iter));
+        costs.push_back(cost_fn(m, n, n_iter));
     }
 
     run_all(epoch_based_versions, epoch_based_names, costs, Data_matr, s_vals, U_mat, V_mat, n_iter);
