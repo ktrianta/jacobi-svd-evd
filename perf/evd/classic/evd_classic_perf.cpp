@@ -9,6 +9,17 @@
 using EVDEpochType = decltype(&evd_classic);
 using EVDTolType = decltype(&evd_classic_tol);
 
+double base_cost_evd(int n, int n_iter) {
+    double add = n_iter * (5 + 6 * n);
+    double mult = n_iter * (7 + 12 * n);
+    double div = n_iter;
+    double sqrt = n_iter * 3;
+
+    return add + mult + div + sqrt;
+}
+
+using CostFuncType = decltype(&base_cost_evd);
+
 std::vector<EVDEpochType> epoch_based_versions = {
     evd_classic,
 };
@@ -35,9 +46,11 @@ double tol_cost(size_t n, size_t n_iter) {
 using CostFuncType = decltype(&tol_cost);
 
 std::vector<CostFuncType> tol_based_cost_fns = {tol_cost};
+std::vector<CostFuncType> evd_epoch_based_cost_fns = {base_cost_evd};
 
 int main() {
     size_t n;
+    size_t n_iter = 100;
 
     std::ios_base::sync_with_stdio(false);  // disable synchronization between C and C++ standard streams
     std::cin.tie(NULL);                     // untie cin from cout
@@ -54,13 +67,13 @@ int main() {
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
 
-    for (size_t i = 0; i < n * n; ++i) {
-        std::cin >> A[i];
+    std::vector<double> costs;
+    for (const auto& cost_fn : evd_epoch_based_cost_fns) {
+        costs.push_back(cost_fn(n, n_iter));
     }
 
     size_t n_iter = evd_classic_tol(Data_matr, Data_matr_copy, E_vecs, E_vals, 1e-8);
     std::cout << n_iter;
-    std::vector<double> costs(1, 10000);
     std::vector<double> costs_tol;
 
     for (const auto& cost_fn : tol_based_cost_fns) {
