@@ -6,9 +6,13 @@ Out of source build in build directory
 
 ```bash
 mkdir build && cd build
-cmake ..
+cmake ..  # Configures the build type to Release
+          # cmake .. -DCMAKE_BUILD_TYPE=Debug to set build for debugging
 
-make && make install
+# Note that if the CMAKE_BUILD_TYPE option is used when running cmake, its value is cached for
+# subsequent runs. To clear it delete CMakeCache.txt or set CMAKE_BUILD_TYPE to the wanted value.
+
+make install
 cd ..
 
 # If there is any issue clean the build directory and try again

@@ -95,8 +95,7 @@ void evd_classic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t
     double* e = evec.ptr;
     double* Q = Qmat.ptr;
     double* A = Amat.ptr;
-    double offA = 0, eps = 0, abs_a, c, s;
-    int p, q;
+    double offA = 0, eps = 0, c, s;
 
     matrix_identity(Qmat);
     matrix_copy(Amat, Xmat);
@@ -105,7 +104,8 @@ void evd_classic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t
     eps = tol * tol * eps;
 
     while (offA > eps) {
-        abs_a = 0.0;
+        double abs_a = 0.0;
+        int p = 0, q = 1;
         for (int i = 0; i < n; ++i) {
             for (int j = i + 1; j < n; ++j) {
                 double abs_ij = fabs(A[i * n + j]);
