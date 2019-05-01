@@ -43,6 +43,7 @@ std::vector<CostFuncType> evdcyclic_epoch_based_cost_fns = {base_cost_evd};
 
 int main() {
     size_t n;
+    size_t n_iter = 20;
 
     std::ios_base::sync_with_stdio(false);  // disable synchronization between C and C++ standard streams
     std::cin.tie(NULL);  // untie cin from cout
