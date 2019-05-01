@@ -79,13 +79,14 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struc
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
 }
 
-void evd_cyclic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t Qmat, struct vector_t evec,
+int evd_cyclic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t Qmat, struct vector_t evec,
                     double tol) {
     const size_t n = Xmat.cols;
     double* e = evec.ptr;
     double* Q = Qmat.ptr;
     double* A = Amat.ptr;
     double offA = 0, eps = 0, c, s;
+    int iter = 0;
     // A=QtXQ
 
     matrix_identity(Qmat);
@@ -95,6 +96,7 @@ void evd_cyclic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t 
     eps = tol * tol * eps;
 
     while (offA > eps) {
+        iter++;
         for (size_t p = 0; p < n; ++p) {
             for (size_t q = p + 1; q < n; ++q) {
                 sym_jacobi_coeffs(A[p * n + p], A[p * n + q], A[q * n + q], &c, &s);
@@ -128,4 +130,5 @@ void evd_cyclic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t 
     }
 
     reorder_decomposition(evec, &Qmat, 1, greater);
+    return iter;
 }

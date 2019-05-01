@@ -23,6 +23,19 @@ std::vector<std::string> tol_based_names = {
     "evd_classic_tol",
 };
 
+double tol_cost(size_t n, size_t n_iter) {
+    double adds = 4 + 6 * n + n * (n - 1);
+    double muls = 3 + 12 * n + n * (n - 1);
+    double divs = 3;
+    double sqrt = 2;
+
+    return n_iter * (adds + muls + divs + sqrt);
+}
+
+using CostFuncType = decltype(&tol_cost);
+
+std::vector<CostFuncType> tol_based_cost_fns = {tol_cost};
+
 int main() {
     size_t n;
 
@@ -45,8 +58,16 @@ int main() {
         std::cin >> A[i];
     }
 
-    std::vector<double> costs(1, 10000);
 
-    run_all(epoch_based_versions, epoch_based_names, costs, Data_matr, Data_matr_copy, E_vecs, E_vals, 100);
-    run_all(tol_based_versions, tol_based_names, costs, Data_matr, Data_matr_copy, E_vecs, E_vals, 1e-8);
+    size_t n_iter = evd_classic_tol(Data_matr, Data_matr_copy, E_vecs, E_vals, 1e-8);
+    std::cout << n_iter;
+    std::vector<double> costs(1, 10000);
+    std::vector<double> costs_tol;
+
+    for (const auto& cost_fn : tol_based_cost_fns) {
+        costs_tol.push_back(cost_fn(n, n_iter));
+    }
+
+    run_all(epoch_based_versions, epoch_based_names, costs, Data_matr, Data_matr_copy, E_vecs, E_vals, 1000);
+    run_all(tol_based_versions, tol_based_names, costs_tol, Data_matr, Data_matr_copy, E_vecs, E_vals, 1e-8);
 }
