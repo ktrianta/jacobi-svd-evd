@@ -40,7 +40,7 @@ int main() {
     size_t n;
 
     std::ios_base::sync_with_stdio(false);  // disable synchronization between C and C++ standard streams
-    std::cin.tie(NULL);  // untie cin from cout
+    std::cin.tie(NULL);                     // untie cin from cout
 
     std::cin >> n;
     std::cout << "Performance benchmark on array of size " << n << " by " << n << std::endl;
@@ -57,7 +57,6 @@ int main() {
     for (size_t i = 0; i < n * n; ++i) {
         std::cin >> A[i];
     }
-
 
     size_t n_iter = evd_classic_tol(Data_matr, Data_matr_copy, E_vecs, E_vals, 1e-8);
     std::cout << n_iter;

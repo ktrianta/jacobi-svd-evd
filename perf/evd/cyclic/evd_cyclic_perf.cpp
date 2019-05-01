@@ -24,15 +24,15 @@ std::vector<std::string> tol_based_names = {
 };
 
 double tol_cost(size_t n, size_t n_iter) {
-    double n_elements = n*(n-1)/2;
-    double adds = (4 + 6 * n ) * n_elements + n_elements * 2;
-    double muls = (4 + 12 * n ) * n_elements + n_elements * 2;
+    double n_elements = n * (n - 1) / 2;
+    double adds = (4 + 6 * n) * n_elements + n_elements * 2;
+    double muls = (4 + 12 * n) * n_elements + n_elements * 2;
     double divs = 3 * n_elements;
     double sqrt = 2 * n_elements;
 
     return n_iter * (adds + muls + divs + sqrt);
 }
-double base_cost_evd(size_t n, size_t n_iter){
+double base_cost_evd(size_t n, size_t n_iter) {
     double add = n_iter * (5 + 6 * n);
     double mult = n_iter * (7 + 12 * n);
     double div = n_iter;
@@ -45,12 +45,11 @@ using CostFuncType = decltype(&tol_cost);
 
 std::vector<CostFuncType> tol_based_cost_fns = {tol_cost};
 
-
 int main() {
     size_t n;
 
     std::ios_base::sync_with_stdio(false);  // disable synchronization between C and C++ standard streams
-    std::cin.tie(NULL);  // untie cin from cout
+    std::cin.tie(NULL);                     // untie cin from cout
 
     std::cin >> n;
     std::cout << "Performance benchmark on array of size " << n << " by " << n << std::endl;

@@ -39,5 +39,4 @@ void evd_classic(struct matrix_t A, struct matrix_t A_copy, struct matrix_t V, s
  * X.
  *@param tol, the tolerance we require. This is with regard to the off-diagonal norm.
  */
-int evd_classic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t Qmat, struct vector_t evec,
-                     double tol);
+int evd_classic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t Qmat, struct vector_t evec, double tol);

@@ -79,8 +79,7 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struc
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
 }
 
-int evd_cyclic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t Qmat, struct vector_t evec,
-                    double tol) {
+int evd_cyclic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t Qmat, struct vector_t evec, double tol) {
     const size_t n = Xmat.cols;
     double* e = evec.ptr;
     double* Q = Qmat.ptr;
