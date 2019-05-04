@@ -64,7 +64,7 @@ using CostFuncType = decltype(&base_cost_evd);
 using CostFuncType = decltype(&tol_cost);
 
 std::vector<CostFuncType> tol_based_cost_fns = {tol_cost};
-std::vector<CostFuncType> evdcyclic_epoch_based_cost_fns = {one_loop_cost};
+std::vector<CostFuncType> evdcyclic_epoch_based_cost_fns = {base_cost_evd};
 
 int main() {
     size_t n;
@@ -103,5 +103,5 @@ int main() {
     }
 
     run_all(epoch_based_versions, epoch_based_names, costs, Data_matr, Data_matr_copy, E_vecs, E_vals, n_iter);
-    // run_all(tol_based_versions, tol_based_names, costs_tol, Data_matr, Data_matr_copy, E_vecs, E_vals, tol);
+    run_all(tol_based_versions, tol_based_names, costs_tol, Data_matr, Data_matr_copy, E_vecs, E_vals, tol);
 }
