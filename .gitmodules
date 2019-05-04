@@ -1,3 +1,3 @@
 [submodule "perf/eigen"]
 	path = perf/eigen
-	url = git@github.com:ktrianta/eigen.git
+	url = https://github.com/ktrianta/eigen.git
