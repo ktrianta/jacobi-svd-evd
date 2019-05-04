@@ -16,7 +16,6 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struc
     double* E = Eigen_values.ptr;
     size_t n = Data_matr.rows;
     double c0, s0;
-    double c1, s1;
 
     matrix_identity(Eigen_vectors);
     matrix_copy(Data_matr_copy, Data_matr);
@@ -26,51 +25,40 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struc
             for (size_t q = p + 1; q < n; q++) {
                 // Compute cos_t and sin_t for the rotation
                 sym_jacobi_coeffs(A[p * n + p], A[p * n + q], A[q * n + q], &c0, &s0);
-                sym_jacobi_coeffs(A[p * n + p], A[p * n + q + 1], A[q * n + q + 1], &c1, &s1);
 
                 size_t i;
-                double A_ip0, A_iq0;
-                double A_ip1, A_iq1;
-                double A_ip2, A_iq2;
-                double A_ip3, A_iq3;
+
+                double A_pp = A[n * p + p];
+                double A_pq = A[n * q + p];
+
+                A[n * p + p] = c0 * A_pp - s0 * A_pq;
+                A[n * q + p] = s0 * A_pp + c0 * A_pq;
+
+                double A_qp = A[n * p + q];
+                double A_qq = A[n * q + q];
+
+                A[n * p + q] = c0 * A_qp - s0 * A_qq;
+                A[n * q + q] = s0 * A_qp + c0 * A_qq;
 
                 for (i = 0; i < n - 3; i += 4) {
-                    A_ip0 = A[n * i + p];
-                    A_iq0 = A[n * i + q];
-                    A_ip1 = A[n * (i + 1) + p];
-                    A_iq1 = A[n * (i + 1) + q];
-                    A_ip2 = A[n * (i + 2) + p];
-                    A_iq2 = A[n * (i + 2) + q];
-                    A_ip3 = A[n * (i + 3) + p];
-                    A_iq3 = A[n * (i + 3) + q];
+                    double A_ip0 = A[n * i + p];
+                    double A_iq0 = A[n * i + q];
+                    double A_ip1 = A[n * (i + 1) + p];
+                    double A_iq1 = A[n * (i + 1) + q];
+                    double A_ip2 = A[n * (i + 2) + p];
+                    double A_iq2 = A[n * (i + 2) + q];
+                    double A_ip3 = A[n * (i + 3) + p];
+                    double A_iq3 = A[n * (i + 3) + q];
 
-                    A[n * i + p] = c0 * A_ip0 - s0 * A_iq0;
-                    A[n * i + q] = s0 * A_ip0 + c0 * A_iq0;
-                    A[n * (i + 1) + p] = c0 * A_ip1 - s0 * A_iq1;
-                    A[n * (i + 1) + q] = s0 * A_ip1 + c0 * A_iq1;
-                    A[n * (i + 2) + p] = c0 * A_ip2 - s0 * A_iq2;
-                    A[n * (i + 2) + q] = s0 * A_ip2 + c0 * A_iq2;
-                    A[n * (i + 3) + p] = c0 * A_ip3 - s0 * A_iq3;
-                    A[n * (i + 3) + q] = s0 * A_ip3 + c0 * A_iq3;
-                }
-                for (; i < n; ++i) {
-                    double A_ip = A[n * i + p];
-                    double A_iq = A[n * i + q];
+                    double nA_ip0 = c0 * A_ip0 - s0 * A_iq0;
+                    double nA_iq0 = s0 * A_ip0 + c0 * A_iq0;
+                    double nA_ip1 = c0 * A_ip1 - s0 * A_iq1;
+                    double nA_iq1 = s0 * A_ip1 + c0 * A_iq1;
+                    double nA_ip2 = c0 * A_ip2 - s0 * A_iq2;
+                    double nA_iq2 = s0 * A_ip2 + c0 * A_iq2;
+                    double nA_ip3 = c0 * A_ip3 - s0 * A_iq3;
+                    double nA_iq3 = s0 * A_ip3 + c0 * A_iq3;
 
-                    A[n * i + p] = c0 * A_ip - s0 * A_iq;
-                    A[n * i + q] = s0 * A_ip + c0 * A_iq;
-                }
-
-                for (i = 0; i < n - 3; i += 4) {
-                    A_ip0 = A[n * p + i];
-                    A_iq0 = A[n * q + i];
-                    A_ip1 = A[n * p + (i + 1)];
-                    A_iq1 = A[n * q + (i + 1)];
-                    A_ip2 = A[n * p + (i + 2)];
-                    A_iq2 = A[n * q + (i + 2)];
-                    A_ip3 = A[n * p + (i + 3)];
-                    A_iq3 = A[n * q + (i + 3)];
-                    // Working with the transpose of eigenvectors to improve locality.
                     double V_pi0 = V[n * p + i];
                     double V_qi0 = V[n * q + i];
                     double V_pi1 = V[n * p + i + 1];
@@ -80,15 +68,6 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struc
                     double V_pi3 = V[n * p + i + 3];
                     double V_qi3 = V[n * q + i + 3];
 
-                    A[n * p + i] = c0 * A_ip0 - s0 * A_iq0;
-                    A[n * q + i] = s0 * A_ip0 + c0 * A_iq0;
-                    A[n * p + (i + 1)] = c0 * A_ip1 - s0 * A_iq1;
-                    A[n * q + (i + 1)] = s0 * A_ip1 + c0 * A_iq1;
-                    A[n * p + (i + 2)] = c0 * A_ip2 - s0 * A_iq2;
-                    A[n * q + (i + 2)] = s0 * A_ip2 + c0 * A_iq2;
-                    A[n * p + (i + 3)] = c0 * A_ip3 - s0 * A_iq3;
-                    A[n * q + (i + 3)] = s0 * A_ip3 + c0 * A_iq3;
-
                     V[n * p + i] = c0 * V_pi0 - s0 * V_qi0;
                     V[n * q + i] = s0 * V_pi0 + c0 * V_qi0;
                     V[n * p + i + 1] = c0 * V_pi1 - s0 * V_qi1;
@@ -97,18 +76,52 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struc
                     V[n * q + i + 2] = s0 * V_pi2 + c0 * V_qi2;
                     V[n * p + i + 3] = c0 * V_pi3 - s0 * V_qi3;
                     V[n * q + i + 3] = s0 * V_pi3 + c0 * V_qi3;
+
+                    A[n * i + p] = nA_ip0;
+                    A[n * i + q] = nA_iq0;
+                    A[n * (i + 1) + p] = nA_ip1;
+                    A[n * (i + 1) + q] = nA_iq1;
+                    A[n * (i + 2) + p] = nA_ip2;
+                    A[n * (i + 2) + q] = nA_iq2;
+                    A[n * (i + 3) + p] = nA_ip3;
+                    A[n * (i + 3) + q] = nA_iq3;
+
+                    if (!(i + 3 >= p && i <= p) && !(i + 3 >= q && i <= q)) {
+                        A[n * p + i] = nA_ip0;
+                        A[n * q + i] = nA_iq0;
+                        A[n * p + i + 1] = nA_ip1;
+                        A[n * q + i + 1] = nA_iq1;
+                        A[n * p + i + 2] = nA_ip2;
+                        A[n * q + i + 2] = nA_iq2;
+                        A[n * p + i + 3] = nA_ip3;
+                        A[n * q + i + 3] = nA_iq3;
+                    } else {
+                        for (int j = 0; j < 4; j++) {
+                            if ((i + j) != p && (i + j) != q) {
+                                A[n * p + i + j] = A[n * (i + j) + p];
+                                A[n * q + i + j] = A[n * (i + j) + q];
+                            }
+                        }
+                    }
                 }
                 for (; i < n; ++i) {
-                    double A_ip = A[n * p + i];
-                    double A_iq = A[n * q + i];
-                    double V_pi = V[n * p + i];
-                    double V_qi = V[n * q + i];
+                    double V_pi0 = V[n * p + i];
+                    double V_qi0 = V[n * q + i];
+                    double A_ip0 = A[n * i + p];
+                    double A_iq0 = A[n * i + q];
 
-                    A[n * p + i] = c0 * A_ip - s0 * A_iq;
-                    A[n * q + i] = s0 * A_ip + c0 * A_iq;
+                    double nA_ip = c0 * A_ip0 - s0 * A_iq0;
+                    double nA_iq = s0 * A_ip0 + c0 * A_iq0;
 
-                    V[n * p + i] = c0 * V_pi - s0 * V_qi;
-                    V[n * q + i] = s0 * V_pi + c0 * V_qi;
+                    A[n * i + p] = nA_ip;
+                    A[n * i + q] = nA_iq;
+                    V[n * p + i] = c0 * V_pi0 - s0 * V_qi0;
+                    V[n * q + i] = s0 * V_pi0 + c0 * V_qi0;
+
+                    if (i != p && i != q) {
+                        A[n * p + i] = nA_ip;
+                        A[n * q + i] = nA_iq;
+                    }
                 }
             }
         }
