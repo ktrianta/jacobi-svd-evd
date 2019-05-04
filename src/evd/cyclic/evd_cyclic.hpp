@@ -22,6 +22,12 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struc
                 int epoch = 20);
 
 /**
+ * Optimization 1: Vectorized version of the above function
+ */
+void evd_cyclic_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
+                          struct vector_t e, int epoch = 20);
+
+/**
  * Compute eigenvalue decomposition of a given symmetric, n times n matrix
  * using cyclic Jacobi rotations.
  *
