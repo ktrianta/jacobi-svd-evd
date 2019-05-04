@@ -16,7 +16,7 @@ static inline void mult_block(struct matrix_t Amat, size_t blockA_row, size_t bl
 static inline void add(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Cmat);
 static inline void copy_block(struct matrix_t S, size_t blockS_row, size_t blockS_col, struct matrix_t D,
                               size_t blockD_row, size_t blockD_col, size_t block_size);
-static inline void transpose_block(struct matrix_t A, size_t blockA_row, size_t blockA_col, size_t block_size);
+static inline void transpose(struct matrix_t A);
 
 size_t svd(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, struct matrix_t Vmat) {
     assert(Amat.rows == Amat.cols);  // Matrix A should be square
@@ -37,11 +37,12 @@ size_t svd(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, str
 
     const size_t block_size = 8;
     const size_t n_blocks = n / block_size;
-    assert(n_blocks * block_size == n);
 
     if (n < 3 * block_size) {
         return svd_block(Bmat, Umat, Vmat);
     }
+
+    assert(n_blocks * block_size == n);
 
     double* memory_block = (double*) malloc((4 + 4 + 4 + 1 + 1) * block_size * block_size * sizeof(double));
     double* Bblock = memory_block;
@@ -57,7 +58,6 @@ size_t svd(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, str
     matrix_t M2mat = {M2, block_size, block_size};
 
     while (off_norm >= tol * norm) {
-        debug("off_norm", off_norm);
         for (size_t i_block = 0; i_block < n_blocks - 1; ++i_block) {
             for (size_t j_block = i_block + 1; j_block < n_blocks; ++j_block) {
                 copy_block(Bmat, i_block, i_block, Bblockmat, 0, 0, block_size);
@@ -67,14 +67,13 @@ size_t svd(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, str
 
                 svd_block(Bblockmat, Ublockmat, Vblockmat);
 
-                transpose_block(Ublockmat, 0, 0, block_size);
-                transpose_block(Ublockmat, 1, 1, block_size);
+                transpose(Ublockmat);
 
                 for (size_t k_block = 0; k_block < n_blocks; ++k_block) {
                     mult_block(Ublockmat, 0, 0, Bmat, i_block, k_block, M1mat, 0, 0, block_size);
-                    mult_block(Ublockmat, 1, 0, Bmat, j_block, k_block, M2mat, 0, 0, block_size);
+                    mult_block(Ublockmat, 0, 1, Bmat, j_block, k_block, M2mat, 0, 0, block_size);
                     add(M1mat, M2mat, M2mat);
-                    mult_block(Ublockmat, 0, 1, Bmat, i_block, k_block, M1mat, 0, 0, block_size);
+                    mult_block(Ublockmat, 1, 0, Bmat, i_block, k_block, M1mat, 0, 0, block_size);
                     copy_block(M2mat, 0, 0, Bmat, i_block, k_block, block_size);
                     mult_block(Ublockmat, 1, 1, Bmat, j_block, k_block, M2mat, 0, 0, block_size);
                     add(M1mat, M2mat, M2mat);
@@ -92,8 +91,7 @@ size_t svd(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, str
                     copy_block(M2mat, 0, 0, Bmat, k_block, j_block, block_size);
                 }
 
-                transpose_block(Ublockmat, 0, 0, block_size);
-                transpose_block(Ublockmat, 1, 1, block_size);
+                transpose(Ublockmat);
 
                 for (size_t k_block = 0; k_block < n_blocks; ++k_block) {
                     mult_block(Umat, k_block, i_block, Ublockmat, 0, 0, M1mat, 0, 0, block_size);
@@ -125,7 +123,6 @@ size_t svd(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, str
 
     free(memory_block);
 
-    debug(Bmat);
     return iter;
 }
 
@@ -145,7 +142,7 @@ static size_t svd_block(struct matrix_t Bmat, struct matrix_t Umat, struct matri
 
     // Repeat while the frobenius norm of the off-diagonal elements of matrix B, which is updated in every
     // iteration, is smaller than the forbenius norm of the original matrix B (or A) times the tolerance
-    while (off_norm >= tol * norm) {
+    while (off_norm >= tol * tol * norm) {
         for (size_t i = 0; i < n - 1; ++i) {
             for (size_t j = i + 1; j < n; ++j) {
                 const double bii = B[n * i + i];  // B[i][i]
@@ -250,15 +247,14 @@ static inline void copy_block(struct matrix_t Smat, size_t blockS_row, size_t bl
     }
 }
 
-static inline void transpose_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, size_t block_size) {
+static inline void transpose(struct matrix_t Amat) {
     size_t n = Amat.rows;
     double* A = Amat.ptr;
-    size_t Abeg = blockA_row * block_size * n + blockA_col * block_size;
-    for (size_t i = 1; i < block_size - 1; ++i) {
-        for (size_t j = i + 1; j < block_size; ++j) {
-            double tmp = A[Abeg + i * n + j];
-            A[Abeg + i * n + j] = A[Abeg + j * n + i];
-            A[Abeg + j * n + i] = tmp;
+    for (size_t i = 0; i < n - 1; ++i) {
+        for (size_t j = i + 1; j < n; ++j) {
+            double tmp = A[i * n + j];
+            A[i * n + j] = A[j * n + i];
+            A[j * n + i] = tmp;
         }
     }
 }

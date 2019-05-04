@@ -32,7 +32,7 @@ TEST(two_sided_svd, usvd) {
 }
 
 TEST(two_sided_svd, identity_matrix) {
-    size_t n_rows = 100, n_cols = 100;
+    size_t n_rows = 96, n_cols = 96;
     std::vector<double> X(n_rows * n_cols, 0);
     for (size_t i = 0; i < n_rows; ++i) {
         X[i * n_cols + i] = 1.0;
@@ -111,7 +111,7 @@ TEST(two_sided_svd, svd_singvalues_crosscheck) {
 }
 
 TEST(two_sided_svd, random_matrix_big) {
-    size_t n = 100;
+    size_t n = 128;
     std::vector<double> X(n * n);
     std::vector<double> B(n * n);
     std::vector<double> s_expect(n);
