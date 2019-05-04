@@ -51,7 +51,7 @@
  * @param Args All the arguments to be passed when calling fn.
  * @return std::vector containing n_reps many measured cycle values.
  */
-template <size_t n_reps = 100, size_t cycles_required = static_cast<size_t>(1e7), size_t num_runs_initial = 5,
+template <size_t n_reps = 10, size_t cycles_required = static_cast<size_t>(1e7), size_t num_runs_initial = 1,
           typename Func, typename... Args>
 std::vector<double> measure_cycles(Func fn, Args... args) {
     double cycles = 0.;
