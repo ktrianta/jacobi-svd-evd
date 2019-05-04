@@ -37,6 +37,17 @@ double base_cost_evd(size_t n, size_t n_iter) {
     return (add + mult + div + sqrt) * loop_multiplier;
 }
 
+double one_loop_cost(size_t n, size_t n_iter) {
+    // number of upper triangular elements
+    double n_elements = n * (n - 1) / 2;
+    double adds = (8 + 4 * n) * n_elements;
+    double muls = (12 + 8 * n) * n_elements;
+    double divs = 3 * n_elements;
+    double sqrt = 2 * n_elements;
+
+    return n_iter * (adds + muls + divs + sqrt);
+}
+
 double tol_cost(size_t n, size_t n_iter) {
     // number of upper triangular elements
     double n_elements = n * (n - 1) / 2;
@@ -48,11 +59,12 @@ double tol_cost(size_t n, size_t n_iter) {
     return n_iter * (adds + muls + divs + sqrt);
 }
 
+using CostFuncType = decltype(&one_loop_cost);
 using CostFuncType = decltype(&base_cost_evd);
 using CostFuncType = decltype(&tol_cost);
 
 std::vector<CostFuncType> tol_based_cost_fns = {tol_cost};
-std::vector<CostFuncType> evdcyclic_epoch_based_cost_fns = {base_cost_evd};
+std::vector<CostFuncType> evdcyclic_epoch_based_cost_fns = {one_loop_cost};
 
 int main() {
     size_t n;
@@ -91,5 +103,5 @@ int main() {
     }
 
     run_all(epoch_based_versions, epoch_based_names, costs, Data_matr, Data_matr_copy, E_vecs, E_vals, n_iter);
-    run_all(tol_based_versions, tol_based_names, costs_tol, Data_matr, Data_matr_copy, E_vecs, E_vals, tol);
+    // run_all(tol_based_versions, tol_based_names, costs_tol, Data_matr, Data_matr_copy, E_vecs, E_vals, tol);
 }
