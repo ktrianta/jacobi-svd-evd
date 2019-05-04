@@ -7,10 +7,11 @@
 #include "svd.hpp"
 #include "types.hpp"
 
-using namespace Eigen;
-typedef Eigen::Matrix<double, Dynamic, Dynamic> MatrixXd;
 
-void run_jacobi(JacobiSVD<MatrixXd>&& svd, MatrixXd&& m, unsigned int flags) { svd.compute(m, flags); }
+typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXd;
+typedef Eigen::JacobiSVD<MatrixXd> SVD;
+
+void run_jacobi(SVD&& svd, MatrixXd&& m, unsigned int flags) { svd.compute(m, flags); }
 
 using SVDTolType = decltype(&run_jacobi);
 
@@ -67,7 +68,7 @@ int main() {
     std::cout << "Performance benchmark on array of size " << n << " by " << n << std::endl;
 
     MatrixXd Ap(n, n);
-    JacobiSVD<MatrixXd> svd;
+    SVD svd;
 
     for (size_t i = 0; i < n; ++i) {
         for (size_t j = 0; j < n; j++) {
@@ -75,7 +76,7 @@ int main() {
         }
     }
 
-    svd.compute(Ap, ComputeFullU | ComputeFullV);
+    svd.compute(Ap, Eigen::ComputeFullU | Eigen::ComputeFullV);
     size_t n_iter = svd.getSweeps();
 
     std::vector<double> costs;
@@ -83,5 +84,5 @@ int main() {
         costs.push_back(cost_fn(n, n_iter));
     }
 
-    run_all(tol_based_versions, tol_based_names, costs, svd, Ap, ComputeFullU | ComputeFullV);
+    run_all(tol_based_versions, tol_based_names, costs, svd, Ap, Eigen::ComputeFullU | Eigen::ComputeFullV);
 }
