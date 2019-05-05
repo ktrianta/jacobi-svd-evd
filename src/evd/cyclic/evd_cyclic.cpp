@@ -124,7 +124,7 @@ void evd_cyclic_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_c
                 sin_vec = _mm256_set1_pd(sin_t);
                 cos_vec = _mm256_set1_pd(cos_t);
 
-                if(m % 4 != 0)
+                if (m % 4 != 0)
                     n = m - (m % 4);
 
                 for (size_t i = 0; i < n; i+=4) {
@@ -157,8 +157,8 @@ void evd_cyclic_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_c
                     A[m * i + m * 3 + col] = Ac_col_updated[0];
                 }
 
-                if(m % 4 != 0) {
-                    for(size_t i = 0; i < m - n; i++) {
+                if (m % 4 != 0) {
+                    for (size_t i = 0; i < m - n; i++) {
                         double A_i_r = A[m * (n + i) + row];
                         A[m * (n + i) + row] = cos_t * A[m * (n + i) + row] + sin_t * A[m * (n + i) + col];
                         A[m * (n + i) + col] = cos_t * A[m * (n + i) + col] - sin_t * A_i_r;
@@ -198,11 +198,10 @@ void evd_cyclic_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_c
                     sin_row = _mm256_mul_pd(V_rcopy, sin_vec);
                     V_col = _mm256_sub_pd(cos_col, sin_row);
                     _mm256_storeu_pd(V + m * col + i, V_col);
-
                 }
 
-                if(m % 4 != 0) {
-                    for(size_t i = 0; i < m - n; i++) {
+                if (m % 4 != 0) {
+                    for (size_t i = 0; i < m - n; i++) {
                         double A_r_i = A[m * row + n + i];
                         A[m * row + n + i] = cos_t * A[m * row + n + i] + sin_t * A[m * col + n + i];
                         A[m * col + n + i] = cos_t * A[m * col + n + i] - sin_t * A_r_i;
