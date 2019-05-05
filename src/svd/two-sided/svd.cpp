@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <math.h>
 #include <algorithm>
+#include "cost.hpp"
 #include "matrix.hpp"
 #include "nsvd.hpp"
 #include "types.hpp"
@@ -13,7 +14,7 @@ size_t svd(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, str
     assert(Amat.rows == Umat.rows && Amat.cols == Umat.cols);
     assert(Amat.rows == Vmat.rows && Amat.cols == Vmat.cols);
 
-    size_t iter = 0;           // count main loop iterations performed till convergence
+    size_t iter = 0;
     const double tol = 1e-15;  // convergence tolerance
     const size_t n = Amat.rows;
     double* B = Bmat.ptr;
@@ -79,8 +80,8 @@ size_t svd(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, str
         }
 
         matrix_off_frobenius(Bmat, &off_norm);
-        iter += 1;
+        iter++;
     }
 
-    return iter;
+    return base_cost(n, iter);
 }

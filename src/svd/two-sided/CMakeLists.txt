@@ -1,6 +1,8 @@
 set(SOURCES
+    svd.cpp
     svd_blocked.cpp
     nsvd.cpp
+    cost.cpp
     )
 
 add_library(two-sided-svd-lib STATIC ${SOURCES})

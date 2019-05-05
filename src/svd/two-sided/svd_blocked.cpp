@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <algorithm>
+#include "cost.hpp"
 #include "debug.hpp"
 #include "matrix.hpp"
 #include "nsvd.hpp"
@@ -18,13 +19,14 @@ static inline void copy_block(struct matrix_t S, size_t blockS_row, size_t block
                               size_t blockD_row, size_t blockD_col, size_t block_size);
 static inline void transpose(struct matrix_t A);
 
-size_t svd(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, struct matrix_t Vmat) {
+size_t svd_blocked(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, struct matrix_t Vmat) {
     assert(Amat.rows == Amat.cols);  // Matrix A should be square
     assert(Amat.rows == Bmat.rows && Amat.cols == Bmat.cols);
     assert(Amat.rows == Umat.rows && Amat.cols == Umat.cols);
     assert(Amat.rows == Vmat.rows && Amat.cols == Vmat.cols);
 
-    size_t iter = 0;           // count main loop iterations performed till convergence
+    size_t iter = 0;
+    size_t block_iter = 0;
     const double tol = 1e-15;  // convergence tolerance
     const size_t n = Amat.rows;
     double norm = 0.0;      // frobenius norm of matrix B
@@ -38,8 +40,9 @@ size_t svd(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, str
     const size_t block_size = 8;
     const size_t n_blocks = n / block_size;
 
-    if (n < 3 * block_size) {
-        return svd_block(Bmat, Umat, Vmat);
+    if (n < 2 * block_size) {
+        size_t block_iters = svd_block(Bmat, Umat, Vmat);
+        return base_cost(n, block_iters);
     }
 
     assert(n_blocks * block_size == n);
@@ -65,7 +68,7 @@ size_t svd(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, str
                 copy_block(Bmat, j_block, i_block, Bblockmat, 1, 0, block_size);
                 copy_block(Bmat, j_block, j_block, Bblockmat, 1, 1, block_size);
 
-                svd_block(Bblockmat, Ublockmat, Vblockmat);
+                block_iter += svd_block(Bblockmat, Ublockmat, Vblockmat);
 
                 transpose(Ublockmat);
 
@@ -118,12 +121,12 @@ size_t svd(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, str
         }
 
         matrix_off_frobenius(Bmat, &off_norm);
-        iter += 1;
+        iter++;
     }
 
     free(memory_block);
 
-    return iter;
+    return blocked_cost(n, block_size, iter, block_iter);
 }
 
 static size_t svd_block(struct matrix_t Bmat, struct matrix_t Umat, struct matrix_t Vmat) {
