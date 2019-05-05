@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 #
 # Usage: Run from the project root directory. Use without any arguments to run all benchmarks. If you give the path to
 #        one of the benchmark executables, all the benchmarks for that specific executable will be run only.

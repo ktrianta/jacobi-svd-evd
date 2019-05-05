@@ -29,7 +29,7 @@ add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
 # Set C++ standard and compiler flags.
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -std=c++11")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -mavx2 -mfma -fno-tree-vectorize")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -DNDEBUG -O3 -mavx2 -mfma -fno-tree-vectorize")
 
 # If cmake is not passed the CMAKE_BUILD_TYPE=Debug option, default to Release.
 # Note that if the CMAKE_BUILD_TYPE option is passed when running cmake, its value is cached
