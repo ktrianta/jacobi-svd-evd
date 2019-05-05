@@ -90,7 +90,6 @@ void evd_cyclic_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_c
     double* V = Eigen_vectors.ptr;
     double* E = Eigen_values.ptr;
     const size_t m = Data_matr.rows;
-    size_t n = m;
 
     matrix_identity(Eigen_vectors);
 
@@ -112,6 +111,7 @@ void evd_cyclic_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_c
 
         for (size_t row = 0; row < m; row++) {
             for (size_t col = row + 1; col < m; col++) {
+                size_t n = m;
                 __m256d sin_vec, cos_vec;
 
                 // Compute cos_t and sin_t for the rotation
@@ -124,15 +124,46 @@ void evd_cyclic_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_c
                 sin_vec = _mm256_set1_pd(sin_t);
                 cos_vec = _mm256_set1_pd(cos_t);
 
-                for (size_t i = 0; i < m; i++) {
-                    // Compute the eigen values by updating the columns until convergence
-                    double A_i_r = A[m * i + row];
-                    A[m * i + row] = cos_t * A[m * i + row] + sin_t * A[m * i + col];
-                    A[m * i + col] = cos_t * A[m * i + col] - sin_t * A_i_r;
-                }
-
                 if(m % 4 != 0)
                     n = m - (m % 4);
+
+                for (size_t i = 0; i < n; i+=4) {
+                    __m256d Ac_row, Ac_col, Ac_rcopy;
+                    __m256d sin_row, sin_col, cos_row, cos_col;
+
+                    // Compute the eigen values by updating the columns until convergence
+                    Ac_row = _mm256_set_pd(A[m * i + row], A[m * i + m + row],
+                                           A[m * i + m * 2 + row], A[m * i + m * 3 + row]);
+                    Ac_rcopy = Ac_row;
+                    Ac_col = _mm256_set_pd(A[m * i + col], A[m * i + m + col],
+                                           A[m * i + m * 2 + col], A[m * i + m * 3 + col]);
+
+                    cos_row = _mm256_mul_pd(Ac_row, cos_vec);
+                    sin_col = _mm256_mul_pd(Ac_col, sin_vec);
+                    Ac_row = _mm256_add_pd(cos_row, sin_col);
+                    double *Ac_row_updated = (double*) &Ac_row;
+                    A[m * i + row] = Ac_row_updated[3];
+                    A[m * i + m + row] = Ac_row_updated[2];
+                    A[m * i + m * 2 + row] = Ac_row_updated[1];
+                    A[m * i + m * 3 + row] = Ac_row_updated[0];
+
+                    cos_col = _mm256_mul_pd(Ac_col, cos_vec);
+                    sin_row = _mm256_mul_pd(Ac_rcopy, sin_vec);
+                    Ac_col = _mm256_sub_pd(cos_col, sin_row);
+                    double *Ac_col_updated = (double*) &Ac_col;
+                    A[m * i + col] = Ac_col_updated[3];
+                    A[m * i + m + col] = Ac_col_updated[2];
+                    A[m * i + m * 2 + col] = Ac_col_updated[1];
+                    A[m * i + m * 3 + col] = Ac_col_updated[0];
+                }
+
+                if(m % 4 != 0) {
+                    for(size_t i = 0; i < m - n; i++) {
+                        double A_i_r = A[m * (n + i) + row];
+                        A[m * (n + i) + row] = cos_t * A[m * (n + i) + row] + sin_t * A[m * (n + i) + col];
+                        A[m * (n + i) + col] = cos_t * A[m * (n + i) + col] - sin_t * A_i_r;
+                    }
+                }
 
                 for (size_t i = 0; i < n; i+=4) {
                     __m256d A_row, A_col, A_rcopy, V_row, V_col, V_rcopy;
@@ -172,13 +203,13 @@ void evd_cyclic_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_c
 
                 if(m % 4 != 0) {
                     for(size_t i = 0; i < m - n; i++) {
-                      double A_r_i = A[m * row + n + i];
-                      A[m * row + n + i] = cos_t * A[m * row + n + i] + sin_t * A[m * col + n + i];
-                      A[m * col + n + i] = cos_t * A[m * col + n + i] - sin_t * A_r_i;
+                        double A_r_i = A[m * row + n + i];
+                        A[m * row + n + i] = cos_t * A[m * row + n + i] + sin_t * A[m * col + n + i];
+                        A[m * col + n + i] = cos_t * A[m * col + n + i] - sin_t * A_r_i;
 
-                      double V_r_i = V[m * row + n + i];
-                      V[m * row + n + i] = cos_t * V[m * row + n + i] + sin_t * V[m * col + n + i];
-                      V[m * col + n + i] = cos_t * V[m * col + n + i] - sin_t * V_r_i;
+                        double V_r_i = V[m * row + n + i];
+                        V[m * row + n + i] = cos_t * V[m * row + n + i] + sin_t * V[m * col + n + i];
+                        V[m * col + n + i] = cos_t * V[m * col + n + i] - sin_t * V_r_i;
                     }
                 }
             }
