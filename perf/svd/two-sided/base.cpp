@@ -12,7 +12,7 @@ int main() {
 
     size_t n;
     std::cin >> n >> n;
-    std::cout << "Performance benchmark on array of size " << n << " by " << n << std::endl;
+    std::cerr << "Performance benchmark on array of size " << n << " by " << n << std::endl;
 
     std::vector<double> A(n * n);
     std::vector<double> B(n * n);
@@ -29,7 +29,4 @@ int main() {
 
     size_t cost = svd(Data_matr, B_mat, U_mat, V_mat);
     bench_func(svd, "svd_two_sided", cost, Data_matr, B_mat, U_mat, V_mat);
-
-    cost = svd_blocked(Data_matr, B_mat, U_mat, V_mat);
-    bench_func(svd_blocked, "svd_two_sided_blocked", cost, Data_matr, B_mat, U_mat, V_mat);
 }

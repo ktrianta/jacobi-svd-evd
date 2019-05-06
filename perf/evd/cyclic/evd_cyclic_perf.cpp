@@ -63,7 +63,7 @@ int main() {
     std::cin.tie(NULL);                     // untie cin from cout
 
     std::cin >> n;
-    std::cout << "Performance benchmark on array of size " << n << " by " << n << std::endl;
+    std::cerr << "Performance benchmark on array of size " << n << " by " << n << std::endl;
 
     std::vector<double> A(n * n);
     std::vector<double> A_copy(n * n);
