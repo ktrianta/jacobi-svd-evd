@@ -7,7 +7,6 @@
 #include "svd.hpp"
 #include "types.hpp"
 
-
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXd;
 typedef Eigen::JacobiSVD<MatrixXd> SVD;
 
