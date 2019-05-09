@@ -39,3 +39,12 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struc
  * X.
  */
 int evd_cyclic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t Qmat, struct vector_t evec, double tol);
+
+void evd_cyclic_oneloop(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V, struct vector_t e,
+                        int epoch = 20);
+
+void evd_cyclic_unroll_outer(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
+                             struct vector_t e, int epoch = 20);
+
+void evd_cyclic_unroll_inner(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
+                             struct vector_t e, int epoch = 20);
