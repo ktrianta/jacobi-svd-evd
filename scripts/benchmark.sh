@@ -12,7 +12,7 @@ run_all () {
     else
         dir=perf/resources/evd
     fi
-    for input in `ls -v ${dir}/* | head -4`; do
+    for input in `ls -v ${dir}/* | head -7`; do
         [ -f "$bin" ] && [ -x "$bin" ] && "$bin" < "$input"
     done
 }

@@ -51,7 +51,7 @@
  * @param Args All the arguments to be passed when calling fn.
  * @return std::vector containing n_reps many measured cycle values.
  */
-template <size_t n_reps = 100, size_t cycles_required = static_cast<size_t>(1e7), size_t num_runs_initial = 5,
+template <size_t n_reps = 10, size_t cycles_required = static_cast<size_t>(1e7), size_t num_runs_initial = 1,
           typename Func, typename... Args>
 std::vector<double> measure_cycles(Func fn, Args... args) {
     double cycles = 0.;
@@ -90,6 +90,21 @@ std::vector<double> measure_cycles(Func fn, Args... args) {
     return cycles_vec;
 }
 
+template <typename FuncType, typename... Args>
+void bench_func(FuncType fn, const std::string& fn_name, double cost, Args... args) {
+    std::vector<double> cycles = measure_cycles(fn, std::forward<Args>(args)...);
+    auto median_it = cycles.begin() + cycles.size() / 2;
+    std::nth_element(cycles.begin(), median_it, cycles.end());
+    double runtime = *median_it;
+
+    std::cout << fn_name << '\n';
+    std::cout << "Runtime:     " << runtime << " cycles (median)\n";
+    std::cout << "Performance: " << cost / runtime << " flops/cycle (median)" << '\n';
+
+    for (size_t j = 0; j < 10; ++j) std::cout << '-';
+    std::cout << '\n' << std::endl;
+}
+
 /**
  * Benchmark all the given functions using the same set of parameters.
  */
@@ -98,16 +113,6 @@ void run_all(const std::vector<FuncType>& fn_vec, const std::vector<std::string>
              const std::vector<double>& costs, Args... args) {
     assert(fn_vec.size() == fn_names.size());
     for (size_t i = 0; i < fn_vec.size(); ++i) {
-        std::vector<double> cycles = measure_cycles(fn_vec[i], std::forward<Args>(args)...);
-        auto median_it = cycles.begin() + cycles.size() / 2;
-        std::nth_element(cycles.begin(), median_it, cycles.end());
-        double runtime = *median_it;
-
-        std::cout << fn_names[i] << '\n';
-        std::cout << "Runtime:     " << runtime << " cycles (median)\n";
-        std::cout << "Performance: " << costs[i] / runtime << " flops/cycle (median)" << '\n';
-
-        for (size_t j = 0; j < 10; ++j) std::cout << '-';
-        std::cout << '\n' << std::endl;
+        bench_func(fn_vec[i], fn_names[i], costs[i], std::forward<Args>(args)...);
     }
 }
