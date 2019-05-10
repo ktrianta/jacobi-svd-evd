@@ -97,12 +97,14 @@ void bench_func(FuncType fn, const std::string& fn_name, double cost, Args... ar
     std::nth_element(cycles.begin(), median_it, cycles.end());
     double runtime = *median_it;
 
-    std::cout << fn_name << '\n';
-    std::cout << "Runtime:     " << runtime << " cycles (median)\n";
-    std::cout << "Performance: " << cost / runtime << " flops/cycle (median)" << '\n';
+    std::cerr << fn_name << '\n';
+    std::cerr << "Runtime:     " << runtime << " cycles (median)\n";
+    std::cerr << "Performance: " << cost / runtime << " flops/cycle (median)" << '\n';
 
-    for (size_t j = 0; j < 10; ++j) std::cout << '-';
-    std::cout << '\n' << std::endl;
+    std::cout << cost / runtime << '\n';
+
+    for (size_t j = 0; j < 10; ++j) std::cerr << '-';
+    std::cerr << '\n' << std::endl;
 }
 
 /**
