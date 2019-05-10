@@ -88,7 +88,8 @@ TEST(two_sided_svd_blocked, svd_singvalues_crosscheck) {
 }
 
 TEST(two_sided_svd_blocked, random_matrix_big) {
-    size_t n = 128;
+    size_t block_size = 16;
+    size_t n = 176;
     std::vector<double> X(n * n);
     std::vector<double> B(n * n);
     std::vector<double> s_expect(n);
@@ -106,7 +107,7 @@ TEST(two_sided_svd_blocked, random_matrix_big) {
     matrix_t Bmat = {&B[0], n, n};
     matrix_t Umat = {&U[0], n, n};
     matrix_t Vmat = {&V[0], n, n};
-    svd_blocked(Xmat, Bmat, Umat, Vmat);
+    svd_blocked(Xmat, Bmat, Umat, Vmat, block_size);
 
     for (size_t i = 0; i < n; ++i) {
         ASSERT_NEAR(B[i * n + i], s_expect[i], 1e-7);

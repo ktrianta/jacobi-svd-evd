@@ -17,9 +17,10 @@ static inline void mult_block(struct matrix_t Amat, size_t blockA_row, size_t bl
 static inline void add(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Cmat);
 static inline void copy_block(struct matrix_t S, size_t blockS_row, size_t blockS_col, struct matrix_t D,
                               size_t blockD_row, size_t blockD_col, size_t block_size);
-static inline void transpose(struct matrix_t A);
+static inline void transpose(struct matrix_t Amat);
 
-size_t svd_blocked(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, struct matrix_t Vmat) {
+size_t svd_blocked(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Umat, struct matrix_t Vmat,
+                   size_t block_size) {
     assert(Amat.rows == Amat.cols);  // Matrix A should be square
     assert(Amat.rows == Bmat.rows && Amat.cols == Bmat.cols);
     assert(Amat.rows == Umat.rows && Amat.cols == Umat.cols);
@@ -37,7 +38,6 @@ size_t svd_blocked(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t U
     matrix_identity(Vmat);
     matrix_frobenius(Bmat, &norm, &off_norm);
 
-    const size_t block_size = 8;
     const size_t n_blocks = n / block_size;
 
     if (n < 2 * block_size) {

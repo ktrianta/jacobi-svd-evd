@@ -28,8 +28,9 @@ int main() {
     }
 
     size_t cost = svd(Data_matr, B_mat, U_mat, V_mat);
-    bench_func(svd, "svd_two_sided", cost, Data_matr, B_mat, U_mat, V_mat);
+    // bench_func(svd, "svd_two_sided", cost, Data_matr, B_mat, U_mat, V_mat);
 
     cost = svd_blocked(Data_matr, B_mat, U_mat, V_mat);
-    bench_func(svd_blocked, "svd_two_sided_blocked", cost, Data_matr, B_mat, U_mat, V_mat);
+    size_t block_size = 16;
+    bench_func(svd_blocked, "svd_two_sided_blocked", cost, Data_matr, B_mat, U_mat, V_mat, block_size);
 }
