@@ -8,6 +8,7 @@
 
 using EVDEpochType = decltype(&evd_cyclic);
 using EVDEpochType = decltype(&evd_cyclic_oneloop);
+using EVDEpochType = decltype(&evd_cyclic_vectorize);
 using EVDEpochType = decltype(&evd_cyclic_unroll_outer);
 using EVDEpochType = decltype(&evd_cyclic_unroll_inner);
 using EVDTolType = decltype(&evd_cyclic_tol);
