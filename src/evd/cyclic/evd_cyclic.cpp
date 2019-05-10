@@ -1,4 +1,5 @@
 #include "evd_cyclic.hpp"
+#include <immintrin.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>

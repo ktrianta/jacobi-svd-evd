@@ -15,10 +15,10 @@ std::ostream& operator<<(std::ostream& os, const struct matrix_t mat) {
     for (size_t i = 0; i < mat.rows; ++i) {
         os << DEBUG_HEADER << "\t[";
         if (mat.cols > 0) {
-            os << mat.ptr[0];
+            os << mat.ptr[i * mat.cols + 0];
         }
         for (size_t j = 1; j < mat.cols; ++j) {
-            os << ", " << mat.ptr[j];
+            os << ", " << mat.ptr[i * mat.cols + j];
         }
         os << "]\n";
     }
