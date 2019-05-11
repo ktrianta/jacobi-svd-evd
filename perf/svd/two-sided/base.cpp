@@ -12,7 +12,7 @@ int main() {
 
     size_t n;
     std::cin >> n >> n;
-    std::cout << "Performance benchmark on array of size " << n << " by " << n << std::endl;
+    std::cerr << "Performance benchmark on array of size " << n << " by " << n << std::endl;
 
     std::vector<double> A(n * n);
     std::vector<double> B(n * n);

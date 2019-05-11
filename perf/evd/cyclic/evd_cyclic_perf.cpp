@@ -11,9 +11,11 @@ using EVDTolType = decltype(&evd_cyclic_tol);
 
 std::vector<EVDEpochType> epoch_based_versions = {
     evd_cyclic,
+    evd_cyclic_vectorize,
 };
 std::vector<std::string> epoch_based_names = {
     "evd_cyclic",
+    "evd_cyclic_vectorize",
 };
 
 std::vector<EVDTolType> tol_based_versions = {
@@ -52,7 +54,7 @@ using CostFuncType = decltype(&base_cost_evd);
 using CostFuncType = decltype(&tol_cost);
 
 std::vector<CostFuncType> tol_based_cost_fns = {tol_cost};
-std::vector<CostFuncType> evdcyclic_epoch_based_cost_fns = {base_cost_evd};
+std::vector<CostFuncType> evdcyclic_epoch_based_cost_fns = {base_cost_evd, base_cost_evd};
 
 int main() {
     size_t n;
@@ -63,7 +65,7 @@ int main() {
     std::cin.tie(NULL);                     // untie cin from cout
 
     std::cin >> n;
-    std::cout << "Performance benchmark on array of size " << n << " by " << n << std::endl;
+    std::cerr << "Performance benchmark on array of size " << n << " by " << n << std::endl;
 
     std::vector<double> A(n * n);
     std::vector<double> A_copy(n * n);
