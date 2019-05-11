@@ -1,6 +1,8 @@
 set(SOURCES
     svd.cpp
     svd_blocked.cpp
+    svd_blocked_less_copy.cpp
+    svd_subprocedure.cpp
     nsvd.cpp
     cost.cpp
     )

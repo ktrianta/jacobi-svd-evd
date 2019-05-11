@@ -36,7 +36,25 @@ size_t blocked_cost(size_t n, size_t b, size_t main_iter, size_t block_iter) {
     size_t frobenius_add = n * n;
     size_t frobenius_mult = n * n;
 
-    size_t add = main_iter * (loops * 4 * n_blocks * (2 * single_add + 4 * single_mult_block_add) + frobenius_add);
+    size_t add = main_iter * (loops * (4 * n_blocks * (2 * single_add + 4 * single_mult_block_add) + frobenius_add));
+    size_t mult = main_iter * (loops * 4 * n_blocks * 4 * single_mult_block_mult + frobenius_mult);
+
+    return add + mult + total_block_svd_cost;
+}
+
+size_t blocked_less_copy_cost(size_t n, size_t b, size_t main_iter, size_t block_iter) {
+    size_t total_block_svd_cost = base_cost(2 * b, block_iter);
+
+    size_t n_blocks = n / b;
+    size_t loops = n_blocks * (n_blocks - 1) / 2;
+
+    size_t single_mult_block_add = b * b * b;
+    size_t single_mult_block_mult = b * b * b;
+
+    size_t frobenius_add = n * n;
+    size_t frobenius_mult = n * n;
+
+    size_t add = main_iter * (loops * 4 * n_blocks * 4 * single_mult_block_add + frobenius_add);
     size_t mult = main_iter * (loops * 4 * n_blocks * 4 * single_mult_block_mult + frobenius_mult);
 
     return add + mult + total_block_svd_cost;
