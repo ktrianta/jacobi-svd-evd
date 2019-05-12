@@ -3,10 +3,10 @@
 
 size_t base_cost(size_t n, size_t n_iter) {
     size_t rot_add = 8 * n;
-    size_t rot_mul = 20 * n;
+    size_t rot_mul = 16 * n;
 
     size_t svd_add = 26;
-    size_t svd_mul = 26;
+    size_t svd_mul = 28;
     size_t svd_div = 5;
     size_t svd_sqrt = 3;
 

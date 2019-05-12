@@ -40,7 +40,7 @@ size_t svd_blocked(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t U
 
     assert(n_blocks * block_size == n);
 
-    double* memory_block = (double*) malloc((4 + 4 + 4 + 1 + 1) * block_size * block_size * sizeof(double));
+    double* memory_block = (double*) aligned_alloc(32, (4 + 4 + 4 + 1 + 1) * block_size * block_size * sizeof(double));
     double* Bblock = memory_block;
     double* Ublock = Bblock + 4 * block_size * block_size;
     double* Vblock = Ublock + 4 * block_size * block_size;
