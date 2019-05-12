@@ -3,14 +3,10 @@
 #include <random>
 #include <vector>
 #include "../../test_utils.hpp"
-#include "boost/align/aligned_allocator.hpp"
 #include "gtest/gtest.h"
 #include "nsvd.hpp"
 #include "svd.hpp"
 #include "types.hpp"
-
-template <typename T>
-using aligned_vector = std::vector<T, boost::alignment::aligned_allocator<T, 32>>;
 
 TEST(two_sided_svd_blocked_less_copy, identity_matrix) {
     size_t n_rows = 96, n_cols = 96;

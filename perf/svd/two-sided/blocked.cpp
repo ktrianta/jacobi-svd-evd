@@ -14,10 +14,10 @@ int main() {
     std::cin >> n >> n;
     std::cerr << "Performance benchmark on array of size " << n << " by " << n << std::endl;
 
-    std::vector<double> A(n * n);
-    std::vector<double> B(n * n);
-    std::vector<double> U(n * n, 0);
-    std::vector<double> V(n * n, 0);
+    aligned_vector<double> A(n * n);
+    aligned_vector<double> B(n * n);
+    aligned_vector<double> U(n * n, 0);
+    aligned_vector<double> V(n * n, 0);
     matrix_t Data_matr = {&A[0], n, n};
     matrix_t B_mat = {&B[0], n, n};
     matrix_t U_mat = {&U[0], n, n};

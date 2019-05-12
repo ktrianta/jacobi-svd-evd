@@ -4,13 +4,9 @@
 #include <random>
 #include <vector>
 #include "../../test_utils.hpp"
-#include "boost/align/aligned_allocator.hpp"
 #include "gtest/gtest.h"
 #include "nsvd.hpp"
 #include "types.hpp"
-
-template <typename T>
-using aligned_vector = std::vector<T, boost::alignment::aligned_allocator<T, 32>>;
 
 TEST(two_sided_svd, usvd) {
     aligned_vector<double> X;
