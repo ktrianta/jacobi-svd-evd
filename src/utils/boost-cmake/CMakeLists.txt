@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9.2)
+cmake_minimum_required(VERSION 3.12)
 project(Boost-CMake)
 
 option(BOOST_DISABLE_TESTS "Do not build test targets, even if building standalone" OFF)
