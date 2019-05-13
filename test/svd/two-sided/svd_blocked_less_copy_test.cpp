@@ -88,8 +88,8 @@ TEST(two_sided_svd_blocked_less_copy, svd_singvalues_crosscheck) {
 }
 
 TEST(two_sided_svd_blocked_less_copy, random_matrix_big) {
-    size_t block_size = 16;
-    size_t n = 176;
+    size_t block_size = 8;
+    size_t n = 128;
     aligned_vector<double> X(n * n);
     aligned_vector<double> B(n * n);
     aligned_vector<double> s_expect(n);
