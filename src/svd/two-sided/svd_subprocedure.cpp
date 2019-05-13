@@ -1,4 +1,6 @@
 #include "svd_subprocedure.hpp"
+#include <math.h>
+#include "debug.hpp"
 #include "matrix.hpp"
 #include "nsvd.hpp"
 
@@ -16,7 +18,7 @@ size_t svd_subprocedure(struct matrix_t Bmat, struct matrix_t Umat, struct matri
     matrix_identity(Vmat);
     matrix_frobenius(Bmat, &norm, &off_norm);
 
-    while (off_norm > tol * tol * norm) {
+    while (sqrt(off_norm) > tol * sqrt(norm)) {
         for (size_t i = 0; i < n - 1; ++i) {
             for (size_t j = i + 1; j < n; ++j) {
                 const double bii = B[n * i + i];
@@ -275,7 +277,7 @@ size_t svd_subprocedure(struct matrix_t Bmat, struct matrix_t Umat, struct matri
             }
         }
 
-        matrix_off_frobenius(Bmat, &off_norm);
+        matrix_frobenius(Bmat, &norm, &off_norm);
         iter += 1;
     }
 
