@@ -1,19 +1,25 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 #
 # Usage: Run from the project root directory. Use without any arguments to run all benchmarks. If you give the path to
 #        one of the benchmark executables, all the benchmarks for that specific executable will be run only.
 
 run_all () {
     bin=$1
-    dir=""
+    resources_dir=""
+    results_dir=""
     if [[ $bin == *"svd"* ]];
     then
-        dir=perf/resources/svd
+        resources_dir=perf/resources/svd
+        results_dir=results/svd
     else
-        dir=perf/resources/evd
+        resources_dir=perf/resources/evd
+        results_dir=results/evd
     fi
-    for input in `ls -v ${dir}/* | head -4`; do
-        [ -f "$bin" ] && [ -x "$bin" ] && "$bin" < "$input"
+    benchmark=$(basename $bin)
+    output="${results_dir}/$benchmark"
+    rm "$output"  # delete previous benchmark output
+    for input in `ls -v ${resources_dir}/* | head -8`; do
+        [ -f "$bin" ] && [ -x "$bin" ] && "$bin" < "$input" >> "$output"
     done
 }
 

@@ -1,5 +1,16 @@
 # SVD and Symmetric EVD Using Jacobi Rotations
 
+## Cloning the project
+
+This repository uses git lfs to version large files. Install git lfs before cloning this repository.
+The project contains the Eigen template library as a git submodule.
+
+```bash
+git clone
+cd jacobi-svd-evd
+git submodule update --init  # pull project git submodules
+```
+
 ## Building the project
 
 Out of source build in build directory

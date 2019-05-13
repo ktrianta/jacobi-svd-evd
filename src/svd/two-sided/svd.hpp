@@ -20,6 +20,8 @@
  * @param[out] V Orthonormal matrix of size n times n, in row-major order.
  *               Columns of V are the right singular vectors and the ith column
  *               corresponds to the ith singular value in s.
- * @return       Number of diagonalization iterations to perform.
+ * @return       Total number of executed floating point operations.
  */
 size_t svd(struct matrix_t X, struct matrix_t B, struct matrix_t U, struct matrix_t V);
+
+size_t svd_blocked(struct matrix_t X, struct matrix_t B, struct matrix_t U, struct matrix_t V);

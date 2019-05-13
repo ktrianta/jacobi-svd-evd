@@ -7,16 +7,16 @@
 #include "types.hpp"
 
 using EVDEpochType = decltype(&evd_cyclic);
+using EVDEpochType = decltype(&evd_cyclic_oneloop);
+using EVDEpochType = decltype(&evd_cyclic_vectorize);
+using EVDEpochType = decltype(&evd_cyclic_unroll_outer);
+using EVDEpochType = decltype(&evd_cyclic_unroll_inner);
 using EVDTolType = decltype(&evd_cyclic_tol);
 
-std::vector<EVDEpochType> epoch_based_versions = {
-    evd_cyclic,
-    evd_cyclic_vectorize,
-};
-std::vector<std::string> epoch_based_names = {
-    "evd_cyclic",
-    "evd_cyclic_vectorize",
-};
+std::vector<EVDEpochType> epoch_based_versions = {evd_cyclic, evd_cyclic_vectorize, evd_cyclic_oneloop,
+                                                  evd_cyclic_unroll_outer, evd_cyclic_unroll_inner};
+std::vector<std::string> epoch_based_names = {"evd_cyclic", "evd_cyclic_vectorize", "evd_cyclic_oneloop",
+                                              "evd_cyclic_unroll_outer", "evd_cyclic_unroll_inner"};
 
 std::vector<EVDTolType> tol_based_versions = {
     evd_cyclic_tol,
@@ -39,6 +39,17 @@ double base_cost_evd(size_t n, size_t n_iter) {
     return (add + mult + div + sqrt) * loop_multiplier;
 }
 
+double one_loop_cost(size_t n, size_t n_iter) {
+    // number of upper triangular elements
+    double n_elements = n * (n - 1) / 2;
+    double adds = (8 + 4 * n) * n_elements;
+    double muls = (12 + 8 * n) * n_elements;
+    double divs = 3 * n_elements;
+    double sqrt = 2 * n_elements;
+
+    return n_iter * (adds + muls + divs + sqrt);
+}
+
 double tol_cost(size_t n, size_t n_iter) {
     // number of upper triangular elements
     double n_elements = n * (n - 1) / 2;
@@ -50,11 +61,13 @@ double tol_cost(size_t n, size_t n_iter) {
     return n_iter * (adds + muls + divs + sqrt);
 }
 
+using CostFuncType = decltype(&one_loop_cost);
 using CostFuncType = decltype(&base_cost_evd);
 using CostFuncType = decltype(&tol_cost);
 
 std::vector<CostFuncType> tol_based_cost_fns = {tol_cost};
-std::vector<CostFuncType> evdcyclic_epoch_based_cost_fns = {base_cost_evd, base_cost_evd};
+std::vector<CostFuncType> evdcyclic_epoch_based_cost_fns = {base_cost_evd, base_cost_evd, one_loop_cost, one_loop_cost,
+                                                            one_loop_cost};
 
 int main() {
     size_t n;
@@ -65,7 +78,7 @@ int main() {
     std::cin.tie(NULL);                     // untie cin from cout
 
     std::cin >> n;
-    std::cout << "Performance benchmark on array of size " << n << " by " << n << std::endl;
+    std::cerr << "Performance benchmark on array of size " << n << " by " << n << std::endl;
 
     std::vector<double> A(n * n);
     std::vector<double> A_copy(n * n);

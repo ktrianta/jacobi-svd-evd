@@ -11,11 +11,17 @@ def save(name):
 input_filename = sys.argv[1]
 perf_filenames = sys.argv[2:]
 
+cpu_peak_perf_vec = 16
+cpu_peak_perf_no_vec = 4
 
-cpu_peak_perf = 16
 input_sizes = np.loadtxt(input_filename)
-test_names = ['CPU peak'] + perf_filenames
-test_perfs = [cpu_peak_perf*np.ones_like(input_sizes)] + [np.loadtxt(f) for f in perf_filenames]
+test_names = ['CPU peak vec'] + perf_filenames
+test_perfs = [cpu_peak_perf_vec*np.ones_like(input_sizes)] + [np.loadtxt(f) for f in perf_filenames]
+
+# Enable also peak performance without vector instructions
+# test_names = ['CPU peak vec', 'CPU peak no-vec'] + perf_filenames
+# test_perfs = [cpu_peak_perf_vec*np.ones_like(input_sizes), cpu_peak_perf_no_vec*np.ones_like(input_sizes)] +
+#     [np.loadtxt(f) for f in perf_filenames]
 
 fig, ax = plt.subplots(figsize=(10, 5))
 ax.set_xlabel('Input size')
@@ -29,13 +35,13 @@ ax.yaxis.set_label_coords(0, 1.02)
 ax.set_facecolor((0.9, 0.9, 0.9))
 ax.set_yticks(np.arange(0, np.max(test_perfs) + 1, 1))
 plt.grid(color='w', axis='y')
-plt.xlim([input_sizes[0], input_sizes[-1]])
-plt.ylim([0, cpu_peak_perf + 1])
+plt.ylim([0, cpu_peak_perf_vec + 1])
 plt.xticks(input_sizes)
 
 # log-scale x 
-#ax.set_xscale('log', basex=2)
-#ax.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
+ax.set_xscale('log', basex=2)
+ax.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
+ax.margins(x=0.04)
 
 for name, perf in zip(test_names, test_perfs):
     line, = ax.plot(input_sizes, perf, '-o', label=name)
@@ -43,4 +49,3 @@ for name, perf in zip(test_names, test_perfs):
 
 plt.legend()
 plt.show()
-#save('ex04_plot')

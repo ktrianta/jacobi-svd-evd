@@ -1,9 +1,9 @@
-#include "evd_cyclic.hpp"
 #include <math.h>
-#include <vector>
 #include <iostream>
 #include <random>
+#include <vector>
 #include "../../test_utils.hpp"
+#include "evd_cyclic.hpp"
 #include "gtest/gtest.h"
 #include "types.hpp"
 
