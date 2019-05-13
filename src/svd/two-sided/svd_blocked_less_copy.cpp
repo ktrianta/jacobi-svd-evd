@@ -21,7 +21,7 @@ size_t svd_blocked_less_copy(struct matrix_t Amat, struct matrix_t Bmat, struct 
 
     size_t iter = 0;
     size_t block_iter = 0;
-    const double tol = 1e-14;  // convergence tolerance
+    const double tol = 1e-15;  // convergence tolerance
     const size_t n = Amat.rows;
     double norm = 0.0;      // frobenius norm of matrix B
     double off_norm = 0.0;  // frobenius norm of the off-diagonal elements of matrix B
@@ -53,7 +53,7 @@ size_t svd_blocked_less_copy(struct matrix_t Amat, struct matrix_t Bmat, struct 
     matrix_t M1mat = {M1, block_size, block_size};
     matrix_t M2mat = {M2, block_size, block_size};
 
-    while (off_norm > tol * tol * norm) {
+    while (sqrt(off_norm) > tol * sqrt(norm)) {
         for (size_t i_block = 0; i_block < n_blocks - 1; ++i_block) {
             for (size_t j_block = i_block + 1; j_block < n_blocks; ++j_block) {
                 copy_block(Bmat, i_block, i_block, Bblockmat, 0, 0, block_size);
@@ -106,7 +106,7 @@ size_t svd_blocked_less_copy(struct matrix_t Amat, struct matrix_t Bmat, struct 
             }
         }
 
-        matrix_off_frobenius(Bmat, &off_norm);
+        matrix_frobenius(Bmat, &norm, &off_norm);
         iter++;
     }
 

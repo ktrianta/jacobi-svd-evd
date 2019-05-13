@@ -88,8 +88,8 @@ TEST(two_sided_svd_blocked, svd_singvalues_crosscheck) {
 }
 
 TEST(two_sided_svd_blocked, random_matrix_big) {
-    size_t block_size = 16;
-    size_t n = 176;
+    size_t block_size = 8;
+    size_t n = 128;
     std::vector<double> X(n * n);
     std::vector<double> B(n * n);
     std::vector<double> s_expect(n);

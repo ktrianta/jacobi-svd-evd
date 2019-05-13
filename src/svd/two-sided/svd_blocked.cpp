@@ -53,7 +53,7 @@ size_t svd_blocked(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t U
     matrix_t M1mat = {M1, block_size, block_size};
     matrix_t M2mat = {M2, block_size, block_size};
 
-    while (off_norm >= tol * norm) {
+    while (sqrt(off_norm) > tol * sqrt(norm)) {
         for (size_t i_block = 0; i_block < n_blocks - 1; ++i_block) {
             for (size_t j_block = i_block + 1; j_block < n_blocks; ++j_block) {
                 copy_block(Bmat, i_block, i_block, Bblockmat, 0, 0, block_size);
@@ -113,7 +113,7 @@ size_t svd_blocked(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t U
             }
         }
 
-        matrix_off_frobenius(Bmat, &off_norm);
+        matrix_frobenius(Bmat, &norm, &off_norm);
         iter++;
     }
 
