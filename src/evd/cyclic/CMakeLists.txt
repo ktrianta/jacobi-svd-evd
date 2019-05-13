@@ -1,7 +1,9 @@
 set(SOURCES
     evd_cyclic.cpp
     evd_cyclic_vectorize.cpp
+    evd_cyclic_blocked.cpp
     evd_cyclic.hpp
+    nevd.cpp
     )
 
 add_library(evd-cyclic-lib STATIC ${SOURCES})
