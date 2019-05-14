@@ -2,6 +2,9 @@ set(SOURCES
     evd_cyclic.cpp
     evd_cyclic_unroll.cpp
     evd_cyclic_vectorize.cpp
+    evd_cyclic_oneloop_vectorize.cpp
+    evd_cyclic_oneloop_row.cpp
+    evd_cyclic_unroll_outer_vectorize.cpp
     evd_cyclic.hpp
     )
 
