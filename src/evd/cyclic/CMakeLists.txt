@@ -1,5 +1,7 @@
 set(SOURCES
     evd_cyclic.cpp
+    evd_cyclic_unroll.cpp
+    evd_cyclic_vectorize.cpp
     evd_cyclic.hpp
     )
 
