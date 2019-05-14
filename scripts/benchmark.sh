@@ -15,6 +15,7 @@ run_all () {
         resources_dir=perf/resources/evd
         results_dir=results/evd
     fi
+
     benchmark=$(basename $bin)
     output="${results_dir}/$benchmark"
     rm "$output"  # delete previous benchmark output
