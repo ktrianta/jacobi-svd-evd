@@ -18,8 +18,8 @@ static inline void copy_block(struct matrix_t S, size_t blockS_row, size_t block
                               size_t blockD_row, size_t blockD_col, size_t block_size);
 static inline void transpose(struct matrix_t A);
 
-void evd_cyclic_blocked_unroll_outer(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t Eigen_vectors,
-                   struct vector_t Eigen_values, int epoch) {
+void evd_cyclic_blocked_unroll_outer(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
+                   struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
     assert(Data_matr.rows == Data_matr.cols);  // Input Matrix should be square
     assert(Eigen_vectors.rows == Eigen_vectors.cols);
     struct matrix_t& Amat = Data_matr_copy;
