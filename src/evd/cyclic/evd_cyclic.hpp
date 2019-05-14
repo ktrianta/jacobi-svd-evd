@@ -32,6 +32,8 @@ void evd_cyclic_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_c
  */
 void evd_cyclic_blocked(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
                           struct vector_t e, int epoch = 20);
+void evd_cyclic_blocked_no_transpose(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
+                          struct vector_t e, int epoch = 20);
 
 /**
  * Optimization 3: Blocked version with outer loop unroll of the above function
