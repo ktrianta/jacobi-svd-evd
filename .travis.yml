@@ -40,7 +40,7 @@ matrix:
             apt:
               sources:
                 - ubuntu-toolchain-r-test
-                - llvm-toolchain-trusty-3.6
+                - llvm-toolchain-xenial-3.6
               packages:
                 - clang-3.6
           env:
@@ -52,7 +52,7 @@ matrix:
             apt:
               sources:
                 - ubuntu-toolchain-r-test
-                - llvm-toolchain-trusty-4.0
+                - llvm-toolchain-xenial-4.0
               packages:
                 - clang-4.0
           env:
@@ -64,7 +64,7 @@ matrix:
             apt:
               sources:
                 - ubuntu-toolchain-r-test
-                - llvm-toolchain-trusty-5.0
+                - llvm-toolchain-xenial-5.0
               packages:
                 - clang-5.0
           env:
