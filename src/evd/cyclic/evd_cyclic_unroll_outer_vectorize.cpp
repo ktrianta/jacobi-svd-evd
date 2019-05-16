@@ -52,10 +52,9 @@ void evd_cyclic_unroll_outer_vectorize(struct matrix_t Data_matr, struct matrix_
 
                 for (i = 0; i < n - 3; i += 4) {
                     __m256d A_piv =
-                        _mm256_set_pd(A[n * i + p], A[n * (i + 1) + p], A[n * (i + 2) + p], A[n * (i + 3) + p]);
+                        _mm256_set_pd(A[n * (i + 3) + p], A[n * (i + 2) + p], A[n * (i + 1) + p], A[n * i + p]);
                     __m256d A_qiv =
-                        _mm256_set_pd(A[n * i + q], A[n * (i + 1) + q], A[n * (i + 2) + q], A[n * (i + 3) + q]);
-
+                        _mm256_set_pd(A[n * (i + 3) + q], A[n * (i + 2) + q], A[n * (i + 1) + q], A[n * i + q]);
                     __m256d V_piv = _mm256_loadu_pd(V + n * p + i);
                     __m256d V_qiv = _mm256_loadu_pd(V + n * q + i);
 
@@ -75,30 +74,23 @@ void evd_cyclic_unroll_outer_vectorize(struct matrix_t Data_matr, struct matrix_
                     __m256d nV_piv = _mm256_sub_pd(cVp_v, sVq_v);
                     V_qiv = _mm256_add_pd(sVp_v, cVq_v);
 
-                    A[n * i + p] = nA_piv[3];
-                    A[n * (i + 1) + p] = nA_piv[2];
-                    A[n * (i + 2) + p] = nA_piv[1];
-                    A[n * (i + 3) + p] = nA_piv[0];
+                    A[n * i + p] = nA_piv[0];
+                    A[n * (i + 1) + p] = nA_piv[1];
+                    A[n * (i + 2) + p] = nA_piv[2];
+                    A[n * (i + 3) + p] = nA_piv[3];
 
-                    A[n * i + q] = nA_qiv[3];
-                    A[n * (i + 1) + q] = nA_qiv[2];
-                    A[n * (i + 2) + q] = nA_qiv[1];
-                    A[n * (i + 3) + q] = nA_qiv[0];
+                    A[n * i + q] = nA_qiv[0];
+                    A[n * (i + 1) + q] = nA_qiv[1];
+                    A[n * (i + 2) + q] = nA_qiv[2];
+                    A[n * (i + 3) + q] = nA_qiv[3];
 
                     // since we use load instead of set the indices are reversed.
                     _mm256_storeu_pd(V + n * p + i,nV_piv);
                     _mm256_storeu_pd(V + n * q + i, V_qiv);
 
                     if (!(i + 3 >= p && i <= p) && !(i + 3 >= q && i <= q)) {
-                        A[n * p + i] = nA_piv[3];
-                        A[n * p + (i + 1)] = nA_piv[2];
-                        A[n * p + (i + 2)] = nA_piv[1];
-                        A[n * p + (i + 3)] = nA_piv[0];
-
-                        A[n * q + i] = nA_qiv[3];
-                        A[n * q + (i + 1)] = nA_qiv[2];
-                        A[n * q + (i + 2)] = nA_qiv[1];
-                        A[n * q + (i + 3)] = nA_qiv[0];
+                        _mm256_storeu_pd(A + n * p + i, nA_piv);
+                        _mm256_storeu_pd(A + n * q + i, nA_qiv);
                     } else {
                         for (int j = 0; j < 4; j++) {
                             if ((i + j) != p && (i + j) != q) {
@@ -143,12 +135,12 @@ void evd_cyclic_unroll_outer_vectorize(struct matrix_t Data_matr, struct matrix_
 
                 for (i = 0; i < n - 3; i += 4) {
                     __m256d A_piv =
-                        _mm256_set_pd(A[n * i + p1], A[n * (i + 1) + p1], A[n * (i + 2) + p1], A[n * (i + 3) + p1]);
+                        _mm256_set_pd(A[n * (i + 3) + p1], A[n * (i + 2) + p1], A[n * (i + 1) + p1], A[n * i + p1]);
                     __m256d A_qiv =
-                        _mm256_set_pd(A[n * i + q1], A[n * (i + 1) + q1], A[n * (i + 2) + q1], A[n * (i + 3) + q1]);
+                        _mm256_set_pd(A[n * (i + 3) + q1], A[n * (i + 2) + q1], A[n * (i + 1) + q1], A[n * i + q1]);
 
-                    __m256d V_piv = _mm256_load_pd(V + n * p1 + i);
-                    __m256d V_qiv = _mm256_load_pd(V + n * q1 + i);
+                    __m256d V_piv = _mm256_loadu_pd(V + n * p1 + i);
+                    __m256d V_qiv = _mm256_loadu_pd(V + n * q1 + i);
 
                     __m256d sAq_v = _mm256_mul_pd(s1_vec, A_qiv);
                     __m256d sAp_v = _mm256_mul_pd(s1_vec, A_piv);
@@ -166,36 +158,22 @@ void evd_cyclic_unroll_outer_vectorize(struct matrix_t Data_matr, struct matrix_
                     __m256d nV_piv = _mm256_sub_pd(cVp_v, sVq_v);
                     V_qiv = _mm256_add_pd(sVp_v, cVq_v);
 
-                    A[n * i + p1] = nA_piv[3];
-                    A[n * (i + 1) + p1] = nA_piv[2];
-                    A[n * (i + 2) + p1] = nA_piv[1];
-                    A[n * (i + 3) + p1] = nA_piv[0];
+                    A[n * i + p1] = nA_piv[0];
+                    A[n * (i + 1) + p1] = nA_piv[1];
+                    A[n * (i + 2) + p1] = nA_piv[2];
+                    A[n * (i + 3) + p1] = nA_piv[3];
 
-                    A[n * i + q1] = nA_qiv[3];
-                    A[n * (i + 1) + q1] = nA_qiv[2];
-                    A[n * (i + 2) + q1] = nA_qiv[1];
-                    A[n * (i + 3) + q1] = nA_qiv[0];
-                    // since we use load instead of set the indices are reversed.
-                    V[n * q1 + i] = V_qiv[0];
-                    V[n * q1 + i + 1] = V_qiv[1];
-                    V[n * q1 + i + 2] = V_qiv[2];
-                    V[n * q1 + i + 3] = V_qiv[3];
+                    A[n * i + q1] = nA_qiv[0];
+                    A[n * (i + 1) + q1] = nA_qiv[1];
+                    A[n * (i + 2) + q1] = nA_qiv[2];
+                    A[n * (i + 3) + q1] = nA_qiv[3];
 
-                    V[n * p1 + i] = nV_piv[0];
-                    V[n * p1 + i + 1] = nV_piv[1];
-                    V[n * p1 + i + 2] = nV_piv[2];
-                    V[n * p1 + i + 3] = nV_piv[3];
+                    _mm256_storeu_pd(V + n * p1 + i,nV_piv);
+                    _mm256_storeu_pd(V + n * q1 + i, V_qiv);
 
                     if (!(i + 3 >= p1 && i <= p1) && !(i + 3 >= q1 && i <= q1)) {
-                        A[n * p1 + i] = nA_piv[3];
-                        A[n * p1 + (i + 1)] = nA_piv[2];
-                        A[n * p1 + (i + 2)] = nA_piv[1];
-                        A[n * p1 + (i + 3)] = nA_piv[0];
-
-                        A[n * q1 + i] = nA_qiv[3];
-                        A[n * q1 + (i + 1)] = nA_qiv[2];
-                        A[n * q1 + (i + 2)] = nA_qiv[1];
-                        A[n * q1 + (i + 3)] = nA_qiv[0];
+                        _mm256_storeu_pd(A + n * p1 + i, nA_piv);
+                        _mm256_storeu_pd(A + n * q1 + i, nA_qiv);
                     } else {
                         for (int j = 0; j < 4; j++) {
                             if ((i + j) != p1 && (i + j) != q1) {
