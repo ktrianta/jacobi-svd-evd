@@ -64,6 +64,18 @@ void matrix_mult(matrix_t Pmat, matrix_t Qmat, matrix_t Rmat) {
     }
 }
 
+void matrix_add(matrix_t Amat, matrix_t Bmat, matrix_t Cmat) {
+    size_t n = Amat.rows;
+    double* A = Amat.ptr;
+    double* B = Bmat.ptr;
+    double* C = Cmat.ptr;
+    for (size_t i = 0; i < n; ++i) {
+        for (size_t j = 0; j < n; ++j) {
+            C[n * i + j] = A[n * i + j] + B[n * i + j];
+        }
+    }
+}
+
 void matrix_copy(matrix_t Bmat, matrix_t Amat) {
     assert(Amat.rows == Bmat.rows);
     assert(Amat.cols == Amat.cols);
