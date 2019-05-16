@@ -24,4 +24,7 @@
  */
 size_t svd(struct matrix_t X, struct matrix_t B, struct matrix_t U, struct matrix_t V);
 
-size_t svd_blocked(struct matrix_t X, struct matrix_t B, struct matrix_t U, struct matrix_t V);
+size_t svd_blocked(struct matrix_t X, struct matrix_t B, struct matrix_t U, struct matrix_t V, size_t block_size);
+
+size_t svd_blocked_less_copy(struct matrix_t X, struct matrix_t B, struct matrix_t U, struct matrix_t V,
+                             size_t block_size);
