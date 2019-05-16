@@ -6,39 +6,14 @@
 #include "perf_test.hpp"
 #include "types.hpp"
 
-using EVDEpochType = decltype(&evd_cyclic);
-using EVDEpochType = decltype(&evd_cyclic_oneloop);
-using EVDEpochType = decltype(&evd_cyclic_oneloop_row);
 using EVDEpochType = decltype(&evd_cyclic_vectorize);
-using EVDEpochType = decltype(&evd_cyclic_unroll_outer);
-using EVDEpochType = decltype(&evd_cyclic_unroll_inner);
 using EVDEpochType = decltype(&evd_cyclic_oneloop_vectorize);
 using EVDEpochType = decltype(&evd_cyclic_unroll_outer_vectorize);
-using EVDTolType = decltype(&evd_cyclic_tol);
 
-std::vector<EVDEpochType> epoch_based_versions = {evd_cyclic,
-                                                  evd_cyclic_vectorize,
-                                                  evd_cyclic_oneloop,
-                                                  evd_cyclic_oneloop_row,
-                                                  evd_cyclic_unroll_outer,
-                                                  evd_cyclic_unroll_inner,
-                                                  evd_cyclic_oneloop_vectorize,
+std::vector<EVDEpochType> epoch_based_versions = {evd_cyclic_vectorize, evd_cyclic_oneloop_vectorize,
                                                   evd_cyclic_unroll_outer_vectorize};
-std::vector<std::string> epoch_based_names = {"evd_cyclic",
-                                              "evd_cyclic_vectorize",
-                                              "evd_cyclic_oneloop",
-                                              "evd_cyclic_oneloop_row",
-                                              "evd_cyclic_unroll_outer",
-                                              "evd_cyclic_unroll_inner",
-                                              "evd_cyclic_oneloop_vectorize",
+std::vector<std::string> epoch_based_names = {"evd_cyclic_vectorize", "evd_cyclic_oneloop_vectorize",
                                               "evd_cyclic_unroll_outer_vectorize"};
-
-std::vector<EVDTolType> tol_based_versions = {
-    evd_cyclic_tol,
-};
-std::vector<std::string> tol_based_names = {
-    "evd_cyclic_tol",
-};
 
 double base_cost_evd(size_t n, size_t n_iter) {
     // The loop_multiplier counts the total number of values
@@ -81,12 +56,11 @@ using CostFuncType = decltype(&base_cost_evd);
 using CostFuncType = decltype(&tol_cost);
 
 std::vector<CostFuncType> tol_based_cost_fns = {tol_cost};
-std::vector<CostFuncType> evdcyclic_epoch_based_cost_fns = {base_cost_evd, base_cost_evd, one_loop_cost, one_loop_cost,
-                                                            one_loop_cost, one_loop_cost, one_loop_cost, one_loop_cost};
+std::vector<CostFuncType> evdcyclic_epoch_based_cost_fns = {base_cost_evd, one_loop_cost, one_loop_cost};
 
 int main() {
     size_t n;
-    size_t n_iter = 20;
+    size_t n_iter = 100;
     double tol = 1e-8;
 
     std::ios_base::sync_with_stdio(false);  // disable synchronization between C and C++ standard streams
@@ -121,5 +95,4 @@ int main() {
     }
 
     run_all(epoch_based_versions, epoch_based_names, costs, Data_matr, Data_matr_copy, E_vecs, E_vals, n_iter);
-    run_all(tol_based_versions, tol_based_names, costs_tol, Data_matr, Data_matr_copy, E_vecs, E_vals, tol);
 }
