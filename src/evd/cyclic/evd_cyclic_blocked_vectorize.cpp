@@ -8,26 +8,10 @@
 #include "types.hpp"
 #include "util.hpp"
 #include "nevd.hpp"
+#include "block.hpp"
 
 static inline void evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat);
 static inline void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat);
-static inline void mult_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, struct matrix_t Bmat,
-                              size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row,
-                              size_t blockC_col, size_t block_size);
-static inline void add(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Cmat);
-static inline void copy_block(struct matrix_t S, size_t blockS_row, size_t blockS_col, struct matrix_t D,
-                              size_t blockD_row, size_t blockD_col, size_t block_size);
-static inline void transpose(struct matrix_t A);
-static inline void mult_add_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, struct matrix_t Bmat,
-                    size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row, size_t blockC_col,
-                    struct matrix_t Dmat, size_t blockD_row, size_t blockD_col, size_t block_size);
-static inline void mult_transpose_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col,
-                          struct matrix_t Bmat, size_t blockB_row, size_t blockB_col, struct matrix_t Cmat,
-                          size_t blockC_row, size_t blockC_col, size_t block_size);
-static inline void mult_add_transpose_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col,
-                          struct matrix_t Bmat, size_t blockB_row, size_t blockB_col, struct matrix_t Cmat,
-                          size_t blockC_row, size_t blockC_col, struct matrix_t Dmat, size_t blockD_row,
-                          size_t blockD_col, size_t block_size);
 
 void evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
             struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
@@ -60,7 +44,7 @@ void evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t Dat
 
     assert(n_blocks * block_size == n);
 
-    double* memory_block = (double*) malloc((4 + 4 + 1 + 1) * block_size * block_size * sizeof(double));
+    double* memory_block = (double*) aligned_alloc(32, (4 + 4 + 1 + 1) * block_size * block_size * sizeof(double));
     double* Ablock = memory_block;
     double* Vblock = Ablock + 4 * block_size * block_size;
     double* M1 = Vblock + 4 * block_size * block_size;
@@ -90,42 +74,42 @@ void evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t Dat
                 copy_block(Amat, j_block, i_block, Ablockmat, 1, 0, block_size);
                 copy_block(Amat, j_block, j_block, Ablockmat, 1, 1, block_size);
 
-                evd_block_vector(Ablockmat, Vblockmat);
-                //evd_subprocedure_vectorized(Ablockmat, Vblockmat);
+                // evd_block_vector(Ablockmat, Vblockmat);
+                evd_subprocedure_vectorized(Ablockmat, Vblockmat);
 
-                transpose(Vblockmat);
+                matrix_transpose(Vblockmat, Vblockmat);
 
                 for (size_t k_block = 0; k_block < n_blocks; ++k_block) {
                     mult_block(Vblockmat, 0, 0, Amat, i_block, k_block, M1mat, 0, 0, block_size);
                     mult_block(Vblockmat, 0, 1, Amat, j_block, k_block, M2mat, 0, 0, block_size);
-                    add(M1mat, M2mat, M2mat);
+                    matrix_add(M1mat, M2mat, M2mat);
                     mult_block(Vblockmat, 1, 0, Amat, i_block, k_block, M1mat, 0, 0, block_size);
                     copy_block(M2mat, 0, 0, Amat, i_block, k_block, block_size);
                     mult_block(Vblockmat, 1, 1, Amat, j_block, k_block, M2mat, 0, 0, block_size);
-                    add(M1mat, M2mat, M2mat);
+                    matrix_add(M1mat, M2mat, M2mat);
                     copy_block(M2mat, 0, 0, Amat, j_block, k_block, block_size);
                 }
-                transpose(Vblockmat);
+                matrix_transpose(Vblockmat, Vblockmat);
 
                 for (size_t k_block = 0; k_block < n_blocks; ++k_block) {
                     mult_block(Amat, k_block, i_block, Vblockmat, 0, 0, M1mat, 0, 0, block_size);
                     mult_block(Amat, k_block, j_block, Vblockmat, 1, 0, M2mat, 0, 0, block_size);
-                    add(M1mat, M2mat, M2mat);
+                    matrix_add(M1mat, M2mat, M2mat);
                     mult_block(Amat, k_block, i_block, Vblockmat, 0, 1, M1mat, 0, 0, block_size);
                     copy_block(M2mat, 0, 0, Amat, k_block, i_block, block_size);
                     mult_block(Amat, k_block, j_block, Vblockmat, 1, 1, M2mat, 0, 0, block_size);
-                    add(M1mat, M2mat, M2mat);
+                    matrix_add(M1mat, M2mat, M2mat);
                     copy_block(M2mat, 0, 0, Amat, k_block, j_block, block_size);
                 }
 
                 for (size_t k_block = 0; k_block < n_blocks; ++k_block) {
                     mult_block(Eigen_vectors, k_block, i_block, Vblockmat, 0, 0, M1mat, 0, 0, block_size);
                     mult_block(Eigen_vectors, k_block, j_block, Vblockmat, 1, 0, M2mat, 0, 0, block_size);
-                    add(M1mat, M2mat, M2mat);
+                    matrix_add(M1mat, M2mat, M2mat);
                     mult_block(Eigen_vectors, k_block, i_block, Vblockmat, 0, 1, M1mat, 0, 0, block_size);
                     copy_block(M2mat, 0, 0, Eigen_vectors, k_block, i_block, block_size);
                     mult_block(Eigen_vectors, k_block, j_block, Vblockmat, 1, 1, M2mat, 0, 0, block_size);
-                    add(M1mat, M2mat, M2mat);
+                    matrix_add(M1mat, M2mat, M2mat);
                     copy_block(M2mat, 0, 0, Eigen_vectors, k_block, j_block, block_size);
                 }
             }
@@ -172,7 +156,7 @@ void evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct ma
 
     assert(n_blocks * block_size == n);
 
-    double* memory_block = (double*) malloc((4 + 4 + 1 + 1) * block_size * block_size * sizeof(double));
+    double* memory_block = (double*) aligned_alloc(32, (4 + 4 + 1 + 1) * block_size * block_size * sizeof(double));
     double* Ablock = memory_block;
     double* Vblock = Ablock + 4 * block_size * block_size;
     double* M1 = Vblock + 4 * block_size * block_size;
@@ -202,8 +186,8 @@ void evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct ma
                 copy_block(Amat, j_block, i_block, Ablockmat, 1, 0, block_size);
                 copy_block(Amat, j_block, j_block, Ablockmat, 1, 1, block_size);
 
-                evd_block_vector(Ablockmat, Vblockmat);
-                //evd_subprocedure_vectorized(Ablockmat, Vblockmat);
+                // evd_block_vector(Ablockmat, Vblockmat);
+                evd_subprocedure_vectorized(Ablockmat, Vblockmat);
 
                 for (size_t k_block = 0; k_block < n_blocks; ++k_block) {
                     mult_transpose_block(Vblockmat, 0, 0, Amat, i_block, k_block, M1mat, 0, 0, block_size);
@@ -519,152 +503,5 @@ void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
             }
         }
         matrix_off_frobenius(Bmat, &off_norm);
-    }
-}
-
-
-static inline void mult_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, struct matrix_t Bmat,
-                              size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row,
-                              size_t blockC_col, size_t block_size) {
-    size_t nA = Amat.rows;
-    size_t nB = Bmat.rows;
-    size_t nC = Cmat.rows;
-    double* A = Amat.ptr;
-    double* B = Bmat.ptr;
-    double* C = Cmat.ptr;
-    size_t Abeg = blockA_row * block_size * nA + blockA_col * block_size;
-    size_t Bbeg = blockB_row * block_size * nB + blockB_col * block_size;
-    size_t Cbeg = blockC_row * block_size * nC + blockC_col * block_size;
-    for (size_t i = 0; i < block_size; ++i) {
-        for (size_t j = 0; j < block_size; ++j) {
-            C[Cbeg + i * nC + j] = 0.0;
-            for (size_t k = 0; k < block_size; ++k) {
-                C[Cbeg + i * nC + j] += A[Abeg + i * nA + k] * B[Bbeg + k * nB + j];
-            }
-        }
-    }
-}
-
-static inline void add(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t Cmat) {
-    size_t n = Amat.rows;
-    double* A = Amat.ptr;
-    double* B = Bmat.ptr;
-    double* C = Cmat.ptr;
-    for (size_t i = 0; i < n; ++i) {
-        for (size_t j = 0; j < n; ++j) {
-            C[n * i + j] = A[n * i + j] + B[n * i + j];
-        }
-    }
-}
-
-static inline void copy_block(struct matrix_t Smat, size_t blockS_row, size_t blockS_col,
-                      struct matrix_t Dmat, size_t blockD_row, size_t blockD_col, size_t block_size) {
-    size_t nS = Smat.rows;
-    size_t nD = Dmat.rows;
-    double* S = Smat.ptr;
-    double* D = Dmat.ptr;
-    size_t Sbeg = blockS_row * block_size * nS + blockS_col * block_size;
-    size_t Dbeg = blockD_row * block_size * nD + blockD_col * block_size;
-    for (size_t i = 0; i < block_size; ++i) {
-        for (size_t j = 0; j < block_size; j += 8) {
-            D[Dbeg + i * nD + j + 0] = S[Sbeg + i * nS + j + 0];
-            D[Dbeg + i * nD + j + 1] = S[Sbeg + i * nS + j + 1];
-            D[Dbeg + i * nD + j + 2] = S[Sbeg + i * nS + j + 2];
-            D[Dbeg + i * nD + j + 3] = S[Sbeg + i * nS + j + 3];
-            D[Dbeg + i * nD + j + 4] = S[Sbeg + i * nS + j + 4];
-            D[Dbeg + i * nD + j + 5] = S[Sbeg + i * nS + j + 5];
-            D[Dbeg + i * nD + j + 6] = S[Sbeg + i * nS + j + 6];
-            D[Dbeg + i * nD + j + 7] = S[Sbeg + i * nS + j + 7];
-        }
-    }
-}
-
-static inline void transpose(struct matrix_t Amat) {
-    size_t n = Amat.rows;
-    double* A = Amat.ptr;
-    for (size_t i = 0; i < n - 1; ++i) {
-        for (size_t j = i + 1; j < n; ++j) {
-            double tmp = A[i * n + j];
-            A[i * n + j] = A[j * n + i];
-            A[j * n + i] = tmp;
-        }
-    }
-}
-
-// perform D = C + AB
-static inline void mult_add_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, struct matrix_t Bmat,
-              size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row, size_t blockC_col,
-              struct matrix_t Dmat, size_t blockD_row, size_t blockD_col, size_t block_size) {
-    size_t nA = Amat.rows;
-    size_t nB = Bmat.rows;
-    size_t nC = Cmat.rows;
-    size_t nD = Dmat.rows;
-    double* A = Amat.ptr;
-    double* B = Bmat.ptr;
-    double* C = Cmat.ptr;
-    double* D = Dmat.ptr;
-    size_t Abeg = blockA_row * block_size * nA + blockA_col * block_size;
-    size_t Bbeg = blockB_row * block_size * nB + blockB_col * block_size;
-    size_t Cbeg = blockC_row * block_size * nC + blockC_col * block_size;
-    size_t Dbeg = blockD_row * block_size * nD + blockD_col * block_size;
-    for (size_t i = 0; i < block_size; ++i) {
-        for (size_t j = 0; j < block_size; ++j) {
-            D[Dbeg + i * nD + j] = C[Cbeg + i * nC + j];
-            for (size_t k = 0; k < block_size; ++k) {
-                D[Dbeg + i * nD + j] += A[Abeg + i * nA + k] * B[Bbeg + k * nB + j];
-            }
-        }
-    }
-}
-
-// perform C += (A^T)B
-// for C_ij, use ith column of A and jth column of B
-void inline mult_transpose_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, struct matrix_t Bmat,
-                          size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row,
-                          size_t blockC_col, size_t block_size) {
-    size_t nA = Amat.rows;
-    size_t nB = Bmat.rows;
-    size_t nC = Cmat.rows;
-    double* A = Amat.ptr;
-    double* B = Bmat.ptr;
-    double* C = Cmat.ptr;
-    size_t Abeg = blockA_row * block_size * nA + blockA_col * block_size;
-    size_t Bbeg = blockB_row * block_size * nB + blockB_col * block_size;
-    size_t Cbeg = blockC_row * block_size * nC + blockC_col * block_size;
-    for (size_t i = 0; i < block_size; ++i) {
-        for (size_t j = 0; j < block_size; ++j) {
-            C[Cbeg + i * nC + j] = 0.0;
-            for (size_t k = 0; k < block_size; ++k) {
-                C[Cbeg + i * nC + j] += A[Abeg + k * nA + i] * B[Bbeg + k * nB + j];
-            }
-        }
-    }
-}
-
-// perform D = C + (A^T)B
-// for D_ij, use ith column of A and jth column of B.
-void inline mult_add_transpose_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, struct matrix_t Bmat,
-                              size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row,
-                              size_t blockC_col, struct matrix_t Dmat, size_t blockD_row, size_t blockD_col,
-                              size_t block_size) {
-    size_t nA = Amat.rows;
-    size_t nB = Bmat.rows;
-    size_t nC = Cmat.rows;
-    size_t nD = Dmat.rows;
-    double* A = Amat.ptr;
-    double* B = Bmat.ptr;
-    double* C = Cmat.ptr;
-    double* D = Dmat.ptr;
-    size_t Abeg = blockA_row * block_size * nA + blockA_col * block_size;
-    size_t Bbeg = blockB_row * block_size * nB + blockB_col * block_size;
-    size_t Cbeg = blockC_row * block_size * nC + blockC_col * block_size;
-    size_t Dbeg = blockD_row * block_size * nD + blockD_col * block_size;
-    for (size_t i = 0; i < block_size; ++i) {
-        for (size_t j = 0; j < block_size; ++j) {
-            D[Dbeg + i * nD + j] = C[Cbeg + i * nC + j];
-            for (size_t k = 0; k < block_size; ++k) {
-                D[Dbeg + i * nD + j] += A[Abeg + k * nA + i] * B[Bbeg + k * nB + j];
-            }
-        }
     }
 }
