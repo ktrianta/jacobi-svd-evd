@@ -6,6 +6,7 @@
 #include "../../test_utils.hpp"
 #include "gtest/gtest.h"
 #include "types.hpp"
+#include "nevd.hpp"
 
 TEST(evd_cyclic_blocked, identity_matrix) {
     size_t n = 10;
@@ -360,6 +361,7 @@ TEST(evd_cyclic_blocked_vectorize, random_matrix_big) {
     std::vector<double> V(n * n, 0), V_expect(n * n, 0);
 
     std::string cmd = "python scripts/evd_testdata.py " + std::to_string(n) + " " + std::to_string(n);
+    //std::string cmd = "cat ttdata";
     std::stringstream ss(exec_cmd(cmd.c_str()));
     read_into(ss, &A[0], n * n);
     read_into(ss, &e_expect[0], n);
@@ -392,6 +394,7 @@ TEST(evd_cyclic_blocked_less_copy_vectorize, random_matrix_big) {
     std::vector<double> V(n * n, 0), V_expect(n * n, 0);
 
     std::string cmd = "python scripts/evd_testdata.py " + std::to_string(n) + " " + std::to_string(n);
+    //std::string cmd = "cat ttdata";
     std::stringstream ss(exec_cmd(cmd.c_str()));
     read_into(ss, &A[0], n * n);
     read_into(ss, &e_expect[0], n);

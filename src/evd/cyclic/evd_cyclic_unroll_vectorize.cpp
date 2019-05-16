@@ -68,8 +68,8 @@ void evd_cyclic_unroll_outer_vectorize(struct matrix_t Data_matr, struct matrix_
                     A[n * i + q] = nA_iq;
 
                     if (i != p && i != q) {
-                        A[n * p + i] = nA_ip;
-                        A[n * q + i] = nA_iq;
+                        A[n * p + i] = A[n * i + p];
+                        A[n * q + i] = A[n * i + q];
                     }
 
                     /*__m256d A_ip0, A_iq0;
@@ -98,8 +98,16 @@ void evd_cyclic_unroll_outer_vectorize(struct matrix_t Data_matr, struct matrix_
                     A[n * i + n * 3 + q] = nA_iq_update[0];
 
                     if (i != p && i != q) {
-                        _mm256_storeu_pd(A + n * p + i, nA_ip);
-                        _mm256_storeu_pd(A + n * q + i, nA_iq);
+                        // _mm256_storeu_pd(A + n * p + i, nA_ip);
+                        // _mm256_storeu_pd(A + n * q + i, nA_iq);
+                        A[n * p + i] = A[n * i + p];
+                        A[n * q + i] = A[n * i + q];
+                        A[n * p + i + 1] = A[n * (i+1) + p];
+                        A[n * q + i + 1] = A[n * (i+1) + q];
+                        A[n * p + i + 2] = A[n * (i+2) + p];
+                        A[n * q + i + 2] = A[n * (i+2) + q];
+                        A[n * p + i + 3] = A[n * (i+3) + p];
+                        A[n * q + i + 3] = A[n * (i+3) + q];
                     }*/
                 }
 
