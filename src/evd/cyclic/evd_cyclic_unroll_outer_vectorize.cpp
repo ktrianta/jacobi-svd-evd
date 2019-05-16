@@ -56,8 +56,8 @@ void evd_cyclic_unroll_outer_vectorize(struct matrix_t Data_matr, struct matrix_
                     __m256d A_qiv =
                         _mm256_set_pd(A[n * i + q], A[n * (i + 1) + q], A[n * (i + 2) + q], A[n * (i + 3) + q]);
 
-                    __m256d V_piv = _mm256_load_pd(V + n * p + i);
-                    __m256d V_qiv = _mm256_load_pd(V + n * q + i);
+                    __m256d V_piv = _mm256_loadu_pd(V + n * p + i);
+                    __m256d V_qiv = _mm256_loadu_pd(V + n * q + i);
 
                     __m256d sAq_v = _mm256_mul_pd(s_vec, A_qiv);
                     __m256d sAp_v = _mm256_mul_pd(s_vec, A_piv);
@@ -86,15 +86,8 @@ void evd_cyclic_unroll_outer_vectorize(struct matrix_t Data_matr, struct matrix_
                     A[n * (i + 3) + q] = nA_qiv[0];
 
                     // since we use load instead of set the indices are reversed.
-                    V[n * q + i] = V_qiv[0];
-                    V[n * q + i + 1] = V_qiv[1];
-                    V[n * q + i + 2] = V_qiv[2];
-                    V[n * q + i + 3] = V_qiv[3];
-
-                    V[n * p + i] = nV_piv[0];
-                    V[n * p + i + 1] = nV_piv[1];
-                    V[n * p + i + 2] = nV_piv[2];
-                    V[n * p + i + 3] = nV_piv[3];
+                    _mm256_storeu_pd(V + n * p + i,nV_piv);
+                    _mm256_storeu_pd(V + n * q + i, V_qiv);
 
                     if (!(i + 3 >= p && i <= p) && !(i + 3 >= q && i <= q)) {
                         A[n * p + i] = nA_piv[3];
