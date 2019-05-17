@@ -138,7 +138,7 @@ void evd_cyclic_blocked_unroll_outer(struct matrix_t Data_matr, struct matrix_t 
         E[i] = A[i * n + i];
     }
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
-}
+}  // NOLINT
 
 void evd_cyclic_blocked_unroll_outer_less_copy(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
                                                struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
