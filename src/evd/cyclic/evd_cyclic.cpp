@@ -28,7 +28,7 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struc
         for (size_t row = 0; row < m; row++) {
             for (size_t col = row + 1; col < m; col++) {
                 // Compute cos_t and sin_t for the rotation
-                
+
                 sym_jacobi_coeffs(A[row * m + row], A[row * m + col], A[col * m + col], &cos_t, &sin_t);
 
                 for (size_t i = 0; i < m; i++) {
