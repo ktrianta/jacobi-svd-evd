@@ -1,9 +1,9 @@
-#include "evd_cyclic.hpp"
 #include <immintrin.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <cassert>
+#include "evd_cyclic.hpp"
 #include "matrix.hpp"
 #include "types.hpp"
 #include "util.hpp"
@@ -17,18 +17,20 @@ static inline void copy_block(struct matrix_t S, size_t blockS_row, size_t block
                               size_t blockD_row, size_t blockD_col, size_t block_size);
 static inline void transpose(struct matrix_t A);
 static inline void mult_add_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, struct matrix_t Bmat,
-                    size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row, size_t blockC_col,
-                    struct matrix_t Dmat, size_t blockD_row, size_t blockD_col, size_t block_size);
+                                  size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row,
+                                  size_t blockC_col, struct matrix_t Dmat, size_t blockD_row, size_t blockD_col,
+                                  size_t block_size);
 static inline void mult_transpose_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col,
-                          struct matrix_t Bmat, size_t blockB_row, size_t blockB_col, struct matrix_t Cmat,
-                          size_t blockC_row, size_t blockC_col, size_t block_size);
+                                        struct matrix_t Bmat, size_t blockB_row, size_t blockB_col,
+                                        struct matrix_t Cmat, size_t blockC_row, size_t blockC_col, size_t block_size);
 static inline void mult_add_transpose_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col,
-                          struct matrix_t Bmat, size_t blockB_row, size_t blockB_col, struct matrix_t Cmat,
-                          size_t blockC_row, size_t blockC_col, struct matrix_t Dmat, size_t blockD_row,
-                          size_t blockD_col, size_t block_size);
+                                            struct matrix_t Bmat, size_t blockB_row, size_t blockB_col,
+                                            struct matrix_t Cmat, size_t blockC_row, size_t blockC_col,
+                                            struct matrix_t Dmat, size_t blockD_row, size_t blockD_col,
+                                            size_t block_size);
 
 void evd_cyclic_blocked_unroll_outer(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
-                   struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
+                                     struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
     assert(Data_matr.rows == Data_matr.cols);  // Input Matrix should be square
     assert(Eigen_vectors.rows == Eigen_vectors.cols);
     struct matrix_t& Amat = Data_matr_copy;
@@ -139,7 +141,7 @@ void evd_cyclic_blocked_unroll_outer(struct matrix_t Data_matr, struct matrix_t 
 }
 
 void evd_cyclic_blocked_unroll_outer_less_copy(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
-                   struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
+                                               struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
     assert(Data_matr.rows == Data_matr.cols);  // Input Matrix should be square
     assert(Eigen_vectors.rows == Eigen_vectors.cols);
     struct matrix_t& Amat = Data_matr_copy;
@@ -224,11 +226,11 @@ void evd_cyclic_blocked_unroll_outer_less_copy(struct matrix_t Data_matr, struct
                 for (size_t k_block = 0; k_block < n_blocks; ++k_block) {
                     mult_block(Eigen_vectors, k_block, i_block, Vblockmat, 0, 0, M1mat, 0, 0, block_size);
                     mult_block(Eigen_vectors, k_block, i_block, Vblockmat, 0, 1, M2mat, 0, 0, block_size);
-                    mult_add_block(Eigen_vectors, k_block, j_block, Vblockmat, 1, 0, M1mat, 0, 0,
-                                   Eigen_vectors, k_block, i_block, block_size);
+                    mult_add_block(Eigen_vectors, k_block, j_block, Vblockmat, 1, 0, M1mat, 0, 0, Eigen_vectors,
+                                   k_block, i_block, block_size);
                     copy_block(Eigen_vectors, k_block, j_block, M1mat, 0, 0, block_size);
-                    mult_add_block(M1mat, 0, 0, Vblockmat, 1, 1, M2mat, 0, 0, Eigen_vectors, k_block,
-                                   j_block, block_size);
+                    mult_add_block(M1mat, 0, 0, Vblockmat, 1, 1, M2mat, 0, 0, Eigen_vectors, k_block, j_block,
+                                   block_size);
                 }
             }
         }
@@ -244,125 +246,125 @@ void evd_cyclic_blocked_unroll_outer_less_copy(struct matrix_t Data_matr, struct
 }
 
 void evd_block(struct matrix_t Data_matr, struct matrix_t Eigen_vectors) {
-  assert(Data_matr.rows == Data_matr.cols);
-  double* A = Data_matr.ptr;
-  double* V = Eigen_vectors.ptr;
-  size_t n = Data_matr.rows;
+    assert(Data_matr.rows == Data_matr.cols);
+    double* A = Data_matr.ptr;
+    double* V = Eigen_vectors.ptr;
+    size_t n = Data_matr.rows;
 
-  double c0, s0;
-  double c1, s1;
+    double c0, s0;
+    double c1, s1;
 
-  matrix_identity(Eigen_vectors);
+    matrix_identity(Eigen_vectors);
 
-  for (int ep = 0; ep < 20; ++ep) {
-      for (size_t p = 0; p < n - 1; p += 2) {
-          for (size_t q = p + 1; q < n - 1; ++q) {
-              // Compute cos_t and sin_t for the rotation
-              size_t p1 = p + 1;
-              size_t q1 = q + 1;
-              sym_jacobi_coeffs(A[p * n + p], A[p * n + q], A[q * n + q], &c0, &s0);
-              sym_jacobi_coeffs(A[p1 * n + p1], A[p1 * n + q1], A[q1 * n + q1], &c1, &s1);
+    for (int ep = 0; ep < 20; ++ep) {
+        for (size_t p = 0; p < n - 1; p += 2) {
+            for (size_t q = p + 1; q < n - 1; ++q) {
+                // Compute cos_t and sin_t for the rotation
+                size_t p1 = p + 1;
+                size_t q1 = q + 1;
+                sym_jacobi_coeffs(A[p * n + p], A[p * n + q], A[q * n + q], &c0, &s0);
+                sym_jacobi_coeffs(A[p1 * n + p1], A[p1 * n + q1], A[q1 * n + q1], &c1, &s1);
 
-              size_t i;
-              // First unroll
-              double A_pp = A[n * p + p];
-              double A_pq = A[n * q + p];
+                size_t i;
+                // First unroll
+                double A_pp = A[n * p + p];
+                double A_pq = A[n * q + p];
 
-              A[n * p + p] = c0 * A_pp - s0 * A_pq;
-              A[n * q + p] = s0 * A_pp + c0 * A_pq;
+                A[n * p + p] = c0 * A_pp - s0 * A_pq;
+                A[n * q + p] = s0 * A_pp + c0 * A_pq;
 
-              double A_qp = A[n * p + q];
-              double A_qq = A[n * q + q];
+                double A_qp = A[n * p + q];
+                double A_qq = A[n * q + q];
 
-              A[n * p + q] = c0 * A_qp - s0 * A_qq;
-              A[n * q + q] = s0 * A_qp + c0 * A_qq;
+                A[n * p + q] = c0 * A_qp - s0 * A_qq;
+                A[n * q + q] = s0 * A_qp + c0 * A_qq;
 
-              for (i = 0; i < n; ++i) {
-                  double V_pi0 = V[n * p + i];
-                  double V_qi0 = V[n * q + i];
-                  double A_ip0 = A[n * i + p];
-                  double A_iq0 = A[n * i + q];
+                for (i = 0; i < n; ++i) {
+                    double V_pi0 = V[n * p + i];
+                    double V_qi0 = V[n * q + i];
+                    double A_ip0 = A[n * i + p];
+                    double A_iq0 = A[n * i + q];
 
-                  double nA_ip = c0 * A_ip0 - s0 * A_iq0;
-                  double nA_iq = s0 * A_ip0 + c0 * A_iq0;
+                    double nA_ip = c0 * A_ip0 - s0 * A_iq0;
+                    double nA_iq = s0 * A_ip0 + c0 * A_iq0;
 
-                  A[n * i + p] = nA_ip;
-                  A[n * i + q] = nA_iq;
-                  V[n * p + i] = c0 * V_pi0 - s0 * V_qi0;
-                  V[n * q + i] = s0 * V_pi0 + c0 * V_qi0;
+                    A[n * i + p] = nA_ip;
+                    A[n * i + q] = nA_iq;
+                    V[n * p + i] = c0 * V_pi0 - s0 * V_qi0;
+                    V[n * q + i] = s0 * V_pi0 + c0 * V_qi0;
 
-                  if (i != p && i != q) {
-                      A[n * p + i] = nA_ip;
-                      A[n * q + i] = nA_iq;
-                  }
-              }
+                    if (i != p && i != q) {
+                        A[n * p + i] = nA_ip;
+                        A[n * q + i] = nA_iq;
+                    }
+                }
 
-              // Second unroll
-              A_pp = A[n * p1 + p1];
-              A_pq = A[n * q1 + p1];
+                // Second unroll
+                A_pp = A[n * p1 + p1];
+                A_pq = A[n * q1 + p1];
 
-              A[n * p1 + p1] = c1 * A_pp - s1 * A_pq;
-              A[n * q1 + p1] = s1 * A_pp + c1 * A_pq;
+                A[n * p1 + p1] = c1 * A_pp - s1 * A_pq;
+                A[n * q1 + p1] = s1 * A_pp + c1 * A_pq;
 
-              A_qp = A[n * p1 + q1];
-              A_qq = A[n * q1 + q1];
+                A_qp = A[n * p1 + q1];
+                A_qq = A[n * q1 + q1];
 
-              A[n * p1 + q1] = c1 * A_qp - s1 * A_qq;
-              A[n * q1 + q1] = s1 * A_qp + c1 * A_qq;
+                A[n * p1 + q1] = c1 * A_qp - s1 * A_qq;
+                A[n * q1 + q1] = s1 * A_qp + c1 * A_qq;
 
-              for (i = 0; i < n; ++i) {
-                  double V_pi0 = V[n * p1 + i];
-                  double V_qi0 = V[n * q1 + i];
-                  double A_ip0 = A[n * i + p1];
-                  double A_iq0 = A[n * i + q1];
+                for (i = 0; i < n; ++i) {
+                    double V_pi0 = V[n * p1 + i];
+                    double V_qi0 = V[n * q1 + i];
+                    double A_ip0 = A[n * i + p1];
+                    double A_iq0 = A[n * i + q1];
 
-                  double nA_ip = c1 * A_ip0 - s1 * A_iq0;
-                  double nA_iq = s1 * A_ip0 + c1 * A_iq0;
+                    double nA_ip = c1 * A_ip0 - s1 * A_iq0;
+                    double nA_iq = s1 * A_ip0 + c1 * A_iq0;
 
-                  A[n * i + p1] = nA_ip;
-                  A[n * i + q1] = nA_iq;
-                  V[n * p1 + i] = c1 * V_pi0 - s1 * V_qi0;
-                  V[n * q1 + i] = s1 * V_pi0 + c1 * V_qi0;
+                    A[n * i + p1] = nA_ip;
+                    A[n * i + q1] = nA_iq;
+                    V[n * p1 + i] = c1 * V_pi0 - s1 * V_qi0;
+                    V[n * q1 + i] = s1 * V_pi0 + c1 * V_qi0;
 
-                  if (i != p1 && i != q1) {
-                      A[n * p1 + i] = nA_ip;
-                      A[n * q1 + i] = nA_iq;
-                  }
-              }
-          }
-      }
+                    if (i != p1 && i != q1) {
+                        A[n * p1 + i] = nA_ip;
+                        A[n * q1 + i] = nA_iq;
+                    }
+                }
+            }
+        }
 
-      for (size_t p = 0; p < n - 1; p += 2) {
-          // Compute cos_t and sin_t for the rotation
-          size_t q = n - 1;
-          sym_jacobi_coeffs(A[p * n + p], A[p * n + q], A[q * n + q], &c0, &s0);
+        for (size_t p = 0; p < n - 1; p += 2) {
+            // Compute cos_t and sin_t for the rotation
+            size_t q = n - 1;
+            sym_jacobi_coeffs(A[p * n + p], A[p * n + q], A[q * n + q], &c0, &s0);
 
-          size_t i;
+            size_t i;
 
-          for (i = 0; i < n; ++i) {
-              double A_ip = A[n * i + p];
-              double A_iq = A[n * i + q];
+            for (i = 0; i < n; ++i) {
+                double A_ip = A[n * i + p];
+                double A_iq = A[n * i + q];
 
-              A[n * i + p] = c0 * A_ip - s0 * A_iq;
-              A[n * i + q] = s0 * A_ip + c0 * A_iq;
-          }
+                A[n * i + p] = c0 * A_ip - s0 * A_iq;
+                A[n * i + q] = s0 * A_ip + c0 * A_iq;
+            }
 
-          for (i = 0; i < n; ++i) {
-              double A_ip0 = A[n * p + i];
-              double A_iq0 = A[n * q + i];
-              // Working with the transpose of eigenvectors to improve locality.
-              double V_pi0 = V[n * p + i];
-              double V_qi0 = V[n * q + i];
+            for (i = 0; i < n; ++i) {
+                double A_ip0 = A[n * p + i];
+                double A_iq0 = A[n * q + i];
+                // Working with the transpose of eigenvectors to improve locality.
+                double V_pi0 = V[n * p + i];
+                double V_qi0 = V[n * q + i];
 
-              A[n * p + i] = c0 * A_ip0 - s0 * A_iq0;
-              A[n * q + i] = s0 * A_ip0 + c0 * A_iq0;
+                A[n * p + i] = c0 * A_ip0 - s0 * A_iq0;
+                A[n * q + i] = s0 * A_ip0 + c0 * A_iq0;
 
-              V[n * p + i] = c0 * V_pi0 - s0 * V_qi0;
-              V[n * q + i] = s0 * V_pi0 + c0 * V_qi0;
-          }
-      }
-  }
-  matrix_transpose(Eigen_vectors, Eigen_vectors);
+                V[n * p + i] = c0 * V_pi0 - s0 * V_qi0;
+                V[n * q + i] = s0 * V_pi0 + c0 * V_qi0;
+            }
+        }
+    }
+    matrix_transpose(Eigen_vectors, Eigen_vectors);
 }
 
 static inline void mult_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, struct matrix_t Bmat,
@@ -399,8 +401,8 @@ static inline void add(struct matrix_t Amat, struct matrix_t Bmat, struct matrix
     }
 }
 
-static inline void copy_block(struct matrix_t Smat, size_t blockS_row, size_t blockS_col,
-                      struct matrix_t Dmat, size_t blockD_row, size_t blockD_col, size_t block_size) {
+static inline void copy_block(struct matrix_t Smat, size_t blockS_row, size_t blockS_col, struct matrix_t Dmat,
+                              size_t blockD_row, size_t blockD_col, size_t block_size) {
     size_t nS = Smat.rows;
     size_t nD = Dmat.rows;
     double* S = Smat.ptr;
@@ -435,8 +437,9 @@ static inline void transpose(struct matrix_t Amat) {
 
 // perform D = C + AB
 static inline void mult_add_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, struct matrix_t Bmat,
-              size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row, size_t blockC_col,
-              struct matrix_t Dmat, size_t blockD_row, size_t blockD_col, size_t block_size) {
+                                  size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row,
+                                  size_t blockC_col, struct matrix_t Dmat, size_t blockD_row, size_t blockD_col,
+                                  size_t block_size) {
     size_t nA = Amat.rows;
     size_t nB = Bmat.rows;
     size_t nC = Cmat.rows;
@@ -462,8 +465,8 @@ static inline void mult_add_block(struct matrix_t Amat, size_t blockA_row, size_
 // perform C += (A^T)B
 // for C_ij, use ith column of A and jth column of B
 void inline mult_transpose_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, struct matrix_t Bmat,
-                          size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row,
-                          size_t blockC_col, size_t block_size) {
+                                 size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row,
+                                 size_t blockC_col, size_t block_size) {
     size_t nA = Amat.rows;
     size_t nB = Bmat.rows;
     size_t nC = Cmat.rows;
@@ -486,9 +489,9 @@ void inline mult_transpose_block(struct matrix_t Amat, size_t blockA_row, size_t
 // perform D = C + (A^T)B
 // for D_ij, use ith column of A and jth column of B.
 void inline mult_add_transpose_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, struct matrix_t Bmat,
-                              size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row,
-                              size_t blockC_col, struct matrix_t Dmat, size_t blockD_row, size_t blockD_col,
-                              size_t block_size) {
+                                     size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row,
+                                     size_t blockC_col, struct matrix_t Dmat, size_t blockD_row, size_t blockD_col,
+                                     size_t block_size) {
     size_t nA = Amat.rows;
     size_t nB = Bmat.rows;
     size_t nC = Cmat.rows;
