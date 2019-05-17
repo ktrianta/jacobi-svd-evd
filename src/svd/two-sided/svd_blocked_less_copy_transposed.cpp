@@ -112,5 +112,6 @@ size_t svd_blocked_less_copy_transposed(struct matrix_t Amat, struct matrix_t Bm
 
     free(memory);
 
-    return blocked_less_copy_cost(n, block_size, iter, block_iter);
+    return blocked_less_copy_cost_without_subprocedure(n, block_size, iter) +
+           base_cost_vectorized(2 * block_size, block_iter);
 }
