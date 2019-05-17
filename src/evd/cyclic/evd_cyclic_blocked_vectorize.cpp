@@ -10,7 +10,7 @@
 #include "nevd.hpp"
 
 static inline void evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat);
-static inline void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat);
+// static inline void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat);
 static inline void mult_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, struct matrix_t Bmat,
                               size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row,
                               size_t blockC_col, size_t block_size);
@@ -306,7 +306,7 @@ static void evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat) {
   matrix_transpose({V, m, m}, {V, m, m});
 }
 
-void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
+/*void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
     size_t n = Bmat.rows;
     const double tol = 1e-15;  // convergence tolerance
     double* B = Bmat.ptr;
@@ -474,7 +474,7 @@ void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
         }
         matrix_off_frobenius(Bmat, &off_norm);
     }
-}
+}*/
 
 
 static inline void mult_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, struct matrix_t Bmat,
