@@ -40,7 +40,7 @@ size_t svd_blocked_less_copy(struct matrix_t Amat, struct matrix_t Bmat, struct 
 
     assert(n_blocks * block_size == n);
 
-    double* memory = (double*) malloc((4 + 4 + 4 + 1 + 1) * block_size * block_size * sizeof(double));
+    double* memory = (double*) aligned_alloc(32, (4 + 4 + 4 + 1 + 1) * block_size * block_size * sizeof(double));
     double* Bblock = memory;
     double* Ublock = Bblock + 4 * block_size * block_size;
     double* Vblock = Ublock + 4 * block_size * block_size;
@@ -112,5 +112,5 @@ size_t svd_blocked_less_copy(struct matrix_t Amat, struct matrix_t Bmat, struct 
 
     free(memory);
 
-    return blocked_less_copy_cost(n, block_size, iter, block_iter);
+    return blocked_less_copy_cost_without_subprocedure(n, block_size, iter) + base_cost(2 * block_size, block_iter);
 }
