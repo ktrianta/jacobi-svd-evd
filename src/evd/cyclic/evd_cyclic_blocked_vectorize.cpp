@@ -1,20 +1,20 @@
-#include "evd_cyclic.hpp"
 #include <immintrin.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <cassert>
+#include "block.hpp"
+#include "evd_cyclic.hpp"
 #include "matrix.hpp"
+#include "nevd.hpp"
 #include "types.hpp"
 #include "util.hpp"
-#include "nevd.hpp"
-#include "block.hpp"
 
 static inline void evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat);
 static inline void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat);
 
 void evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
-            struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
+                                  struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
     assert(Data_matr.rows == Data_matr.cols);  // Input Matrix should be square
     assert(Eigen_vectors.rows == Eigen_vectors.cols);
     struct matrix_t& Amat = Data_matr_copy;
@@ -28,8 +28,6 @@ void evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t Dat
     const size_t n_blocks = n / block_size;
 
     matrix_identity(Eigen_vectors);
-
-    int is_not_diagonal = 0;
 
     if (n < 2 * block_size) {
         evd_block_vector(Amat, Eigen_vectors);
@@ -56,17 +54,6 @@ void evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t Dat
     matrix_t M2mat = {M2, block_size, block_size};
 
     for (int ep = 1; ep <= epoch; ep++) {
-        for (size_t i = 0; i < n; i++) {
-            for (size_t j = i + 1; j < n; j++) {
-                if (A[i * n + j] != 0.0) {
-                    is_not_diagonal = 1;
-                    break;
-                }
-            }
-        }
-
-        if (!is_not_diagonal) break;
-
         for (size_t i_block = 0; i_block < n_blocks - 1; ++i_block) {
             for (size_t j_block = i_block + 1; j_block < n_blocks; ++j_block) {
                 copy_block(Amat, i_block, i_block, Ablockmat, 0, 0, block_size);
@@ -114,7 +101,6 @@ void evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t Dat
                 }
             }
         }
-        is_not_diagonal = 0;
     }
 
     free(memory_block);
@@ -126,7 +112,7 @@ void evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t Dat
 }
 
 void evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
-                    struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
+                                            struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
     assert(Data_matr.rows == Data_matr.cols);  // Input Matrix should be square
     assert(Eigen_vectors.rows == Eigen_vectors.cols);
     struct matrix_t& Amat = Data_matr_copy;
@@ -140,8 +126,6 @@ void evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct ma
     const size_t n_blocks = n / block_size;
 
     matrix_identity(Eigen_vectors);
-
-    int is_not_diagonal = 0;
 
     if (n < 2 * block_size) {
         evd_block_vector(Amat, Eigen_vectors);
@@ -168,17 +152,6 @@ void evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct ma
     matrix_t M2mat = {M2, block_size, block_size};
 
     for (int ep = 1; ep <= epoch; ep++) {
-        for (size_t i = 0; i < n; i++) {
-            for (size_t j = i + 1; j < n; j++) {
-                if (A[i * n + j] != 0.0) {
-                    is_not_diagonal = 1;
-                    break;
-                }
-            }
-        }
-
-        if (!is_not_diagonal) break;
-
         for (size_t i_block = 0; i_block < n_blocks - 1; ++i_block) {
             for (size_t j_block = i_block + 1; j_block < n_blocks; ++j_block) {
                 copy_block(Amat, i_block, i_block, Ablockmat, 0, 0, block_size);
@@ -212,15 +185,14 @@ void evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct ma
                 for (size_t k_block = 0; k_block < n_blocks; ++k_block) {
                     mult_block(Eigen_vectors, k_block, i_block, Vblockmat, 0, 0, M1mat, 0, 0, block_size);
                     mult_block(Eigen_vectors, k_block, i_block, Vblockmat, 0, 1, M2mat, 0, 0, block_size);
-                    mult_add_block(Eigen_vectors, k_block, j_block, Vblockmat, 1, 0, M1mat, 0, 0,
-                                   Eigen_vectors, k_block, i_block, block_size);
+                    mult_add_block(Eigen_vectors, k_block, j_block, Vblockmat, 1, 0, M1mat, 0, 0, Eigen_vectors,
+                                   k_block, i_block, block_size);
                     copy_block(Eigen_vectors, k_block, j_block, M1mat, 0, 0, block_size);
-                    mult_add_block(M1mat, 0, 0, Vblockmat, 1, 1, M2mat, 0, 0, Eigen_vectors, k_block,
-                                   j_block, block_size);
+                    mult_add_block(M1mat, 0, 0, Vblockmat, 1, 1, M2mat, 0, 0, Eigen_vectors, k_block, j_block,
+                                   block_size);
                 }
             }
         }
-        is_not_diagonal = 0;
     }
 
     free(memory_block);
@@ -242,32 +214,15 @@ static void evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat) {
 
   matrix_identity(Vmat);
 
-  int is_not_diagonal = 0;
-
   for (int ep = 1; ep <= 20; ep++) {
-      double alpha, beta, cos_t, sin_t;
-
-      for (size_t i = 0; i < m; i++) {
-          for (size_t j = i + 1; j < m; j++) {
-              if (A[i * m + j] != 0.0) {
-                  is_not_diagonal = 1;
-                  break;
-              }
-          }
-      }
-
-      if (!is_not_diagonal) break;
+      double cos_t, sin_t;
 
       for (size_t row = 0; row < m; row++) {
           for (size_t col = row + 1; col < m; col++) {
               __m256d sin_vec, cos_vec;
-              // Compute cos_t and sin_t for the rotation
 
-              alpha = 2.0 * sign(A[row * m + row] - A[col * m + col]) * A[row * m + col];
-              beta = fabs(A[row * m + row] - A[col * m + col]);
-              cos_t = sqrt(0.5 * (1 + beta / sqrt(alpha * alpha + beta * beta)));
-              // sin_t = (1 / 2*cos_t) * (alpha / sqrt(alpha*alpha + beta*beta));
-              sin_t = sign(alpha) * sqrt(1 - cos_t * cos_t);
+              // Compute cos_t and sin_t for the rotation
+              sym_jacobi_coeffs(A[row * m + row], A[row * m + col], A[col * m + col], &cos_t, &sin_t);
 
               sin_vec = _mm256_set1_pd(sin_t);
               cos_vec = _mm256_set1_pd(cos_t);
@@ -275,8 +230,8 @@ static void evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat) {
               for (size_t i = 0; i < m; i++) {
                   // Compute the eigen values by updating the columns until convergence
                   double A_i_r = A[m * i + row];
-                  A[m * i + row] = cos_t * A[m * i + row] + sin_t * A[m * i + col];
-                  A[m * i + col] = cos_t * A[m * i + col] - sin_t * A_i_r;
+                  A[m * i + row] = cos_t * A[m * i + row] - sin_t * A[m * i + col];
+                  A[m * i + col] = cos_t * A[m * i + col] + sin_t * A_i_r;
               }
 
               if (m % 4 != 0)
@@ -293,12 +248,12 @@ static void evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat) {
 
                   cos_row = _mm256_mul_pd(A_row, cos_vec);
                   sin_col = _mm256_mul_pd(A_col, sin_vec);
-                  A_row = _mm256_add_pd(cos_row, sin_col);
+                  A_row = _mm256_sub_pd(cos_row, sin_col);
                   _mm256_storeu_pd(A + m * row + i, A_row);
 
                   cos_col = _mm256_mul_pd(A_col, cos_vec);
                   sin_row = _mm256_mul_pd(A_rcopy, sin_vec);
-                  A_col = _mm256_sub_pd(cos_col, sin_row);
+                  A_col = _mm256_add_pd(cos_col, sin_row);
                   _mm256_storeu_pd(A + m * col + i, A_col);
 
                   // Compute the eigen vectors similarly by updating the eigen vector matrix
@@ -308,29 +263,28 @@ static void evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat) {
 
                   cos_row = _mm256_mul_pd(V_row, cos_vec);
                   sin_col = _mm256_mul_pd(V_col, sin_vec);
-                  V_row = _mm256_add_pd(cos_row, sin_col);
+                  V_row = _mm256_sub_pd(cos_row, sin_col);
                   _mm256_storeu_pd(V + m * row + i, V_row);
 
                   cos_col = _mm256_mul_pd(V_col, cos_vec);
                   sin_row = _mm256_mul_pd(V_rcopy, sin_vec);
-                  V_col = _mm256_sub_pd(cos_col, sin_row);
+                  V_col = _mm256_add_pd(cos_col, sin_row);
                   _mm256_storeu_pd(V + m * col + i, V_col);
               }
 
               if (m % 4 != 0) {
                   for (size_t i = 0; i < m - n; i++) {
                     double A_r_i = A[m * row + n + i];
-                    A[m * row + n + i] = cos_t * A[m * row + n + i] + sin_t * A[m * col + n + i];
-                    A[m * col + n + i] = cos_t * A[m * col + n + i] - sin_t * A_r_i;
+                    A[m * row + n + i] = cos_t * A[m * row + n + i] - sin_t * A[m * col + n + i];
+                    A[m * col + n + i] = cos_t * A[m * col + n + i] + sin_t * A_r_i;
 
                     double V_r_i = V[m * row + n + i];
-                    V[m * row + n + i] = cos_t * V[m * row + n + i] + sin_t * V[m * col + n + i];
-                    V[m * col + n + i] = cos_t * V[m * col + n + i] - sin_t * V_r_i;
+                    V[m * row + n + i] = cos_t * V[m * row + n + i] - sin_t * V[m * col + n + i];
+                    V[m * col + n + i] = cos_t * V[m * col + n + i] + sin_t * V_r_i;
                   }
               }
           }
       }
-      is_not_diagonal = 0;
   }
 
   matrix_transpose({V, m, m}, {V, m, m});
@@ -347,7 +301,7 @@ void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
     matrix_identity(Vmat);
     matrix_frobenius(Bmat, &norm, &off_norm);
 
-     while (off_norm > tol * tol * norm) {
+    while (off_norm > tol * tol * norm) {
         for (size_t i = 0; i < n - 1; ++i) {
             for (size_t j = i + 1; j < n; ++j) {
                 const double bii = B[n * i + i];
@@ -358,7 +312,7 @@ void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
                 const double s1k = cf.s1 * cf.k;
                 const double c1k = cf.c1 * cf.k;
 
-                 size_t k = 0;
+                size_t k = 0;
                 __m256d vi_0, vi_1, vj_0, vj_1;
                 __m256d left_0, left_1, right_0, right_1;
                 __m256d v_c = _mm256_set1_pd(cf.c1);
@@ -371,17 +325,17 @@ void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
                     vj_0 = _mm256_load_pd(B + n * j + (k + 0));
                     vj_1 = _mm256_load_pd(B + n * j + (k + 4));
 
-                     left_0 = _mm256_mul_pd(v_s, vj_0);
+                    left_0 = _mm256_mul_pd(v_s, vj_0);
                     left_1 = _mm256_mul_pd(v_s, vj_1);
                     left_0 = _mm256_fmsub_pd(v_c, vi_0, left_0);
                     left_1 = _mm256_fmsub_pd(v_c, vi_1, left_1);
 
-                     right_0 = _mm256_mul_pd(v_c1k, vj_0);
+                    right_0 = _mm256_mul_pd(v_c1k, vj_0);
                     right_1 = _mm256_mul_pd(v_c1k, vj_1);
                     right_0 = _mm256_fmadd_pd(v_s1k, vi_0, right_0);
                     right_1 = _mm256_fmadd_pd(v_s1k, vi_1, right_1);
 
-                     _mm256_store_pd(B + n * i + k + 0, left_0);
+                    _mm256_store_pd(B + n * i + k + 0, left_0);
                     _mm256_store_pd(B + n * i + k + 4, left_1);
                     _mm256_store_pd(B + n * j + k + 0, right_0);
                     _mm256_store_pd(B + n * j + k + 4, right_1);
@@ -395,7 +349,7 @@ void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
                     B[n * j + k] = right;
                 }
 
-                 k = 0;
+                k = 0;
                 v_c = _mm256_set1_pd(cf.c2);
                 v_s = _mm256_set1_pd(cf.s2);
                 for (; k + 7 < n; k += 8) {
@@ -408,17 +362,17 @@ void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
                     vj_1 =
                         _mm256_set_pd(B[n * (k + 4) + j], B[n * (k + 5) + j], B[n * (k + 6) + j], B[n * (k + 7) + j]);
 
-                     left_0 = _mm256_mul_pd(v_s, vj_0);
+                    left_0 = _mm256_mul_pd(v_s, vj_0);
                     left_1 = _mm256_mul_pd(v_s, vj_1);
                     left_0 = _mm256_fmsub_pd(v_c, vi_0, left_0);
                     left_1 = _mm256_fmsub_pd(v_c, vi_1, left_1);
 
-                     right_0 = _mm256_mul_pd(v_c, vj_0);
+                    right_0 = _mm256_mul_pd(v_c, vj_0);
                     right_1 = _mm256_mul_pd(v_c, vj_1);
                     right_0 = _mm256_fmadd_pd(v_s, vi_0, right_0);
                     right_1 = _mm256_fmadd_pd(v_s, vi_1, right_1);
 
-                     double* left_0_ptr = (double*) &left_0;
+                    double* left_0_ptr = (double*) &left_0;
                     double* left_1_ptr = (double*) &left_1;
                     double* right_0_ptr = (double*) &right_0;
                     double* right_1_ptr = (double*) &right_1;
@@ -448,7 +402,7 @@ void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
                     B[n * k + j] = right;
                 }
 
-                 k = 0;
+                k = 0;
                 v_c = _mm256_set1_pd(cf.c2);
                 v_s = _mm256_set1_pd(cf.s2);
                 for (; k + 7 < n; k += 8) {
