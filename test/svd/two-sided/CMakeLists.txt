@@ -3,6 +3,7 @@ add_executable(
     svd_test.cpp
     svd_blocked_test.cpp
     svd_blocked_less_copy_test.cpp
+    svd_blocked_less_copy_transposed_test.cpp
     ../../test_utils.cpp)
 target_link_libraries(two-sided-svd-test gtest_main two-sided-svd-lib utils-lib m)
 
