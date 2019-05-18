@@ -10,7 +10,7 @@
 #include "util.hpp"
 
 void evd_cyclic_unroll_outer_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
-                             struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
+                                       struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
     assert(Data_matr.rows == Data_matr.cols);
     double* A = Data_matr_copy.ptr;
     double* V = Eigen_vectors.ptr;
@@ -191,10 +191,8 @@ void evd_cyclic_unroll_outer_vectorize(struct matrix_t Data_matr, struct matrix_
 
             for (i = 0; i < n; i += 4) {
                 __m256d A_ip, A_iq;
-                A_ip = _mm256_set_pd(A[n * i + p], A[n * i + n + p], A[n * i + n * 2 + p],
-                                     A[n * i + n * 3 + p]);
-                A_iq = _mm256_set_pd(A[n * i + q], A[n * i + n + q], A[n * i + n * 2 + q],
-                                     A[n * i + n * 3 + q]);
+                A_ip = _mm256_set_pd(A[n * i + p], A[n * i + n + p], A[n * i + n * 2 + p], A[n * i + n * 3 + p]);
+                A_iq = _mm256_set_pd(A[n * i + q], A[n * i + n + q], A[n * i + n * 2 + q], A[n * i + n * 3 + q]);
                 cos_c1 = _mm256_mul_pd(A_ip, cos_vec0);
                 sin_c1 = _mm256_mul_pd(A_iq, sin_vec0);
                 nA_ip = _mm256_sub_pd(cos_c1, sin_c1);
@@ -226,7 +224,6 @@ void evd_cyclic_unroll_outer_vectorize(struct matrix_t Data_matr, struct matrix_
                 nA_ip = _mm256_sub_pd(cos_c1, sin_c1);
                 _mm256_storeu_pd(A + n * p + i, nA_ip);
 
-
                 sin_c2 = _mm256_mul_pd(A_pi, sin_vec0);
                 cos_c2 = _mm256_mul_pd(A_qi, cos_vec0);
                 nA_iq = _mm256_add_pd(sin_c2, cos_c2);
@@ -242,7 +239,6 @@ void evd_cyclic_unroll_outer_vectorize(struct matrix_t Data_matr, struct matrix_
                 sin_c1 = _mm256_mul_pd(V_qi, sin_vec0);
                 nV_ip = _mm256_sub_pd(cos_c1, sin_c1);
                 _mm256_storeu_pd(V + n * p + i, nV_ip);
-
 
                 sin_c2 = _mm256_mul_pd(V_pi, sin_vec0);
                 cos_c2 = _mm256_mul_pd(V_qi, cos_vec0);

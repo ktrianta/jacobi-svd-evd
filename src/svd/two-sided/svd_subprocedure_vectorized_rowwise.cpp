@@ -4,7 +4,7 @@
 #include "nsvd.hpp"
 #include "svd_subprocedure.hpp"
 
-size_t svd_subprocedure_vectorized_with_transpose(struct matrix_t Bmat, struct matrix_t Umat, struct matrix_t Vmat) {
+size_t svd_subprocedure_vectorized_rowwise(struct matrix_t Bmat, struct matrix_t Umat, struct matrix_t Vmat) {
     size_t iter = 0;  // count main loop iterations performed till convergence
     size_t n = Bmat.rows;
     const double tol = 1e-15;  // convergence tolerance
@@ -17,8 +17,6 @@ size_t svd_subprocedure_vectorized_with_transpose(struct matrix_t Bmat, struct m
     matrix_identity(Umat);
     matrix_identity(Vmat);
     matrix_frobenius(Bmat, &norm, &off_norm);
-
-    matrix_transpose(Bmat, Bmat);
 
     while (off_norm > tol * tol * norm) {
         for (size_t i = 0; i < n - 1; ++i) {
@@ -192,8 +190,6 @@ size_t svd_subprocedure_vectorized_with_transpose(struct matrix_t Bmat, struct m
         matrix_off_frobenius(Bmat, &off_norm);
         iter += 1;
     }
-    matrix_transpose(Umat, Umat);
-    matrix_transpose(Vmat, Vmat);
 
     return iter;
 }
