@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9.2)
+cmake_minimum_required(VERSION 3.12)
 
 # Performance benchmarks install directory
 set(SVD_BENCHMARK_BIN_DIR "${PROJECT_SOURCE_DIR}/bin/benchmark/svd")

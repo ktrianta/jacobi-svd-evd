@@ -23,6 +23,9 @@ void matrix_transpose(matrix_t Pmat, matrix_t Qmat);
  */
 void matrix_mult(matrix_t Pmat, matrix_t Qmat, matrix_t Rmat);
 
+// C = A + B
+void matrix_add(matrix_t Amat, matrix_t Bmat, matrix_t Cmat);
+
 /**
  * @brief Copies a matrix Amat to matrix Bmat
  * @param Bmat Output matrix, copy of input matrix
