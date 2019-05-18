@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9.2)
+cmake_minimum_required(VERSION 3.12)
 add_executable(util_test util_test.cpp)
 target_link_libraries(util_test gtest_main utils-lib m)
 
