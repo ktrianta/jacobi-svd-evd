@@ -23,7 +23,7 @@ void copy_block(struct matrix_t Smat, size_t blockS_row, size_t blockS_col, stru
     }
 }
 
-void inner_product(size_t n, double* A, size_t lda, double* B, size_t ldb, double* C, size_t ldc) {
+static inline void inner_product(size_t n, double* A, size_t lda, double* B, size_t ldb, double* C, size_t ldc) {
     double* C_1 = C;
     double* C_2 = C_1 + ldc;
     double* C_3 = C_2 + ldc;
@@ -75,8 +75,8 @@ void inner_product(size_t n, double* A, size_t lda, double* B, size_t ldb, doubl
     _mm256_store_pd(C_4 + 4, c[7]);
 }
 
-void inner_add_product(size_t n, double* A, size_t lda, double* B, size_t ldb, double* C, size_t ldc, double* D,
-                       size_t ldd) {
+static inline void inner_add_product(size_t n, double* A, size_t lda, double* B, size_t ldb, double* C, size_t ldc,
+                                     double* D, size_t ldd) {
     double* A_1 = A;
     double* A_2 = A_1 + lda;
     double* A_3 = A_2 + lda;
@@ -230,7 +230,8 @@ void mult_add_transpose_block(struct matrix_t Amat, size_t blockA_row, size_t bl
     }
 }
 
-inline __m128d hsum_double_avx(__m256d v) {
+static inline __m128d hsum_double_avx(__m256d v) __attribute__((always_inline));
+static inline __m128d hsum_double_avx(__m256d v) {
     __m128d vlow = _mm256_castpd256_pd128(v);
     __m128d vhigh = _mm256_extractf128_pd(v, 1);  // high 128
     vlow = _mm_add_pd(vlow, vhigh);               // reduce down to 128
@@ -239,7 +240,7 @@ inline __m128d hsum_double_avx(__m256d v) {
     return _mm_add_pd(vlow, high64);  // reduce to scalar
 }
 
-inline void inner_product_tr(size_t n, double* A, size_t lda, double* B, size_t ldb, double* C, size_t ldc) {
+static inline void inner_product_tr(size_t n, double* A, size_t lda, double* B, size_t ldb, double* C, size_t ldc) {
     double* A_1 = A;
     double* A_2 = A_1 + lda;
     double* A_3 = A_2 + lda;
@@ -298,8 +299,8 @@ inline void inner_product_tr(size_t n, double* A, size_t lda, double* B, size_t 
     _mm_store_pd(C_4, _mm_shuffle_pd(c30, c31, 0));
 }
 
-inline void inner_add_product_tr(size_t n, double* A, size_t lda, double* B, size_t ldb, double* C, size_t ldc,
-                                 double* D, size_t ldd) {
+static inline void inner_add_product_tr(size_t n, double* A, size_t lda, double* B, size_t ldb, double* C, size_t ldc,
+                                        double* D, size_t ldd) {
     double* A_1 = A;
     double* A_2 = A_1 + lda;
     double* A_3 = A_2 + lda;
