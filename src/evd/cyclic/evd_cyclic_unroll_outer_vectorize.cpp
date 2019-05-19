@@ -55,24 +55,19 @@ void evd_cyclic_unroll_outer_vectorize(struct matrix_t Data_matr, struct matrix_
                         _mm256_set_pd(A[n * (i + 3) + p], A[n * (i + 2) + p], A[n * (i + 1) + p], A[n * i + p]);
                     __m256d A_qiv =
                         _mm256_set_pd(A[n * (i + 3) + q], A[n * (i + 2) + q], A[n * (i + 1) + q], A[n * i + q]);
-                    __m256d V_piv = _mm256_loadu_pd(V + n * p + i);
-                    __m256d V_qiv = _mm256_loadu_pd(V + n * q + i);
+                    __m256d V_piv = _mm256_load_pd(V + n * p + i);
+                    __m256d V_qiv = _mm256_load_pd(V + n * q + i);
 
                     __m256d sAq_v = _mm256_mul_pd(s_vec, A_qiv);
-                    __m256d sAp_v = _mm256_mul_pd(s_vec, A_piv);
                     __m256d cAq_v = _mm256_mul_pd(c_vec, A_qiv);
-                    __m256d cAp_v = _mm256_mul_pd(c_vec, A_piv);
 
-                    __m256d nA_piv = _mm256_sub_pd(cAp_v, sAq_v);
-                    __m256d nA_qiv = _mm256_add_pd(sAp_v, cAq_v);
+                    __m256d nA_piv = _mm256_fmsub_pd(c_vec, A_piv, sAq_v);
+                    __m256d nA_qiv = _mm256_fmadd_pd(s_vec, A_piv, cAq_v);
 
                     __m256d sVq_v = _mm256_mul_pd(s_vec, V_qiv);
-                    __m256d sVp_v = _mm256_mul_pd(s_vec, V_piv);
                     __m256d cVq_v = _mm256_mul_pd(c_vec, V_qiv);
-                    __m256d cVp_v = _mm256_mul_pd(c_vec, V_piv);
-
-                    __m256d nV_piv = _mm256_sub_pd(cVp_v, sVq_v);
-                    V_qiv = _mm256_add_pd(sVp_v, cVq_v);
+                    __m256d nV_piv = _mm256_fmsub_pd(c_vec, V_piv, sVq_v);
+                    V_qiv = _mm256_fmadd_pd(s_vec, V_piv, cVq_v);
 
                     A[n * i + p] = nA_piv[0];
                     A[n * (i + 1) + p] = nA_piv[1];
@@ -85,12 +80,12 @@ void evd_cyclic_unroll_outer_vectorize(struct matrix_t Data_matr, struct matrix_
                     A[n * (i + 3) + q] = nA_qiv[3];
 
                     // since we use load instead of set the indices are reversed.
-                    _mm256_storeu_pd(V + n * p + i, nV_piv);
-                    _mm256_storeu_pd(V + n * q + i, V_qiv);
+                    _mm256_store_pd(V + n * p + i, nV_piv);
+                    _mm256_store_pd(V + n * q + i, V_qiv);
 
                     if (!(i + 3 >= p && i <= p) && !(i + 3 >= q && i <= q)) {
-                        _mm256_storeu_pd(A + n * p + i, nA_piv);
-                        _mm256_storeu_pd(A + n * q + i, nA_qiv);
+                        _mm256_store_pd(A + n * p + i, nA_piv);
+                        _mm256_store_pd(A + n * q + i, nA_qiv);
                     } else {
                         for (int j = 0; j < 4; j++) {
                             if ((i + j) != p && (i + j) != q) {
@@ -139,24 +134,19 @@ void evd_cyclic_unroll_outer_vectorize(struct matrix_t Data_matr, struct matrix_
                     __m256d A_qiv =
                         _mm256_set_pd(A[n * (i + 3) + q1], A[n * (i + 2) + q1], A[n * (i + 1) + q1], A[n * i + q1]);
 
-                    __m256d V_piv = _mm256_loadu_pd(V + n * p1 + i);
-                    __m256d V_qiv = _mm256_loadu_pd(V + n * q1 + i);
+                    __m256d V_piv = _mm256_load_pd(V + n * p1 + i);
+                    __m256d V_qiv = _mm256_load_pd(V + n * q1 + i);
 
                     __m256d sAq_v = _mm256_mul_pd(s1_vec, A_qiv);
-                    __m256d sAp_v = _mm256_mul_pd(s1_vec, A_piv);
                     __m256d cAq_v = _mm256_mul_pd(c1_vec, A_qiv);
-                    __m256d cAp_v = _mm256_mul_pd(c1_vec, A_piv);
 
-                    __m256d nA_piv = _mm256_sub_pd(cAp_v, sAq_v);
-                    __m256d nA_qiv = _mm256_add_pd(sAp_v, cAq_v);
+                    __m256d nA_piv = _mm256_fmsub_pd(c1_vec, A_piv, sAq_v);
+                    __m256d nA_qiv = _mm256_fmadd_pd(s1_vec, A_piv, cAq_v);
 
                     __m256d sVq_v = _mm256_mul_pd(s1_vec, V_qiv);
-                    __m256d sVp_v = _mm256_mul_pd(s1_vec, V_piv);
                     __m256d cVq_v = _mm256_mul_pd(c1_vec, V_qiv);
-                    __m256d cVp_v = _mm256_mul_pd(c1_vec, V_piv);
-
-                    __m256d nV_piv = _mm256_sub_pd(cVp_v, sVq_v);
-                    V_qiv = _mm256_add_pd(sVp_v, cVq_v);
+                    __m256d nV_piv = _mm256_fmsub_pd(c1_vec, V_piv, sVq_v);
+                    V_qiv = _mm256_fmadd_pd(s1_vec, V_piv, cVq_v);
 
                     A[n * i + p1] = nA_piv[0];
                     A[n * (i + 1) + p1] = nA_piv[1];
@@ -168,12 +158,12 @@ void evd_cyclic_unroll_outer_vectorize(struct matrix_t Data_matr, struct matrix_
                     A[n * (i + 2) + q1] = nA_qiv[2];
                     A[n * (i + 3) + q1] = nA_qiv[3];
 
-                    _mm256_storeu_pd(V + n * p1 + i, nV_piv);
-                    _mm256_storeu_pd(V + n * q1 + i, V_qiv);
+                    _mm256_store_pd(V + n * p1 + i, nV_piv);
+                    _mm256_store_pd(V + n * q1 + i, V_qiv);
 
                     if (!(i + 3 >= p1 && i <= p1) && !(i + 3 >= q1 && i <= q1)) {
-                        _mm256_storeu_pd(A + n * p1 + i, nA_piv);
-                        _mm256_storeu_pd(A + n * q1 + i, nA_qiv);
+                        _mm256_store_pd(A + n * p1 + i, nA_piv);
+                        _mm256_store_pd(A + n * q1 + i, nA_qiv);
                     } else {
                         for (int j = 0; j < 4; j++) {
                             if ((i + j) != p1 && (i + j) != q1) {

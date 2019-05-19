@@ -69,10 +69,10 @@ int main() {
     std::cin >> n;
     std::cerr << "Performance benchmark on array of size " << n << " by " << n << std::endl;
 
-    std::vector<double> A(n * n);
-    std::vector<double> A_copy(n * n);
-    std::vector<double> e(n);
-    std::vector<double> V(n * n, 0);
+    aligned_vector<double> A(n * n);
+    aligned_vector<double> A_copy(n * n);
+    aligned_vector<double> e(n);
+    aligned_vector<double> V(n * n, 0);
     matrix_t Data_matr = {&A[0], n, n};
     matrix_t Data_matr_copy = {&A_copy[0], n, n};
     vector_t E_vals = {&e[0], n};
