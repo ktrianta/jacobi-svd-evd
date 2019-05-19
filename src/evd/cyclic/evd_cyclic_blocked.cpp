@@ -208,7 +208,7 @@ static void evd_block(struct matrix_t Amat, struct matrix_t Vmat) {
 
     matrix_identity(Vmat);
 
-    for (int ep = 1; ep <= 20; ep++) {
+    for (int ep = 1; ep <= 5; ep++) {
         for (size_t row = 0; row < n - 1; ++row) {
             for (size_t col = row + 1; col < n; ++col) {
                 // Compute cos_t and sin_t for the rotation

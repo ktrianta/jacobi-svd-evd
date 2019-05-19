@@ -226,7 +226,7 @@ void evd_block(struct matrix_t Data_matr, struct matrix_t Eigen_vectors) {
 
   matrix_identity(Eigen_vectors);
 
-  for (int ep = 0; ep < 20; ++ep) {
+  for (int ep = 0; ep < 5; ++ep) {
       for (size_t p = 0; p < n - 1; p += 2) {
           for (size_t q = p + 1; q < n - 1; ++q) {
               // Compute cos_t and sin_t for the rotation
