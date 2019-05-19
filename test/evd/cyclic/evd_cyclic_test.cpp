@@ -21,7 +21,7 @@ TEST(evd_cyclic, identity_matrix) {
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
 
-    evd_cyclic(Data_matr, Data_matr_copy, E_vecs, E_vals, 100);
+    evd_cyclic(Data_matr, Data_matr_copy, E_vecs, E_vals, 10);
     for (size_t i = 0; i < n; ++i) {
         ASSERT_DOUBLE_EQ(e[i], 1.0);
     }
@@ -39,7 +39,7 @@ TEST(evd_cyclic, random_square_matrix) {
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
 
-    evd_cyclic(Data_matr, Data_matr_copy, E_vecs, E_vals, 100);
+    evd_cyclic(Data_matr, Data_matr_copy, E_vecs, E_vals, 10);
 
     aligned_vector<double> e_expect = {12.71986, 5.78305, 2.09733, -5.60024};
 
@@ -67,7 +67,7 @@ TEST(evd_cyclic, evd_crosscheck) {
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
 
-    evd_cyclic(Data_matr, Data_matr_copy, E_vecs, E_vals, 100);
+    evd_cyclic(Data_matr, Data_matr_copy, E_vecs, E_vals, 10);
 
     aligned_vector<double> e_expect = {2.415032147975995969e+01, 4.001355036163166012e+00, -1.007738346679503572e+00,
                                        -3.262428878677021693e+00, -5.881509290566617310e+00};
@@ -96,7 +96,7 @@ TEST(evd_cyclic, eigenvector_check) {
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
 
-    evd_cyclic(Data_matr, Data_matr_copy, E_vecs, E_vals, 100);
+    evd_cyclic(Data_matr, Data_matr_copy, E_vecs, E_vals, 10);
 
     aligned_vector<double> V_expect = {
         4.183471639051151714e-01,  4.111245337904025771e-02,  7.089492553079320691e-01,  -2.465472573146875179e-01,
@@ -133,7 +133,7 @@ TEST(evd_cyclic, random_matrix_big) {
     matrix_t Data_matr_copy = {&A_copy[0], n, n};
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
-    evd_cyclic(Data_matr, Data_matr_copy, E_vecs, E_vals, 100);
+    evd_cyclic(Data_matr, Data_matr_copy, E_vecs, E_vals, 10);
 
     for (size_t i = 0; i < n; ++i) {
         ASSERT_NEAR(e[i], e_expect[i], 1e-7);
@@ -165,7 +165,7 @@ TEST(evd_cyclic_unroll_vectorize, random_matrix_big) {
     matrix_t Data_matr_copy = {&A_copy[0], n, n};
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
-    evd_cyclic_unroll_outer_vectorize(Data_matr, Data_matr_copy, E_vecs, E_vals, 20);
+    evd_cyclic_unroll_outer_vectorize(Data_matr, Data_matr_copy, E_vecs, E_vals, 10);
 
     for (size_t i = 0; i < n; ++i) {
         ASSERT_NEAR(e[i], e_expect[i], 1e-7);
