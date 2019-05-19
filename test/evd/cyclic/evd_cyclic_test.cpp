@@ -165,7 +165,7 @@ TEST(evd_cyclic_unroll_vectorize, random_matrix_big) {
     matrix_t Data_matr_copy = {&A_copy[0], n, n};
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
-    evd_cyclic_unroll_outer_vectorize(Data_matr, Data_matr_copy, E_vecs, E_vals, 100);
+    evd_cyclic_unroll_outer_vectorize(Data_matr, Data_matr_copy, E_vecs, E_vals, 20);
 
     for (size_t i = 0; i < n; ++i) {
         ASSERT_NEAR(e[i], e_expect[i], 1e-7);
