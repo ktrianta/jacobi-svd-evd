@@ -70,7 +70,7 @@ TEST(evd_cyclic, evd_crosscheck) {
     evd_cyclic(Data_matr, Data_matr_copy, E_vecs, E_vals, 100);
 
     aligned_vector<double> e_expect = {2.415032147975995969e+01, 4.001355036163166012e+00, -1.007738346679503572e+00,
-                                    -3.262428878677021693e+00, -5.881509290566617310e+00};
+                                       -3.262428878677021693e+00, -5.881509290566617310e+00};
 
     for (size_t i = 0; i < n; ++i) {
         ASSERT_NEAR(e[i], e_expect[i], 1e-7);
