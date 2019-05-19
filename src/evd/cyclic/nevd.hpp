@@ -17,6 +17,7 @@ struct evd_2x2_params {
  * @param x element at position (i,j) of the original matrix.
  * @param y element at position (j,i) of the original matrix.
  * @param z element at position (j,j) of the original matrix.
- * @return coefficients of the 2x2 matrices involved in the 2x2 EVD computation.
+ * @return coefficients of the 2x2 matrices involved in the
+ * 2x2 EVD computation.
  */
 struct evd_2x2_params nevd(double w, double x, double y, double z);
