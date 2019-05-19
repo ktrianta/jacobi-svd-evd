@@ -1,3 +1,11 @@
 add_executable(evd_cyclic_perf evd_cyclic_perf.cpp)
 target_link_libraries(evd_cyclic_perf evd-cyclic-lib utils-lib perf-lib m)
 install(TARGETS evd_cyclic_perf DESTINATION ${EVD_BENCHMARK_BIN_DIR})
+
+message("${Yellow}-- SVD Benchmarks:${ColourReset}")
+
+# Benchmark SVD base
+message("${Yellow}---- Base${ColourReset}")
+add_executable("evd-base" base_evd.cpp)
+target_link_libraries("evd-base" evd-cyclic-lib utils-lib perf-lib m)
+install(TARGETS "evd-base" DESTINATION ${EVD_BENCHMARK_BIN_DIR})
