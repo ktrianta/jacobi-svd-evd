@@ -1,18 +1,18 @@
-#include "evd_cyclic.hpp"
 #include <immintrin.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <cassert>
+#include "block.hpp"
+#include "evd_cyclic.hpp"
 #include "matrix.hpp"
 #include "types.hpp"
 #include "util.hpp"
-#include "block.hpp"
 
 static inline void evd_block(struct matrix_t Amat, struct matrix_t Vmat);
 
-void evd_cyclic_blocked(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
-            struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
+void evd_cyclic_blocked(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t Eigen_vectors,
+                        struct vector_t Eigen_values, int epoch) {
     assert(Data_matr.rows == Data_matr.cols);  // Input Matrix should be square
     assert(Eigen_vectors.rows == Eigen_vectors.cols);
     struct matrix_t& Amat = Data_matr_copy;
@@ -109,7 +109,7 @@ void evd_cyclic_blocked(struct matrix_t Data_matr, struct matrix_t Data_matr_cop
 }
 
 void evd_cyclic_blocked_less_copy(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
-                    struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
+                                  struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
     assert(Data_matr.rows == Data_matr.cols);  // Input Matrix should be square
     assert(Eigen_vectors.rows == Eigen_vectors.cols);
     struct matrix_t& Amat = Data_matr_copy;
@@ -181,11 +181,11 @@ void evd_cyclic_blocked_less_copy(struct matrix_t Data_matr, struct matrix_t Dat
                 for (size_t k_block = 0; k_block < n_blocks; ++k_block) {
                     mult_block(Eigen_vectors, k_block, i_block, Vblockmat, 0, 0, M1mat, 0, 0, block_size);
                     mult_block(Eigen_vectors, k_block, i_block, Vblockmat, 0, 1, M2mat, 0, 0, block_size);
-                    mult_add_block(Eigen_vectors, k_block, j_block, Vblockmat, 1, 0, M1mat, 0, 0,
-                                   Eigen_vectors, k_block, i_block, block_size);
+                    mult_add_block(Eigen_vectors, k_block, j_block, Vblockmat, 1, 0, M1mat, 0, 0, Eigen_vectors,
+                                   k_block, i_block, block_size);
                     copy_block(Eigen_vectors, k_block, j_block, M1mat, 0, 0, block_size);
-                    mult_add_block(M1mat, 0, 0, Vblockmat, 1, 1, M2mat, 0, 0, Eigen_vectors, k_block,
-                                   j_block, block_size);
+                    mult_add_block(M1mat, 0, 0, Vblockmat, 1, 1, M2mat, 0, 0, Eigen_vectors, k_block, j_block,
+                                   block_size);
                 }
             }
         }

@@ -1,9 +1,9 @@
-#include "evd_cyclic.hpp"
 #include <immintrin.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <cassert>
+#include "evd_cyclic.hpp"
 #include "matrix.hpp"
 #include "types.hpp"
 #include "util.hpp"
@@ -17,18 +17,20 @@ static inline void copy_block(struct matrix_t S, size_t blockS_row, size_t block
                               size_t blockD_row, size_t blockD_col, size_t block_size);
 static inline void transpose(struct matrix_t A);
 static inline void mult_add_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, struct matrix_t Bmat,
-                    size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row, size_t blockC_col,
-                    struct matrix_t Dmat, size_t blockD_row, size_t blockD_col, size_t block_size);
+                                  size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row,
+                                  size_t blockC_col, struct matrix_t Dmat, size_t blockD_row, size_t blockD_col,
+                                  size_t block_size);
 static inline void mult_transpose_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col,
-                          struct matrix_t Bmat, size_t blockB_row, size_t blockB_col, struct matrix_t Cmat,
-                          size_t blockC_row, size_t blockC_col, size_t block_size);
+                                        struct matrix_t Bmat, size_t blockB_row, size_t blockB_col,
+                                        struct matrix_t Cmat, size_t blockC_row, size_t blockC_col, size_t block_size);
 static inline void mult_add_transpose_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col,
-                          struct matrix_t Bmat, size_t blockB_row, size_t blockB_col, struct matrix_t Cmat,
-                          size_t blockC_row, size_t blockC_col, struct matrix_t Dmat, size_t blockD_row,
-                          size_t blockD_col, size_t block_size);
+                                            struct matrix_t Bmat, size_t blockB_row, size_t blockB_col,
+                                            struct matrix_t Cmat, size_t blockC_row, size_t blockC_col,
+                                            struct matrix_t Dmat, size_t blockD_row, size_t blockD_col,
+                                            size_t block_size);
 
 void evd_cyclic_blocked_unroll_outer(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
-                   struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
+                                     struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
     assert(Data_matr.rows == Data_matr.cols);  // Input Matrix should be square
     assert(Eigen_vectors.rows == Eigen_vectors.cols);
     struct matrix_t& Amat = Data_matr_copy;
@@ -122,10 +124,10 @@ void evd_cyclic_blocked_unroll_outer(struct matrix_t Data_matr, struct matrix_t 
         E[i] = A[i * n + i];
     }
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
-}
+}  // NOLINT
 
 void evd_cyclic_blocked_unroll_outer_less_copy(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
-                   struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
+                                               struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
     assert(Data_matr.rows == Data_matr.cols);  // Input Matrix should be square
     assert(Eigen_vectors.rows == Eigen_vectors.cols);
     struct matrix_t& Amat = Data_matr_copy;
@@ -197,11 +199,11 @@ void evd_cyclic_blocked_unroll_outer_less_copy(struct matrix_t Data_matr, struct
                 for (size_t k_block = 0; k_block < n_blocks; ++k_block) {
                     mult_block(Eigen_vectors, k_block, i_block, Vblockmat, 0, 0, M1mat, 0, 0, block_size);
                     mult_block(Eigen_vectors, k_block, i_block, Vblockmat, 0, 1, M2mat, 0, 0, block_size);
-                    mult_add_block(Eigen_vectors, k_block, j_block, Vblockmat, 1, 0, M1mat, 0, 0,
-                                   Eigen_vectors, k_block, i_block, block_size);
+                    mult_add_block(Eigen_vectors, k_block, j_block, Vblockmat, 1, 0, M1mat, 0, 0, Eigen_vectors,
+                                   k_block, i_block, block_size);
                     copy_block(Eigen_vectors, k_block, j_block, M1mat, 0, 0, block_size);
-                    mult_add_block(M1mat, 0, 0, Vblockmat, 1, 1, M2mat, 0, 0, Eigen_vectors, k_block,
-                                   j_block, block_size);
+                    mult_add_block(M1mat, 0, 0, Vblockmat, 1, 1, M2mat, 0, 0, Eigen_vectors, k_block, j_block,
+                                   block_size);
                 }
             }
         }
@@ -371,8 +373,8 @@ static inline void add(struct matrix_t Amat, struct matrix_t Bmat, struct matrix
     }
 }
 
-static inline void copy_block(struct matrix_t Smat, size_t blockS_row, size_t blockS_col,
-                      struct matrix_t Dmat, size_t blockD_row, size_t blockD_col, size_t block_size) {
+static inline void copy_block(struct matrix_t Smat, size_t blockS_row, size_t blockS_col, struct matrix_t Dmat,
+                              size_t blockD_row, size_t blockD_col, size_t block_size) {
     size_t nS = Smat.rows;
     size_t nD = Dmat.rows;
     double* S = Smat.ptr;
@@ -407,8 +409,9 @@ static inline void transpose(struct matrix_t Amat) {
 
 // perform D = C + AB
 static inline void mult_add_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, struct matrix_t Bmat,
-              size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row, size_t blockC_col,
-              struct matrix_t Dmat, size_t blockD_row, size_t blockD_col, size_t block_size) {
+                                  size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row,
+                                  size_t blockC_col, struct matrix_t Dmat, size_t blockD_row, size_t blockD_col,
+                                  size_t block_size) {
     size_t nA = Amat.rows;
     size_t nB = Bmat.rows;
     size_t nC = Cmat.rows;
@@ -434,8 +437,8 @@ static inline void mult_add_block(struct matrix_t Amat, size_t blockA_row, size_
 // perform C += (A^T)B
 // for C_ij, use ith column of A and jth column of B
 void inline mult_transpose_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, struct matrix_t Bmat,
-                          size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row,
-                          size_t blockC_col, size_t block_size) {
+                                 size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row,
+                                 size_t blockC_col, size_t block_size) {
     size_t nA = Amat.rows;
     size_t nB = Bmat.rows;
     size_t nC = Cmat.rows;
@@ -458,9 +461,9 @@ void inline mult_transpose_block(struct matrix_t Amat, size_t blockA_row, size_t
 // perform D = C + (A^T)B
 // for D_ij, use ith column of A and jth column of B.
 void inline mult_add_transpose_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, struct matrix_t Bmat,
-                              size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row,
-                              size_t blockC_col, struct matrix_t Dmat, size_t blockD_row, size_t blockD_col,
-                              size_t block_size) {
+                                     size_t blockB_row, size_t blockB_col, struct matrix_t Cmat, size_t blockC_row,
+                                     size_t blockC_col, struct matrix_t Dmat, size_t blockD_row, size_t blockD_col,
+                                     size_t block_size) {
     size_t nA = Amat.rows;
     size_t nB = Bmat.rows;
     size_t nC = Cmat.rows;
