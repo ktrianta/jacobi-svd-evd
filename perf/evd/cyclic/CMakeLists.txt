@@ -4,8 +4,20 @@ install(TARGETS evd_cyclic_perf DESTINATION ${EVD_BENCHMARK_BIN_DIR})
 
 message("${Yellow}-- SVD Benchmarks:${ColourReset}")
 
-# Benchmark SVD base
+# Benchmark EVD base
 message("${Yellow}---- Base${ColourReset}")
 add_executable("evd-base" base_evd.cpp)
 target_link_libraries("evd-base" evd-cyclic-lib utils-lib perf-lib m)
 install(TARGETS "evd-base" DESTINATION ${EVD_BENCHMARK_BIN_DIR})
+
+# Benchmark EVD Vectorized
+message("${Yellow}---- Base${ColourReset}")
+add_executable("evd-vectorized" vectorized_evd.cpp)
+target_link_libraries("evd-vectorized" evd-cyclic-lib utils-lib perf-lib m)
+install(TARGETS "evd-vectorized" DESTINATION ${EVD_BENCHMARK_BIN_DIR})
+
+# Benchmark EVD Blocked
+message("${Yellow}---- Base${ColourReset}")
+add_executable("evd-blocked" blocked_evd.cpp)
+target_link_libraries("evd-blocked" evd-cyclic-lib utils-lib perf-lib m)
+install(TARGETS "evd-blocked" DESTINATION ${EVD_BENCHMARK_BIN_DIR})
