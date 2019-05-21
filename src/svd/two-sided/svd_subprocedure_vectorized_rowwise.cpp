@@ -187,7 +187,7 @@ size_t svd_subprocedure_vectorized_rowwise(struct matrix_t Bmat, struct matrix_t
             }
         }
 
-        matrix_off_frobenius(Bmat, &off_norm);
+        matrix_off_frobenius_vectorized(Bmat, &off_norm);
         iter += 1;
     }
 
