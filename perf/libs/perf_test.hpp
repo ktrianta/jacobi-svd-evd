@@ -124,7 +124,7 @@ void bench_func(FuncType fn, const std::string& fn_name, double cost, Args... ar
     std::cerr << "Performance:             " << cost / runtime << " flops/cycle (median)" << '\n';
     std::cerr << "Computational intensity: " << cost / bytes_accessed << " flops/byte (median)" << '\n';
 
-    std::cout << cost / runtime <<' ' << cost / bytes_accessed << '\n';
+    std::cout << cost / runtime <<' ' << cost / bytes_accessed << ' ' << runtime << '\n';
 
     for (size_t j = 0; j < 10; ++j) std::cerr << '-';
     std::cerr << '\n' << std::endl;
