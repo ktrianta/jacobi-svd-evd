@@ -214,7 +214,7 @@ static void evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat) {
 
   matrix_identity(Vmat);
 
-  for (int ep = 1; ep <= 20; ep++) {
+  for (int ep = 1; ep <= 5; ep++) {
       double cos_t, sin_t;
 
       for (size_t row = 0; row < m; row++) {

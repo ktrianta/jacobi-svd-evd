@@ -11,7 +11,7 @@ set(SOURCES
     evd_cyclic_blocked_vectorize.cpp
     evd_cyclic.hpp
     nevd.cpp
-    nevd.hpp
+    evd_cost.cpp
     )
 
 add_library(evd-cyclic-lib STATIC ${SOURCES})
