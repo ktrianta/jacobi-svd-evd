@@ -29,8 +29,6 @@ void evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t Dat
 
     matrix_identity(Eigen_vectors);
 
-    int is_not_diagonal = 0;
-
     if (n < 2 * block_size) {
         evd_block_vector(Amat, Eigen_vectors);
 
@@ -56,17 +54,6 @@ void evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t Dat
     matrix_t M2mat = {M2, block_size, block_size};
 
     for (int ep = 1; ep <= epoch; ep++) {
-        for (size_t i = 0; i < n; i++) {
-            for (size_t j = i + 1; j < n; j++) {
-                if (A[i * n + j] != 0.0) {
-                    is_not_diagonal = 1;
-                    break;
-                }
-            }
-        }
-
-        if (!is_not_diagonal) break;
-
         for (size_t i_block = 0; i_block < n_blocks - 1; ++i_block) {
             for (size_t j_block = i_block + 1; j_block < n_blocks; ++j_block) {
                 copy_block(Amat, i_block, i_block, Ablockmat, 0, 0, block_size);
@@ -114,7 +101,6 @@ void evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t Dat
                 }
             }
         }
-        is_not_diagonal = 0;
     }
 
     free(memory_block);
@@ -141,8 +127,6 @@ void evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct ma
 
     matrix_identity(Eigen_vectors);
 
-    int is_not_diagonal = 0;
-
     if (n < 2 * block_size) {
         evd_block_vector(Amat, Eigen_vectors);
 
@@ -168,17 +152,6 @@ void evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct ma
     matrix_t M2mat = {M2, block_size, block_size};
 
     for (int ep = 1; ep <= epoch; ep++) {
-        for (size_t i = 0; i < n; i++) {
-            for (size_t j = i + 1; j < n; j++) {
-                if (A[i * n + j] != 0.0) {
-                    is_not_diagonal = 1;
-                    break;
-                }
-            }
-        }
-
-        if (!is_not_diagonal) break;
-
         for (size_t i_block = 0; i_block < n_blocks - 1; ++i_block) {
             for (size_t j_block = i_block + 1; j_block < n_blocks; ++j_block) {
                 copy_block(Amat, i_block, i_block, Ablockmat, 0, 0, block_size);
@@ -220,7 +193,6 @@ void evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct ma
                 }
             }
         }
-        is_not_diagonal = 0;
     }
 
     free(memory_block);
@@ -233,106 +205,89 @@ void evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct ma
 
 // Perform EVD for the block
 static void evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat) {
-    assert(Amat.rows == Amat.cols);
-    double* A = Amat.ptr;
+  assert(Amat.rows == Amat.cols);
+  double* A = Amat.ptr;
 
-    double* V = Vmat.ptr;
-    const size_t m = Amat.rows;
-    size_t n = m;
+  double* V = Vmat.ptr;
+  const size_t m = Amat.rows;
+  size_t n = m;
 
-    matrix_identity(Vmat);
+  matrix_identity(Vmat);
 
-    int is_not_diagonal = 0;
+  for (int ep = 1; ep <= 5; ep++) {
+      double cos_t, sin_t;
 
-    for (int ep = 1; ep <= 20; ep++) {
-        double alpha, beta, cos_t, sin_t;
+      for (size_t row = 0; row < m; row++) {
+          for (size_t col = row + 1; col < m; col++) {
+              __m256d sin_vec, cos_vec;
 
-        for (size_t i = 0; i < m; i++) {
-            for (size_t j = i + 1; j < m; j++) {
-                if (A[i * m + j] != 0.0) {
-                    is_not_diagonal = 1;
-                    break;
-                }
-            }
-        }
+              // Compute cos_t and sin_t for the rotation
+              sym_jacobi_coeffs(A[row * m + row], A[row * m + col], A[col * m + col], &cos_t, &sin_t);
 
-        if (!is_not_diagonal) break;
+              sin_vec = _mm256_set1_pd(sin_t);
+              cos_vec = _mm256_set1_pd(cos_t);
 
-        for (size_t row = 0; row < m; row++) {
-            for (size_t col = row + 1; col < m; col++) {
-                __m256d sin_vec, cos_vec;
-                // Compute cos_t and sin_t for the rotation
+              for (size_t i = 0; i < m; i++) {
+                  // Compute the eigen values by updating the columns until convergence
+                  double A_i_r = A[m * i + row];
+                  A[m * i + row] = cos_t * A[m * i + row] - sin_t * A[m * i + col];
+                  A[m * i + col] = cos_t * A[m * i + col] + sin_t * A_i_r;
+              }
 
-                alpha = 2.0 * sign(A[row * m + row] - A[col * m + col]) * A[row * m + col];
-                beta = fabs(A[row * m + row] - A[col * m + col]);
-                cos_t = sqrt(0.5 * (1 + beta / sqrt(alpha * alpha + beta * beta)));
-                // sin_t = (1 / 2*cos_t) * (alpha / sqrt(alpha*alpha + beta*beta));
-                sin_t = sign(alpha) * sqrt(1 - cos_t * cos_t);
+              if (m % 4 != 0)
+                  n = m - (m % 4);
 
-                sin_vec = _mm256_set1_pd(sin_t);
-                cos_vec = _mm256_set1_pd(cos_t);
+              for (size_t i = 0; i < n; i+=4) {
+                  __m256d A_row, A_col, A_rcopy, V_row, V_col, V_rcopy;
+                  __m256d sin_row, sin_col, cos_row, cos_col;
 
-                for (size_t i = 0; i < m; i++) {
-                    // Compute the eigen values by updating the columns until convergence
-                    double A_i_r = A[m * i + row];
-                    A[m * i + row] = cos_t * A[m * i + row] + sin_t * A[m * i + col];
-                    A[m * i + col] = cos_t * A[m * i + col] - sin_t * A_i_r;
-                }
+                  // Compute the eigen values by updating the rows until convergence
+                  A_row = _mm256_loadu_pd(A + m * row + i);
+                  A_rcopy = A_row;
+                  A_col = _mm256_loadu_pd(A + m * col + i);
 
-                if (m % 4 != 0) n = m - (m % 4);
+                  cos_row = _mm256_mul_pd(A_row, cos_vec);
+                  sin_col = _mm256_mul_pd(A_col, sin_vec);
+                  A_row = _mm256_sub_pd(cos_row, sin_col);
+                  _mm256_storeu_pd(A + m * row + i, A_row);
 
-                for (size_t i = 0; i < n; i += 4) {
-                    __m256d A_row, A_col, A_rcopy, V_row, V_col, V_rcopy;
-                    __m256d sin_row, sin_col, cos_row, cos_col;
+                  cos_col = _mm256_mul_pd(A_col, cos_vec);
+                  sin_row = _mm256_mul_pd(A_rcopy, sin_vec);
+                  A_col = _mm256_add_pd(cos_col, sin_row);
+                  _mm256_storeu_pd(A + m * col + i, A_col);
 
-                    // Compute the eigen values by updating the rows until convergence
-                    A_row = _mm256_loadu_pd(A + m * row + i);
-                    A_rcopy = A_row;
-                    A_col = _mm256_loadu_pd(A + m * col + i);
+                  // Compute the eigen vectors similarly by updating the eigen vector matrix
+                  V_row = _mm256_loadu_pd(V + m * row + i);
+                  V_rcopy = V_row;
+                  V_col = _mm256_loadu_pd(V + m * col + i);
 
-                    cos_row = _mm256_mul_pd(A_row, cos_vec);
-                    sin_col = _mm256_mul_pd(A_col, sin_vec);
-                    A_row = _mm256_add_pd(cos_row, sin_col);
-                    _mm256_storeu_pd(A + m * row + i, A_row);
+                  cos_row = _mm256_mul_pd(V_row, cos_vec);
+                  sin_col = _mm256_mul_pd(V_col, sin_vec);
+                  V_row = _mm256_sub_pd(cos_row, sin_col);
+                  _mm256_storeu_pd(V + m * row + i, V_row);
 
-                    cos_col = _mm256_mul_pd(A_col, cos_vec);
-                    sin_row = _mm256_mul_pd(A_rcopy, sin_vec);
-                    A_col = _mm256_sub_pd(cos_col, sin_row);
-                    _mm256_storeu_pd(A + m * col + i, A_col);
+                  cos_col = _mm256_mul_pd(V_col, cos_vec);
+                  sin_row = _mm256_mul_pd(V_rcopy, sin_vec);
+                  V_col = _mm256_add_pd(cos_col, sin_row);
+                  _mm256_storeu_pd(V + m * col + i, V_col);
+              }
 
-                    // Compute the eigen vectors similarly by updating the eigen vector matrix
-                    V_row = _mm256_loadu_pd(V + m * row + i);
-                    V_rcopy = V_row;
-                    V_col = _mm256_loadu_pd(V + m * col + i);
+              if (m % 4 != 0) {
+                  for (size_t i = 0; i < m - n; i++) {
+                    double A_r_i = A[m * row + n + i];
+                    A[m * row + n + i] = cos_t * A[m * row + n + i] - sin_t * A[m * col + n + i];
+                    A[m * col + n + i] = cos_t * A[m * col + n + i] + sin_t * A_r_i;
 
-                    cos_row = _mm256_mul_pd(V_row, cos_vec);
-                    sin_col = _mm256_mul_pd(V_col, sin_vec);
-                    V_row = _mm256_add_pd(cos_row, sin_col);
-                    _mm256_storeu_pd(V + m * row + i, V_row);
+                    double V_r_i = V[m * row + n + i];
+                    V[m * row + n + i] = cos_t * V[m * row + n + i] - sin_t * V[m * col + n + i];
+                    V[m * col + n + i] = cos_t * V[m * col + n + i] + sin_t * V_r_i;
+                  }
+              }
+          }
+      }
+  }
 
-                    cos_col = _mm256_mul_pd(V_col, cos_vec);
-                    sin_row = _mm256_mul_pd(V_rcopy, sin_vec);
-                    V_col = _mm256_sub_pd(cos_col, sin_row);
-                    _mm256_storeu_pd(V + m * col + i, V_col);
-                }
-
-                if (m % 4 != 0) {
-                    for (size_t i = 0; i < m - n; i++) {
-                        double A_r_i = A[m * row + n + i];
-                        A[m * row + n + i] = cos_t * A[m * row + n + i] + sin_t * A[m * col + n + i];
-                        A[m * col + n + i] = cos_t * A[m * col + n + i] - sin_t * A_r_i;
-
-                        double V_r_i = V[m * row + n + i];
-                        V[m * row + n + i] = cos_t * V[m * row + n + i] + sin_t * V[m * col + n + i];
-                        V[m * col + n + i] = cos_t * V[m * col + n + i] - sin_t * V_r_i;
-                    }
-                }
-            }
-        }
-        is_not_diagonal = 0;
-    }
-
-    matrix_transpose({V, m, m}, {V, m, m});
+  matrix_transpose({V, m, m}, {V, m, m});
 }
 
 void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
