@@ -199,7 +199,7 @@ void evd_cyclic_blocked_less_copy(struct matrix_t Data_matr, struct matrix_t Dat
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
 }
 
-// Perform EVD for the block
+// Perform EVD for the block, why does it not take iter as input?
 static void evd_block(struct matrix_t Amat, struct matrix_t Vmat) {
     size_t n = Amat.rows;
     double* A = Amat.ptr;

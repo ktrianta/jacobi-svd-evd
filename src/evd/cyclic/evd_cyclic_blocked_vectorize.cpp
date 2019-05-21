@@ -159,8 +159,9 @@ void evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct ma
                 copy_block(Amat, j_block, i_block, Ablockmat, 1, 0, block_size);
                 copy_block(Amat, j_block, j_block, Ablockmat, 1, 1, block_size);
 
-                // evd_block_vector(Ablockmat, Vblockmat);
-                evd_subprocedure_vectorized(Ablockmat, Vblockmat);
+                evd_block_vector(Ablockmat, Vblockmat);
+                //Cannot use this since we do not know n.o. iterations.
+                //evd_subprocedure_vectorized(Ablockmat, Vblockmat);
 
                 for (size_t k_block = 0; k_block < n_blocks; ++k_block) {
                     mult_transpose_block(Vblockmat, 0, 0, Amat, i_block, k_block, M1mat, 0, 0, block_size);

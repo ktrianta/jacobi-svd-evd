@@ -56,13 +56,15 @@ struct perf_info {
     double bytes;
 };
 
-template <size_t n_reps = 50, size_t cycles_required = static_cast<size_t>(1e7), size_t num_runs_initial = 1,
+template <size_t n_reps = 5, size_t cycles_required = static_cast<size_t>(1e9), size_t num_runs_initial = 1,
           typename Func, typename... Args>
 perf_info measure_perf(Func fn, Args... args) {
     double cycles = 0., bytes = 0.;
     size_t num_runs = num_runs_initial;
     double multiplier = 1;
     myInt64 start, end;
+    std::vector<double> cycles_vec;
+
 
     // dont want this ouput in the output file.
     std::cout.setstate(std::ios_base::failbit);
@@ -84,12 +86,10 @@ perf_info measure_perf(Func fn, Args... args) {
             fn(std::forward<Args>(args)...);
         }
         end = stop_tsc(start);
-
         cycles = (double) end;
         multiplier = (cycles_required) / (cycles);
     } while (multiplier > 2);
 
-    std::vector<double> cycles_vec;
     // Actual performance measurements repeated n_reps times.
     // We simply store all results and compute medians during post-processing.
 

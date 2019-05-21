@@ -12,7 +12,7 @@ int main() {
     std::cin.tie(NULL);                     // untie cin from cout
 
     size_t n, n_iter = 10;
-    std::cin >> n >> n;
+    std::cin >> n;
     std::cerr << "Performance benchmark on array of size " << n << " by " << n << std::endl;
 
     aligned_vector<double> A(n * n);
@@ -24,7 +24,7 @@ int main() {
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
     size_t b = 8, individual_block_iter = 5;
-
+    //Observe indivual_block_iter is hardcoded into evd_block.
     for (size_t i = 0; i < n * n; ++i) {
         std::cin >> A[i];
     }

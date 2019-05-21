@@ -130,9 +130,9 @@ size_t blocked_cost_without_subprocedure_evd(size_t n, size_t b, size_t n_iter, 
     size_t single_mult_block_mul = b * b * b;
     size_t single_add = b * b;
 
-    size_t block_adds = loops * (4 * n_blocks * (12 * single_mult_block_add + 6 * single_add));
-    size_t block_muls = loops * (4 * n_blocks * (12 * single_mult_block_mul));
-    size_t individual_block_ops = loops * base_cost_evd(4 * b, individual_block_iter);  // 4 individual blocks
+    size_t block_adds = loops * (3 * n_blocks * (2 * single_add + 4 * single_mult_block_add));
+    size_t block_muls = loops * (3 * n_blocks * (4 * single_mult_block_mul));
+    size_t individual_block_ops = loops * base_cost_evd(2 * b, individual_block_iter);  // 4 individual blocks
     size_t total_ops_per_iter = (block_adds + block_muls + individual_block_ops);
 
     return n_iter * total_ops_per_iter;
@@ -146,8 +146,8 @@ size_t blocked_less_copy_cost_without_subprocedure_evd(size_t n, size_t b, size_
     size_t single_mult_block_add = b * b * b;
     size_t single_mult_block_mul = b * b * b;
 
-    size_t block_adds = loops * (4 * n_blocks * (12 * single_mult_block_add));
-    size_t block_muls = loops * (4 * n_blocks * (12 * single_mult_block_mul));
+    size_t block_adds = loops * (3 * n_blocks * (4 * single_mult_block_add));
+    size_t block_muls = loops * (3 * n_blocks * (4 * single_mult_block_mul));
     size_t individual_block_ops = loops * base_cost_evd(4 * b, individual_block_iter);  // 4 individual blocks
     size_t total_ops_per_iter = (block_adds + block_muls + individual_block_ops);
 
@@ -172,9 +172,9 @@ size_t blocked_cost_with_subprocedure_evd(size_t n, size_t b, size_t n_iter, siz
     size_t single_mult_block_mul = b * b * b;
     size_t single_add = b * b;
 
-    size_t block_adds = loops * (4 * n_blocks * (12 * single_mult_block_add + 6 * single_add));
-    size_t block_muls = loops * (4 * n_blocks * (12 * single_mult_block_mul));
-    size_t individual_block_ops = loops * subprocedure_cost(4 * b, individual_block_iter);  // 4 individual blocks
+        size_t block_adds = loops * (3 * n_blocks * (2 * single_add + 4 * single_mult_block_add));
+        size_t block_muls = loops * (3 * n_blocks * (4 * single_mult_block_mul));
+    size_t individual_block_ops = loops * base_cost_evd(2 * b, individual_block_iter);  // 4 individual blocks
     size_t total_ops_per_iter = (block_adds + block_muls + individual_block_ops);
 
     return n_iter * total_ops_per_iter;
@@ -188,9 +188,9 @@ size_t blocked_less_copy_cost_with_subprocedure_evd(size_t n, size_t b, size_t n
     size_t single_mult_block_add = b * b * b;
     size_t single_mult_block_mul = b * b * b;
 
-    size_t block_adds = loops * (4 * n_blocks * (12 * single_mult_block_add));
-    size_t block_muls = loops * (4 * n_blocks * (12 * single_mult_block_mul));
-    size_t individual_block_ops = loops * subprocedure_cost(4 * b, individual_block_iter);  // 4 individual blocks
+        size_t block_adds = loops * (3 * n_blocks * (4 * single_mult_block_add));
+        size_t block_muls = loops * (3 * n_blocks * (4 * single_mult_block_mul));
+    size_t individual_block_ops = loops * base_cost_evd(2 * b, individual_block_iter);  // 4 individual blocks
     size_t total_ops_per_iter = (block_adds + block_muls + individual_block_ops);
 
     return n_iter * total_ops_per_iter;
