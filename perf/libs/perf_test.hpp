@@ -35,8 +35,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "cpucounters.h"
 #include "tsc_x86.h"
-
 /**
  * A template variadic runtime measurement function which runs the given function with the given arguments a number
  * of times, and returns all the measured cycle values. Before performing the actual benchmarking, this function runs
@@ -51,13 +51,28 @@
  * @param Args All the arguments to be passed when calling fn.
  * @return std::vector containing n_reps many measured cycle values.
  */
-template <size_t n_reps = 10, size_t cycles_required = static_cast<size_t>(1e7), size_t num_runs_initial = 1,
+struct perf_info {
+    std::vector<double> cycles_vec;
+    double bytes;
+};
+
+template <size_t n_reps = 50, size_t cycles_required = static_cast<size_t>(1e7), size_t num_runs_initial = 1,
           typename Func, typename... Args>
-std::vector<double> measure_cycles(Func fn, Args... args) {
-    double cycles = 0.;
+perf_info measure_perf(Func fn, Args... args) {
+    double cycles = 0., bytes = 0.;
     size_t num_runs = num_runs_initial;
     double multiplier = 1;
     myInt64 start, end;
+
+    // dont want this ouput in the output file.
+    std::cout.setstate(std::ios_base::failbit);
+    PCM* m = PCM::getInstance();
+    std::cout.clear();
+
+    SystemCounterState before_sstate = getSystemCounterState();
+    fn(std::forward<Args>(args)...);
+    SystemCounterState after_sstate = getSystemCounterState();
+    bytes = getIORequestBytesFromMC(before_sstate, after_sstate);
 
     // Warm-up phase: we determine a number of executions that allows
     // the code to be executed for at least cycles_required cycles.
@@ -77,31 +92,39 @@ std::vector<double> measure_cycles(Func fn, Args... args) {
     std::vector<double> cycles_vec;
     // Actual performance measurements repeated n_reps times.
     // We simply store all results and compute medians during post-processing.
+
     for (size_t j = 0; j < n_reps; j++) {
         start = start_tsc();
+
         for (size_t i = 0; i < num_runs; ++i) {
             fn(std::forward<Args>(args)...);
         }
+        // bytes += getBytesReadFromMC(before_sstate,after_sstate);
         end = stop_tsc(start);
         cycles = ((double) end) / num_runs;
         cycles_vec.push_back(cycles);
     }
 
-    return cycles_vec;
+    perf_info info = {cycles_vec, bytes};
+
+    return info;
 }
 
 template <typename FuncType, typename... Args>
 void bench_func(FuncType fn, const std::string& fn_name, double cost, Args... args) {
-    std::vector<double> cycles = measure_cycles(fn, std::forward<Args>(args)...);
+    perf_info info = measure_perf(fn, std::forward<Args>(args)...);
+    std::vector<double> cycles = info.cycles_vec;
     auto median_it = cycles.begin() + cycles.size() / 2;
     std::nth_element(cycles.begin(), median_it, cycles.end());
     double runtime = *median_it;
+    double bytes_accessed = info.bytes;
 
     std::cerr << fn_name << '\n';
-    std::cerr << "Runtime:     " << runtime << " cycles (median)\n";
-    std::cerr << "Performance: " << cost / runtime << " flops/cycle (median)" << '\n';
+    std::cerr << "Runtime:                 " << runtime << " cycles (median)\n";
+    std::cerr << "Performance:             " << cost / runtime << " flops/cycle (median)" << '\n';
+    std::cerr << "Computational intensity: " << cost / bytes_accessed << " flops/byte (median)" << '\n';
 
-    std::cout << cost / runtime << '\n';
+    std::cout << cost / runtime <<' ' << cost / bytes_accessed << '\n';
 
     for (size_t j = 0; j < 10; ++j) std::cerr << '-';
     std::cerr << '\n' << std::endl;

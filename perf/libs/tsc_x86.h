@@ -8,7 +8,7 @@
 		/* if we're neither compiling with gcc or under linux, we can hope
 		 * the following lines work, they probably won't */
 		#define ASM asm
-		#define VOLATILE 
+		#define VOLATILE
 	#endif
 
 	#define myInt64 unsigned long long
@@ -46,7 +46,7 @@
 		    struct {INT32 lo, hi;} int32;
 	} tsc_counter;
 
-  #define RDTSC(cpu_c) \
+  #define RDTSC_our(cpu_c) \
 	  ASM VOLATILE ("rdtsc" : "=a" ((cpu_c).int32.lo), "=d"((cpu_c).int32.hi))
 	#define CPUID() \
 		ASM VOLATILE ("cpuid" : : "a" (0) : "bx", "cx", "dx" )
@@ -59,7 +59,7 @@
 			struct {INT32 lo, hi;} int32;
 	} tsc_counter;
 
-	#define RDTSC(cpu_c)   \
+	#define RDTSC_our(cpu_c)   \
 	{       __asm rdtsc    \
 			__asm mov (cpu_c).int32.lo,eax  \
 			__asm mov (cpu_c).int32.hi,edx  \
@@ -81,14 +81,13 @@ void init_tsc() {
 myInt64 start_tsc(void) {
     tsc_counter start;
     CPUID();
-    RDTSC(start);
+    RDTSC_our(start);
     return COUNTER_VAL(start);
 }
 
 myInt64 stop_tsc(myInt64 start) {
 	tsc_counter end;
-	RDTSC(end);
+	RDTSC_our(end);
 	CPUID();
 	return COUNTER_VAL(end) - start;
 }
-
