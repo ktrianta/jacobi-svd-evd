@@ -4,15 +4,16 @@
 #include <string.h>
 #include <cassert>
 #include "block.hpp"
+#include "evd_cost.hpp"
 #include "evd_cyclic.hpp"
 #include "matrix.hpp"
 #include "types.hpp"
 #include "util.hpp"
 
-static inline void evd_block(struct matrix_t Amat, struct matrix_t Vmat);
+static inline size_t evd_block(struct matrix_t Amat, struct matrix_t Vmat, size_t epoch);
 
-void evd_cyclic_blocked(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t Eigen_vectors,
-                        struct vector_t Eigen_values, int epoch) {
+size_t evd_cyclic_blocked(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t Eigen_vectors,
+                          struct vector_t Eigen_values, int epoch, size_t block_epoch, const size_t block_size) {
     assert(Data_matr.rows == Data_matr.cols);  // Input Matrix should be square
     assert(Eigen_vectors.rows == Eigen_vectors.cols);
     struct matrix_t& Amat = Data_matr_copy;
@@ -22,20 +23,19 @@ void evd_cyclic_blocked(struct matrix_t Data_matr, struct matrix_t Data_matr_cop
 
     double* E = Eigen_values.ptr;
     const size_t n = Amat.rows;
-    const size_t block_size = 8;
     const size_t n_blocks = n / block_size;
 
     matrix_identity(Eigen_vectors);
 
     if (n < 2 * block_size) {
-        evd_block(Amat, Eigen_vectors);
+        evd_block(Amat, Eigen_vectors, block_epoch);
 
         // Store the generated eigen values in the vector
         for (size_t i = 0; i < n; i++) {
             E[i] = A[i * n + i];
         }
         reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
-        return;
+        return oneloop_cost_evd(n, block_epoch);
     }
 
     assert(n_blocks * block_size == n);
@@ -59,7 +59,7 @@ void evd_cyclic_blocked(struct matrix_t Data_matr, struct matrix_t Data_matr_cop
                 copy_block(Amat, j_block, i_block, Ablockmat, 1, 0, block_size);
                 copy_block(Amat, j_block, j_block, Ablockmat, 1, 1, block_size);
 
-                evd_block(Ablockmat, Vblockmat);
+                evd_block(Ablockmat, Vblockmat, block_epoch);
 
                 matrix_transpose(Vblockmat, Vblockmat);
 
@@ -106,10 +106,13 @@ void evd_cyclic_blocked(struct matrix_t Data_matr, struct matrix_t Data_matr_cop
         E[i] = A[i * n + i];
     }
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
+    return blocked_cost_without_subprocedure_evd(n, block_size, epoch) +
+           epoch * n_blocks * (n_blocks - 1) * 0.5 * base_cost_evd(2 * block_size, block_epoch);
 }
 
-void evd_cyclic_blocked_less_copy(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
-                                  struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
+size_t evd_cyclic_blocked_less_copy(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
+                                    struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch,
+                                    size_t block_epoch, const size_t block_size) {
     assert(Data_matr.rows == Data_matr.cols);  // Input Matrix should be square
     assert(Eigen_vectors.rows == Eigen_vectors.cols);
     struct matrix_t& Amat = Data_matr_copy;
@@ -119,20 +122,19 @@ void evd_cyclic_blocked_less_copy(struct matrix_t Data_matr, struct matrix_t Dat
 
     double* E = Eigen_values.ptr;
     const size_t n = Amat.rows;
-    const size_t block_size = 8;
     const size_t n_blocks = n / block_size;
 
     matrix_identity(Eigen_vectors);
 
     if (n < 2 * block_size) {
-        evd_block(Amat, Eigen_vectors);
+        evd_block(Amat, Eigen_vectors, block_epoch);
 
         // Store the generated eigen values in the vector
         for (size_t i = 0; i < n; i++) {
             E[i] = A[i * n + i];
         }
         reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
-        return;
+        return oneloop_cost_evd(n, block_epoch);
     }
 
     assert(n_blocks * block_size == n);
@@ -156,7 +158,7 @@ void evd_cyclic_blocked_less_copy(struct matrix_t Data_matr, struct matrix_t Dat
                 copy_block(Amat, j_block, i_block, Ablockmat, 1, 0, block_size);
                 copy_block(Amat, j_block, j_block, Ablockmat, 1, 1, block_size);
 
-                evd_block(Ablockmat, Vblockmat);
+                evd_block(Ablockmat, Vblockmat, block_epoch);
 
                 for (size_t k_block = 0; k_block < n_blocks; ++k_block) {
                     mult_transpose_block(Vblockmat, 0, 0, Amat, i_block, k_block, M1mat, 0, 0, block_size);
@@ -197,10 +199,12 @@ void evd_cyclic_blocked_less_copy(struct matrix_t Data_matr, struct matrix_t Dat
         E[i] = A[i * n + i];
     }
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
+    return blocked_less_copy_cost_without_subprocedure_evd(n, block_size, epoch) +
+           epoch * n_blocks * (n_blocks - 1) * 0.5 * base_cost_evd(2 * block_size, block_epoch);
 }
 
 // Perform EVD for the block
-static void evd_block(struct matrix_t Amat, struct matrix_t Vmat) {
+static size_t evd_block(struct matrix_t Amat, struct matrix_t Vmat, size_t epoch) {
     size_t n = Amat.rows;
     double* A = Amat.ptr;
     double* V = Vmat.ptr;
@@ -208,7 +212,7 @@ static void evd_block(struct matrix_t Amat, struct matrix_t Vmat) {
 
     matrix_identity(Vmat);
 
-    for (int ep = 1; ep <= 5; ep++) {
+    for (size_t ep = 1; ep <= epoch; ep++) {
         for (size_t row = 0; row < n - 1; ++row) {
             for (size_t col = row + 1; col < n; ++col) {
                 // Compute cos_t and sin_t for the rotation
@@ -237,4 +241,5 @@ static void evd_block(struct matrix_t Amat, struct matrix_t Vmat) {
             }
         }
     }
+    return epoch;
 }

@@ -5,12 +5,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <cassert>
+#include "evd_cost.hpp"
 #include "matrix.hpp"
 #include "types.hpp"
 #include "util.hpp"
 
-void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t Eigen_vectors,
-                struct vector_t Eigen_values, int epoch) {
+size_t evd_cyclic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t Eigen_vectors,
+                  struct vector_t Eigen_values, int epoch) {
     assert(Data_matr.rows == Data_matr.cols);
     double* A = Data_matr_copy.ptr;
     // Create a copy of the matrix to prevent modification of the original matrix
@@ -61,15 +62,17 @@ void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struc
     }
 
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
+    return base_cost_evd(m, epoch);
 }
 
-int evd_cyclic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t Qmat, struct vector_t evec, double tol) {
+size_t evd_cyclic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t Qmat, struct vector_t evec,
+                      double tol) {
     const size_t n = Xmat.cols;
     double* e = evec.ptr;
     double* Q = Qmat.ptr;
     double* A = Amat.ptr;
     double offA = 0, eps = 0, c, s;
-    int iter = 0;
+    size_t iter = 0;
     // A=QtXQ
 
     matrix_identity(Qmat);
