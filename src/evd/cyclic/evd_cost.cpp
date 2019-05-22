@@ -1,3 +1,6 @@
+#include <cstddef>
+#include "evd_cost.hpp"
+
 
 size_t base_cost_evd(size_t n, size_t n_iter) {
     size_t loops = n * (n - 1) * 0.5;
