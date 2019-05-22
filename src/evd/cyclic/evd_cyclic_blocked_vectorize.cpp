@@ -242,34 +242,34 @@ static void evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat) {
                   __m256d sin_row, sin_col, cos_row, cos_col;
 
                   // Compute the eigen values by updating the rows until convergence
-                  A_row = _mm256_loadu_pd(A + m * row + i);
+                  A_row = _mm256_load_pd(A + m * row + i);
                   A_rcopy = A_row;
-                  A_col = _mm256_loadu_pd(A + m * col + i);
+                  A_col = _mm256_load_pd(A + m * col + i);
 
                   cos_row = _mm256_mul_pd(A_row, cos_vec);
                   sin_col = _mm256_mul_pd(A_col, sin_vec);
                   A_row = _mm256_sub_pd(cos_row, sin_col);
-                  _mm256_storeu_pd(A + m * row + i, A_row);
+                  _mm256_store_pd(A + m * row + i, A_row);
 
                   cos_col = _mm256_mul_pd(A_col, cos_vec);
                   sin_row = _mm256_mul_pd(A_rcopy, sin_vec);
                   A_col = _mm256_add_pd(cos_col, sin_row);
-                  _mm256_storeu_pd(A + m * col + i, A_col);
+                  _mm256_store_pd(A + m * col + i, A_col);
 
                   // Compute the eigen vectors similarly by updating the eigen vector matrix
-                  V_row = _mm256_loadu_pd(V + m * row + i);
+                  V_row = _mm256_load_pd(V + m * row + i);
                   V_rcopy = V_row;
-                  V_col = _mm256_loadu_pd(V + m * col + i);
+                  V_col = _mm256_load_pd(V + m * col + i);
 
                   cos_row = _mm256_mul_pd(V_row, cos_vec);
                   sin_col = _mm256_mul_pd(V_col, sin_vec);
                   V_row = _mm256_sub_pd(cos_row, sin_col);
-                  _mm256_storeu_pd(V + m * row + i, V_row);
+                  _mm256_store_pd(V + m * row + i, V_row);
 
                   cos_col = _mm256_mul_pd(V_col, cos_vec);
                   sin_row = _mm256_mul_pd(V_rcopy, sin_vec);
                   V_col = _mm256_add_pd(cos_col, sin_row);
-                  _mm256_storeu_pd(V + m * col + i, V_col);
+                  _mm256_store_pd(V + m * col + i, V_col);
               }
 
               if (m % 4 != 0) {
