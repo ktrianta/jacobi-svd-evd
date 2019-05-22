@@ -11,7 +11,7 @@
 #include "util.hpp"
 
 static inline void evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat);
-static inline void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat);
+static inline void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat, int epoch = 10);
 
 void evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
                                   struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
@@ -62,7 +62,7 @@ void evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t Dat
                 copy_block(Amat, j_block, j_block, Ablockmat, 1, 1, block_size);
 
                 // evd_block_vector(Ablockmat, Vblockmat);
-                evd_subprocedure_vectorized(Ablockmat, Vblockmat);
+                evd_subprocedure_vectorized(Ablockmat, Vblockmat, 5);
 
                 matrix_transpose(Vblockmat, Vblockmat);
 
@@ -160,7 +160,7 @@ void evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct ma
                 copy_block(Amat, j_block, j_block, Ablockmat, 1, 1, block_size);
 
                 // evd_block_vector(Ablockmat, Vblockmat);
-                evd_subprocedure_vectorized(Ablockmat, Vblockmat);
+                evd_subprocedure_vectorized(Ablockmat, Vblockmat, 5);
 
                 for (size_t k_block = 0; k_block < n_blocks; ++k_block) {
                     mult_transpose_block(Vblockmat, 0, 0, Amat, i_block, k_block, M1mat, 0, 0, block_size);
@@ -242,34 +242,34 @@ static void evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat) {
                   __m256d sin_row, sin_col, cos_row, cos_col;
 
                   // Compute the eigen values by updating the rows until convergence
-                  A_row = _mm256_loadu_pd(A + m * row + i);
+                  A_row = _mm256_load_pd(A + m * row + i);
                   A_rcopy = A_row;
-                  A_col = _mm256_loadu_pd(A + m * col + i);
+                  A_col = _mm256_load_pd(A + m * col + i);
 
                   cos_row = _mm256_mul_pd(A_row, cos_vec);
                   sin_col = _mm256_mul_pd(A_col, sin_vec);
                   A_row = _mm256_sub_pd(cos_row, sin_col);
-                  _mm256_storeu_pd(A + m * row + i, A_row);
+                  _mm256_store_pd(A + m * row + i, A_row);
 
                   cos_col = _mm256_mul_pd(A_col, cos_vec);
                   sin_row = _mm256_mul_pd(A_rcopy, sin_vec);
                   A_col = _mm256_add_pd(cos_col, sin_row);
-                  _mm256_storeu_pd(A + m * col + i, A_col);
+                  _mm256_store_pd(A + m * col + i, A_col);
 
                   // Compute the eigen vectors similarly by updating the eigen vector matrix
-                  V_row = _mm256_loadu_pd(V + m * row + i);
+                  V_row = _mm256_load_pd(V + m * row + i);
                   V_rcopy = V_row;
-                  V_col = _mm256_loadu_pd(V + m * col + i);
+                  V_col = _mm256_load_pd(V + m * col + i);
 
                   cos_row = _mm256_mul_pd(V_row, cos_vec);
                   sin_col = _mm256_mul_pd(V_col, sin_vec);
                   V_row = _mm256_sub_pd(cos_row, sin_col);
-                  _mm256_storeu_pd(V + m * row + i, V_row);
+                  _mm256_store_pd(V + m * row + i, V_row);
 
                   cos_col = _mm256_mul_pd(V_col, cos_vec);
                   sin_row = _mm256_mul_pd(V_rcopy, sin_vec);
                   V_col = _mm256_add_pd(cos_col, sin_row);
-                  _mm256_storeu_pd(V + m * col + i, V_col);
+                  _mm256_store_pd(V + m * col + i, V_col);
               }
 
               if (m % 4 != 0) {
@@ -290,18 +290,14 @@ static void evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat) {
   matrix_transpose({V, m, m}, {V, m, m});
 }
 
-void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
+void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat, int epoch) {
     size_t n = Bmat.rows;
-    const double tol = 1e-15;  // convergence tolerance
     double* B = Bmat.ptr;
     double* V = Vmat.ptr;
-    double norm = 0.0;      // frobenius norm of matrix B
-    double off_norm = 0.0;  // frobenius norm of the off-diagonal elements of matrix B
 
     matrix_identity(Vmat);
-    matrix_frobenius(Bmat, &norm, &off_norm);
 
-    while (off_norm > tol * tol * norm) {
+    for (int ep = 1; ep <= epoch; ep++) {
         for (size_t i = 0; i < n - 1; ++i) {
             for (size_t j = i + 1; j < n; ++j) {
                 const double bii = B[n * i + i];
@@ -456,6 +452,5 @@ void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
                 }
             }
         }
-        matrix_off_frobenius(Bmat, &off_norm);
     }
 }
