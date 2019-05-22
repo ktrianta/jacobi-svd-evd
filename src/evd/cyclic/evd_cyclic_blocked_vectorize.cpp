@@ -27,7 +27,7 @@ size_t evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t D
     double* E = Eigen_values.ptr;
     const size_t n = Amat.rows;
     const size_t n_blocks = n / block_size;
-    size_t block_iter = 0;
+    size_t sub_cost = 0;
     matrix_identity(Eigen_vectors);
 
     if (n < 2 * block_size) {
@@ -64,7 +64,7 @@ size_t evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t D
 
                 // evd_block_vector(Ablockmat, Vblockmat);
                 // Cant use this because our cost is wrong
-                block_iter += evd_subprocedure_vectorized(Ablockmat, Vblockmat);
+                sub_cost += evd_subprocedure_vectorized(Ablockmat, Vblockmat);
 
                 matrix_transpose(Vblockmat, Vblockmat);
 
@@ -111,7 +111,7 @@ size_t evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t D
         E[i] = A[i * n + i];
     }
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
-    return blocked_cost_without_subprocedure_evd(n, block_size, epoch) + subprocedure_cost(2 * block_size, block_iter);
+    return blocked_cost_without_subprocedure_evd(n, block_size, epoch) + sub_cost;
 }
 
 size_t evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
@@ -123,7 +123,7 @@ size_t evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct 
     double* A = Amat.ptr;
     // Create a copy of the matrix to prevent modification of the original matrix
     memcpy(A, Data_matr.ptr, Data_matr.rows * Data_matr.cols * sizeof(double));
-    size_t block_iter = 0;
+    size_t sub_cost = 0;
     double* E = Eigen_values.ptr;
     const size_t n = Amat.rows;
     const size_t n_blocks = n / block_size;
@@ -164,7 +164,7 @@ size_t evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct 
 
                 // evd_block_vector(Ablockmat, Vblockmat);
                 // We have the wrong cost for this.
-                block_iter += evd_subprocedure_vectorized(Ablockmat, Vblockmat);
+                sub_cost += evd_subprocedure_vectorized(Ablockmat, Vblockmat);
 
                 for (size_t k_block = 0; k_block < n_blocks; ++k_block) {
                     mult_transpose_block(Vblockmat, 0, 0, Amat, i_block, k_block, M1mat, 0, 0, block_size);
@@ -207,7 +207,7 @@ size_t evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct 
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
 
     return blocked_less_copy_cost_without_subprocedure_evd(n, block_size, epoch) +
-           subprocedure_cost(2 * block_size, block_iter);
+           sub_cost;
 }
 
 size_t evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
@@ -218,7 +218,6 @@ size_t evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
     double* V = Vmat.ptr;
     double norm = 0.0;      // frobenius norm of matrix B
     double off_norm = 0.0;  // frobenius norm of the off-diagonal elements of matrix B
-
     matrix_identity(Vmat);
     matrix_frobenius(Bmat, &norm, &off_norm);
 
@@ -380,7 +379,7 @@ size_t evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
         }
         matrix_off_frobenius(Bmat, &off_norm);
     }
-    return iter;
+    return subprocedure_cost(n, iter);
 }
 
 // Perform EVD for the block

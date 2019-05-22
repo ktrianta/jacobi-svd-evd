@@ -24,18 +24,19 @@ size_t evd_cyclic_blocked(struct matrix_t Data_matr, struct matrix_t Data_matr_c
     double* E = Eigen_values.ptr;
     const size_t n = Amat.rows;
     const size_t n_blocks = n / block_size;
+    size_t block_cost = 0;
 
     matrix_identity(Eigen_vectors);
 
     if (n < 2 * block_size) {
-        evd_block(Amat, Eigen_vectors, block_epoch);
+         block_cost = evd_block(Amat, Eigen_vectors, block_epoch);
 
         // Store the generated eigen values in the vector
         for (size_t i = 0; i < n; i++) {
             E[i] = A[i * n + i];
         }
         reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
-        return oneloop_cost_evd(n, block_epoch);
+        return block_cost;
     }
 
     assert(n_blocks * block_size == n);
@@ -59,7 +60,7 @@ size_t evd_cyclic_blocked(struct matrix_t Data_matr, struct matrix_t Data_matr_c
                 copy_block(Amat, j_block, i_block, Ablockmat, 1, 0, block_size);
                 copy_block(Amat, j_block, j_block, Ablockmat, 1, 1, block_size);
 
-                evd_block(Ablockmat, Vblockmat, block_epoch);
+                block_cost += evd_block(Ablockmat, Vblockmat, block_epoch);
 
                 matrix_transpose(Vblockmat, Vblockmat);
 
@@ -106,8 +107,7 @@ size_t evd_cyclic_blocked(struct matrix_t Data_matr, struct matrix_t Data_matr_c
         E[i] = A[i * n + i];
     }
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
-    return blocked_cost_without_subprocedure_evd(n, block_size, epoch) +
-           epoch * n_blocks * (n_blocks - 1) * 0.5 * base_cost_evd(2 * block_size, block_epoch);
+    return blocked_cost_without_subprocedure_evd(n, block_size, epoch) + block_cost;
 }
 
 size_t evd_cyclic_blocked_less_copy(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
@@ -123,6 +123,7 @@ size_t evd_cyclic_blocked_less_copy(struct matrix_t Data_matr, struct matrix_t D
     double* E = Eigen_values.ptr;
     const size_t n = Amat.rows;
     const size_t n_blocks = n / block_size;
+    size_t block_cost = 0;
 
     matrix_identity(Eigen_vectors);
 
@@ -158,7 +159,7 @@ size_t evd_cyclic_blocked_less_copy(struct matrix_t Data_matr, struct matrix_t D
                 copy_block(Amat, j_block, i_block, Ablockmat, 1, 0, block_size);
                 copy_block(Amat, j_block, j_block, Ablockmat, 1, 1, block_size);
 
-                evd_block(Ablockmat, Vblockmat, block_epoch);
+                block_cost += evd_block(Ablockmat, Vblockmat, block_epoch);
 
                 for (size_t k_block = 0; k_block < n_blocks; ++k_block) {
                     mult_transpose_block(Vblockmat, 0, 0, Amat, i_block, k_block, M1mat, 0, 0, block_size);
@@ -199,8 +200,7 @@ size_t evd_cyclic_blocked_less_copy(struct matrix_t Data_matr, struct matrix_t D
         E[i] = A[i * n + i];
     }
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
-    return blocked_less_copy_cost_without_subprocedure_evd(n, block_size, epoch) +
-           epoch * n_blocks * (n_blocks - 1) * 0.5 * base_cost_evd(2 * block_size, block_epoch);
+    return blocked_less_copy_cost_without_subprocedure_evd(n, block_size, epoch) + block_cost;
 }
 
 // Perform EVD for the block
@@ -241,5 +241,5 @@ static size_t evd_block(struct matrix_t Amat, struct matrix_t Vmat, size_t epoch
             }
         }
     }
-    return epoch;
+    return base_cost_evd(n, epoch);
 }
