@@ -29,7 +29,7 @@ int main() {
         std::cin >> A[i];
     }
 
-    size_t cost = blocked_cost_without_subprocedure_evd(n, b, n_iter, individual_block_iter);
+    size_t cost = evd_cyclic_blocked(Data_matr, Data_matr_copy, E_vecs, E_vals, n_iter, individual_block_iter = 5, b);
     bench_func(evd_cyclic_blocked, "evd_cyclic_blocked_version", cost, Data_matr, Data_matr_copy, E_vecs, E_vals,
-               n_iter);
+               n_iter, individual_block_iter = 5, b);
 }
