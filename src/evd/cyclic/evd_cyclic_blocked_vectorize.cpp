@@ -11,7 +11,7 @@
 #include "util.hpp"
 
 static inline void evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat);
-static inline void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat);
+static inline void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat, int epoch = 10);
 
 void evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
                                   struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
@@ -62,7 +62,7 @@ void evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t Dat
                 copy_block(Amat, j_block, j_block, Ablockmat, 1, 1, block_size);
 
                 // evd_block_vector(Ablockmat, Vblockmat);
-                evd_subprocedure_vectorized(Ablockmat, Vblockmat);
+                evd_subprocedure_vectorized(Ablockmat, Vblockmat, 5);
 
                 matrix_transpose(Vblockmat, Vblockmat);
 
@@ -160,7 +160,7 @@ void evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct ma
                 copy_block(Amat, j_block, j_block, Ablockmat, 1, 1, block_size);
 
                 // evd_block_vector(Ablockmat, Vblockmat);
-                evd_subprocedure_vectorized(Ablockmat, Vblockmat);
+                evd_subprocedure_vectorized(Ablockmat, Vblockmat, 5);
 
                 for (size_t k_block = 0; k_block < n_blocks; ++k_block) {
                     mult_transpose_block(Vblockmat, 0, 0, Amat, i_block, k_block, M1mat, 0, 0, block_size);
@@ -290,14 +290,14 @@ static void evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat) {
   matrix_transpose({V, m, m}, {V, m, m});
 }
 
-void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
+void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat, int epoch) {
     size_t n = Bmat.rows;
     double* B = Bmat.ptr;
     double* V = Vmat.ptr;
 
     matrix_identity(Vmat);
 
-    for (int ep = 1; ep <= 5; ep++) {
+    for (int ep = 1; ep <= epoch; ep++) {
         for (size_t i = 0; i < n - 1; ++i) {
             for (size_t j = i + 1; j < n; ++j) {
                 const double bii = B[n * i + i];
