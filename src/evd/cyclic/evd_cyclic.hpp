@@ -39,10 +39,12 @@ size_t evd_cyclic_blocked_less_copy(struct matrix_t Data_matr, struct matrix_t D
  * Optimization 3: Blocked version with outer loop unroll of the above function
  */
 size_t evd_cyclic_blocked_unroll_outer(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
-                                     struct vector_t e, int epoch = 20, size_t block_epoch = 5, size_t block_size = 8);
+                                       struct vector_t e, int epoch = 20, size_t block_epoch = 5,
+                                       size_t block_size = 8);
 
 size_t evd_cyclic_blocked_unroll_outer_less_copy(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
-                                               struct matrix_t V, struct vector_t e, int epoch = 20, size_t block_epoch = 5, size_t block_size = 8);
+                                                 struct matrix_t V, struct vector_t e, int epoch = 20,
+                                                 size_t block_epoch = 5, size_t block_size = 8);
 
 /**
  * Optimization 3: Blocked version with outer loop unroll of the above function

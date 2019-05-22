@@ -206,8 +206,7 @@ size_t evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct 
     }
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
 
-    return blocked_less_copy_cost_without_subprocedure_evd(n, block_size, epoch) +
-           sub_cost;
+    return blocked_less_copy_cost_without_subprocedure_evd(n, block_size, epoch) + sub_cost;
 }
 
 size_t evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {

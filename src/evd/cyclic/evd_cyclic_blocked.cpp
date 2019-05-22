@@ -29,7 +29,7 @@ size_t evd_cyclic_blocked(struct matrix_t Data_matr, struct matrix_t Data_matr_c
     matrix_identity(Eigen_vectors);
 
     if (n < 2 * block_size) {
-         block_cost = evd_block(Amat, Eigen_vectors, block_epoch);
+        block_cost = evd_block(Amat, Eigen_vectors, block_epoch);
 
         // Store the generated eigen values in the vector
         for (size_t i = 0; i < n; i++) {
