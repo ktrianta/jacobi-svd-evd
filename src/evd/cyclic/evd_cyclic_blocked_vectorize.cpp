@@ -292,16 +292,12 @@ static void evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat) {
 
 void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
     size_t n = Bmat.rows;
-    const double tol = 1e-15;  // convergence tolerance
     double* B = Bmat.ptr;
     double* V = Vmat.ptr;
-    double norm = 0.0;      // frobenius norm of matrix B
-    double off_norm = 0.0;  // frobenius norm of the off-diagonal elements of matrix B
 
     matrix_identity(Vmat);
-    matrix_frobenius(Bmat, &norm, &off_norm);
 
-    while (off_norm > tol * tol * norm) {
+    for (int ep = 1; ep <= 5; ep++) {
         for (size_t i = 0; i < n - 1; ++i) {
             for (size_t j = i + 1; j < n; ++j) {
                 const double bii = B[n * i + i];
@@ -456,6 +452,5 @@ void evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
                 }
             }
         }
-        matrix_off_frobenius(Bmat, &off_norm);
     }
 }
