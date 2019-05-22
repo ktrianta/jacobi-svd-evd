@@ -18,40 +18,43 @@
  * in order of ascending magnitude.
  * @param epoch Number of Jacobi iterations until convergence (default 20)
  */
-void evd_cyclic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V, struct vector_t e,
-                int epoch = 20);
+size_t evd_cyclic(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V, struct vector_t e,
+                  int epoch = 20);
 
 /**
  * Optimization 1: Vectorized version of the above function
  */
-void evd_cyclic_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
-                          struct vector_t e, int epoch = 20);
+size_t evd_cyclic_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
+                            struct vector_t e, int epoch = 20);
 
 /**
  * Optimization 2: Blocked version of the above function
  */
-void evd_cyclic_blocked(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V, struct vector_t e,
-                        int epoch = 20);
-void evd_cyclic_blocked_less_copy(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
-                                  struct vector_t e, int epoch = 20);
+size_t evd_cyclic_blocked(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
+                          struct vector_t e, int epoch = 20, size_t block_epoch = 5, size_t block_size = 8);
+size_t evd_cyclic_blocked_less_copy(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
+                                    struct vector_t e, int epoch = 20, size_t block_epoch = 5, size_t block_size = 8);
 
 /**
  * Optimization 3: Blocked version with outer loop unroll of the above function
  */
-void evd_cyclic_blocked_unroll_outer(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
-                                     struct vector_t e, int epoch = 20);
+size_t evd_cyclic_blocked_unroll_outer(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
+                                       struct vector_t e, int epoch = 20, size_t block_epoch = 5,
+                                       size_t block_size = 8);
 
-void evd_cyclic_blocked_unroll_outer_less_copy(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
-                                               struct matrix_t V, struct vector_t e, int epoch = 20);
+size_t evd_cyclic_blocked_unroll_outer_less_copy(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
+                                                 struct matrix_t V, struct vector_t e, int epoch = 20,
+                                                 size_t block_epoch = 5, size_t block_size = 8);
 
 /**
  * Optimization 3: Blocked version with outer loop unroll of the above function
  */
-void evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
-                                  struct vector_t e, int epoch = 20);
+size_t evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
+                                    struct vector_t e, int epoch = 20, size_t block_epoch = 5, size_t block_size = 8);
 
-void evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
-                                            struct matrix_t V, struct vector_t e, int epoch = 20);
+size_t evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
+                                              struct matrix_t V, struct vector_t e, int epoch = 20,
+                                              size_t block_epoch = 5, size_t block_size = 8);
 
 /**
  * Compute eigenvalue decomposition of a given symmetric, n times n matrix
@@ -70,20 +73,21 @@ void evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct ma
  * order.  Columns of U form an orthonormal eigenbasis for the column space of
  * X.
  */
-int evd_cyclic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t Qmat, struct vector_t evec, double tol);
+size_t evd_cyclic_tol(struct matrix_t Xmat, struct matrix_t Amat, struct matrix_t Qmat, struct vector_t evec,
+                      double tol);
 
-void evd_cyclic_oneloop(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V, struct vector_t e,
-                        int epoch = 20);
+size_t evd_cyclic_oneloop(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
+                          struct vector_t e, int epoch = 20);
 
-void evd_cyclic_unroll_outer(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
-                             struct vector_t e, int epoch = 20);
+size_t evd_cyclic_unroll_outer(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
+                               struct vector_t e, int epoch = 20);
 
-void evd_cyclic_unroll_inner(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
-                             struct vector_t e, int epoch = 20);
+size_t evd_cyclic_unroll_inner(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
+                               struct vector_t e, int epoch = 20);
 
-void evd_cyclic_oneloop_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
-                                  struct vector_t e, int epoch = 20);
-void evd_cyclic_unroll_outer_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
-                                       struct vector_t e, int epoch = 20);
-void evd_cyclic_oneloop_row(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
-                            struct vector_t e, int epoch = 20);
+size_t evd_cyclic_oneloop_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
+                                    struct vector_t e, int epoch = 20);
+size_t evd_cyclic_unroll_outer_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
+                                         struct vector_t e, int epoch = 20);
+size_t evd_cyclic_oneloop_row(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
+                              struct vector_t e, int epoch = 20);
