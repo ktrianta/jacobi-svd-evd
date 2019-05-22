@@ -1,4 +1,5 @@
 #include "matrix.hpp"
+#include <immintrin.h>
 #include <algorithm>
 #include <cassert>
 #include <utility>
@@ -106,6 +107,59 @@ void matrix_frobenius(matrix_t m, double* norm, double* off_norm) {
     *off_norm = off_diag_elems_sum;
 }
 
+void matrix_frobenius_vectorized(matrix_t m, double* norm, double* off_norm) {
+    const size_t M = m.rows;
+    const size_t N = m.cols;
+    const size_t N4 = N - (N % 4);
+    double* data = m.ptr;
+    double off_diag_elems_sum, rem = 0.0;  // sum m[i][j]^2 for 0 < i < M and 0 < j < N and i == j
+    __m256d mvals, squared_mvals, all_sum, rem_sum;
+
+    all_sum = _mm256_set1_pd(0.0);
+    rem_sum = _mm256_set1_pd(0.0);
+    for (size_t i = 0; i < M; ++i) {
+        size_t j = 0;
+        for (; j < N4; j += 4) {
+            if ((j == i) || (j + 1 == i) || (j + 2 == i) || (j + 3 == i)) {
+                if (j == i) {
+                    rem += data[N * i + j + 1] * data[N * i + j + 1];
+                    rem += data[N * i + j + 2] * data[N * i + j + 2];
+                    rem += data[N * i + j + 3] * data[N * i + j + 3];
+                } else if (j == i + 1) {
+                    rem += data[N * i + j] * data[N * i + j];
+                    rem += data[N * i + j + 2] * data[N * i + j + 2];
+                    rem += data[N * i + j + 3] * data[N * i + j + 3];
+                } else if (j == i + 2) {
+                    rem += data[N * i + j] * data[N * i + j];
+                    rem += data[N * i + j + 1] * data[N * i + j + 1];
+                    rem += data[N * i + j + 3] * data[N * i + j + 3];
+                } else if (j == i + 3) {
+                    rem += data[N * i + j] * data[N * i + j];
+                    rem += data[N * i + j + 1] * data[N * i + j + 1];
+                    rem += data[N * i + j + 2] * data[N * i + j + 2];
+                }
+                mvals = _mm256_loadu_pd(data + N * i + j);
+                squared_mvals = _mm256_mul_pd(mvals, mvals);
+                all_sum = _mm256_add_pd(squared_mvals, all_sum);
+            } else {
+                mvals = _mm256_loadu_pd(data + N * i + j);
+                squared_mvals = _mm256_mul_pd(mvals, mvals);
+                rem_sum = _mm256_add_pd(squared_mvals, rem_sum);
+            }
+        }
+
+        for (; j < N; j++) {
+            if (j != i) {
+                rem += data[N * i + j] * data[N * i + j];
+            }
+        }
+    }
+
+    off_diag_elems_sum = all_sum[0] + all_sum[1] + all_sum[2] + all_sum[3] + rem;
+    *off_norm = off_diag_elems_sum;
+    *norm = off_diag_elems_sum + rem_sum[0] + rem_sum[1] + rem_sum[2] + rem_sum[3];
+}
+
 void matrix_off_frobenius(matrix_t m, double* off_norm) {
     const size_t M = m.rows;
     const size_t N = m.cols;
@@ -122,5 +176,53 @@ void matrix_off_frobenius(matrix_t m, double* off_norm) {
         }
     }
 
+    *off_norm = off_diag_elems_sum;
+}
+
+void matrix_off_frobenius_vectorized(matrix_t m, double* off_norm) {
+    const size_t M = m.rows;
+    const size_t N = m.cols;
+    const size_t N4 = (N > N % 4 ? N - (N % 4) : N);
+    double* data = m.ptr;
+    double off_diag_elems_sum = 0.0, rem = 0.0;  // sum m[i][j]^2 for 0 < i < M and 0 < j < N and i == j
+    __m256d mvals, squared_mvals, all_sum;
+
+    all_sum = _mm256_set1_pd(0.0);
+    for (size_t i = 0; i < M; ++i) {
+        size_t j = 0;
+        for (; j < N4; j += 4) {
+            if ((j == i) || (j + 1 == i) || (j + 2 == i) || (j + 3 == i)) {
+                if (j == i) {
+                    rem += data[N * i + j + 1] * data[N * i + j + 1];
+                    rem += data[N * i + j + 2] * data[N * i + j + 2];
+                    rem += data[N * i + j + 3] * data[N * i + j + 3];
+                } else if (j == i + 1) {
+                    rem += data[N * i + j] * data[N * i + j];
+                    rem += data[N * i + j + 2] * data[N * i + j + 2];
+                    rem += data[N * i + j + 3] * data[N * i + j + 3];
+                } else if (j == i + 2) {
+                    rem += data[N * i + j] * data[N * i + j];
+                    rem += data[N * i + j + 1] * data[N * i + j + 1];
+                    rem += data[N * i + j + 3] * data[N * i + j + 3];
+                } else if (j == i + 3) {
+                    rem += data[N * i + j] * data[N * i + j];
+                    rem += data[N * i + j + 1] * data[N * i + j + 1];
+                    rem += data[N * i + j + 2] * data[N * i + j + 2];
+                }
+            } else {
+                mvals = _mm256_loadu_pd(data + N * i + j);
+                squared_mvals = _mm256_mul_pd(mvals, mvals);
+                all_sum = _mm256_add_pd(squared_mvals, all_sum);
+            }
+        }
+
+        for (; j < N; j++) {
+            if (j != i) {
+                rem += data[N * i + j] * data[N * i + j];
+            }
+        }
+    }
+
+    off_diag_elems_sum = all_sum[0] + all_sum[1] + all_sum[2] + all_sum[3] + rem;
     *off_norm = off_diag_elems_sum;
 }

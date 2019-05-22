@@ -45,8 +45,6 @@ void evd_cyclic_blocked_unroll_outer(struct matrix_t Data_matr, struct matrix_t 
 
     matrix_identity(Eigen_vectors);
 
-    int is_not_diagonal = 0;
-
     if (n < 2 * block_size) {
         evd_block(Amat, Eigen_vectors);
 
@@ -72,17 +70,6 @@ void evd_cyclic_blocked_unroll_outer(struct matrix_t Data_matr, struct matrix_t 
     matrix_t M2mat = {M2, block_size, block_size};
 
     for (int ep = 1; ep <= epoch; ep++) {
-        for (size_t i = 0; i < n; i++) {
-            for (size_t j = i + 1; j < n; j++) {
-                if (A[i * n + j] != 0.0) {
-                    is_not_diagonal = 1;
-                    break;
-                }
-            }
-        }
-
-        if (!is_not_diagonal) break;
-
         for (size_t i_block = 0; i_block < n_blocks - 1; ++i_block) {
             for (size_t j_block = i_block + 1; j_block < n_blocks; ++j_block) {
                 copy_block(Amat, i_block, i_block, Ablockmat, 0, 0, block_size);
@@ -129,7 +116,6 @@ void evd_cyclic_blocked_unroll_outer(struct matrix_t Data_matr, struct matrix_t 
                 }
             }
         }
-        is_not_diagonal = 0;
     }
 
     free(memory_block);
@@ -138,7 +124,7 @@ void evd_cyclic_blocked_unroll_outer(struct matrix_t Data_matr, struct matrix_t 
         E[i] = A[i * n + i];
     }
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
-}
+}  // NOLINT
 
 void evd_cyclic_blocked_unroll_outer_less_copy(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
                                                struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch) {
@@ -155,8 +141,6 @@ void evd_cyclic_blocked_unroll_outer_less_copy(struct matrix_t Data_matr, struct
     const size_t n_blocks = n / block_size;
 
     matrix_identity(Eigen_vectors);
-
-    int is_not_diagonal = 0;
 
     if (n < 2 * block_size) {
         evd_block(Amat, Eigen_vectors);
@@ -183,17 +167,6 @@ void evd_cyclic_blocked_unroll_outer_less_copy(struct matrix_t Data_matr, struct
     matrix_t M2mat = {M2, block_size, block_size};
 
     for (int ep = 1; ep <= epoch; ep++) {
-        for (size_t i = 0; i < n; i++) {
-            for (size_t j = i + 1; j < n; j++) {
-                if (A[i * n + j] != 0.0) {
-                    is_not_diagonal = 1;
-                    break;
-                }
-            }
-        }
-
-        if (!is_not_diagonal) break;
-
         for (size_t i_block = 0; i_block < n_blocks - 1; ++i_block) {
             for (size_t j_block = i_block + 1; j_block < n_blocks; ++j_block) {
                 copy_block(Amat, i_block, i_block, Ablockmat, 0, 0, block_size);
@@ -234,7 +207,6 @@ void evd_cyclic_blocked_unroll_outer_less_copy(struct matrix_t Data_matr, struct
                 }
             }
         }
-        is_not_diagonal = 0;
     }
 
     free(memory_block);
@@ -256,7 +228,7 @@ void evd_block(struct matrix_t Data_matr, struct matrix_t Eigen_vectors) {
 
     matrix_identity(Eigen_vectors);
 
-    for (int ep = 0; ep < 20; ++ep) {
+    for (int ep = 0; ep < 5; ++ep) {
         for (size_t p = 0; p < n - 1; p += 2) {
             for (size_t q = p + 1; q < n - 1; ++q) {
                 // Compute cos_t and sin_t for the rotation

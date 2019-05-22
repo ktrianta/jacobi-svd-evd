@@ -7,50 +7,50 @@
 #include "gtest/gtest.h"
 #include "types.hpp"
 
-TEST(evd_cyclic_vectorize, identity_matrix) {
+TEST(evd_cyclic_oneloop_row, identity_matrix) {
     size_t n = 10;
-    aligned_vector<double> A(n * n, 0);
-    aligned_vector<double> A_copy(n * n, 0);
+    std::vector<double> A(n * n, 0);
+    std::vector<double> A_copy(n * n, 0);
     for (size_t i = 0; i < n; ++i) {
         A[i * n + i] = 1.0;
     }
-    aligned_vector<double> e(n);
-    aligned_vector<double> V(n * n, 0);
+    std::vector<double> e(n);
+    std::vector<double> V(n * n, 0);
     matrix_t Data_matr = {&A[0], n, n};
     matrix_t Data_matr_copy = {&A_copy[0], n, n};
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
 
-    evd_cyclic_vectorize(Data_matr, Data_matr_copy, E_vecs, E_vals, 10);
+    evd_cyclic_oneloop_row(Data_matr, Data_matr_copy, E_vecs, E_vals, 100);
     for (size_t i = 0; i < n; ++i) {
         ASSERT_DOUBLE_EQ(e[i], 1.0);
     }
 }
 
-TEST(evd_cyclic_vectorize, random_square_matrix) {
+TEST(evd_cyclic_oneloop_row, random_square_matrix) {
     size_t n = 4;
-    aligned_vector<double> A = {7.0, 3.0, 2.0, 1.0, 3.0, 9.0, -2.0, 4.0, 2.0, -2.0, -4.0, 2.0, 1.0, 4.0, 2.0, 3.0};
-    aligned_vector<double> A_copy(n * n, 0);
-    aligned_vector<double> e(n);
-    aligned_vector<double> V(n * n, 0);
+    std::vector<double> A = {7.0, 3.0, 2.0, 1.0, 3.0, 9.0, -2.0, 4.0, 2.0, -2.0, -4.0, 2.0, 1.0, 4.0, 2.0, 3.0};
+    std::vector<double> A_copy(n * n, 0);
+    std::vector<double> e(n);
+    std::vector<double> V(n * n, 0);
 
     matrix_t Data_matr = {&A[0], n, n};
     matrix_t Data_matr_copy = {&A_copy[0], n, n};
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
 
-    evd_cyclic_vectorize(Data_matr, Data_matr_copy, E_vecs, E_vals, 10);
+    evd_cyclic_oneloop_row(Data_matr, Data_matr_copy, E_vecs, E_vals, 100);
 
-    aligned_vector<double> e_expect = {12.71986, 5.78305, 2.09733, -5.60024};
+    std::vector<double> e_expect = {12.71986, 5.78305, 2.09733, -5.60024};
 
     for (size_t i = 0; i < n; ++i) {
         ASSERT_NEAR(e[i], e_expect[i], 1e-5);
     }
 }
 
-TEST(evd_cyclic_vectorize, evd_crosscheck) {
+TEST(evd_cyclic_oneloop_row, evd_crosscheck) {
     size_t n = 5;
-    aligned_vector<double> A = {
+    std::vector<double> A = {
         2.000000000000000000e+00, 6.000000000000000000e+00, 4.000000000000000000e+00, 6.000000000000000000e+00,
         4.500000000000000000e+00, 6.000000000000000000e+00, 5.000000000000000000e+00, 8.000000000000000000e+00,
         5.500000000000000000e+00, 4.500000000000000000e+00, 4.000000000000000000e+00, 8.000000000000000000e+00,
@@ -58,28 +58,28 @@ TEST(evd_cyclic_vectorize, evd_crosscheck) {
         5.500000000000000000e+00, 6.000000000000000000e+00, 1.000000000000000000e+00, 2.000000000000000000e+00,
         4.500000000000000000e+00, 4.500000000000000000e+00, 4.000000000000000000e+00, 2.000000000000000000e+00,
         7.000000000000000000e+00};
-    aligned_vector<double> A_copy(n * n, 0);
-    aligned_vector<double> e(n);
-    aligned_vector<double> V(n * n, 0);
+    std::vector<double> A_copy(n * n, 0);
+    std::vector<double> e(n);
+    std::vector<double> V(n * n, 0);
 
     matrix_t Data_matr = {&A[0], n, n};
     matrix_t Data_matr_copy = {&A_copy[0], n, n};
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
 
-    evd_cyclic_vectorize(Data_matr, Data_matr_copy, E_vecs, E_vals, 10);
+    evd_cyclic_oneloop_row(Data_matr, Data_matr_copy, E_vecs, E_vals, 100);
 
-    aligned_vector<double> e_expect = {2.415032147975995969e+01, 4.001355036163166012e+00, -1.007738346679503572e+00,
-                                       -3.262428878677021693e+00, -5.881509290566617310e+00};
+    std::vector<double> e_expect = {2.415032147975995969e+01, 4.001355036163166012e+00, -1.007738346679503572e+00,
+                                    -3.262428878677021693e+00, -5.881509290566617310e+00};
 
     for (size_t i = 0; i < n; ++i) {
         ASSERT_NEAR(e[i], e_expect[i], 1e-7);
     }
 }
 
-TEST(evd_cyclic_vectorize, eigenvector_check) {
+TEST(evd_cyclic_oneloop_row, eigenvector_check) {
     size_t n = 5;
-    aligned_vector<double> A = {
+    std::vector<double> A = {
         2.000000000000000000e+00, 6.000000000000000000e+00, 4.000000000000000000e+00, 6.000000000000000000e+00,
         4.500000000000000000e+00, 6.000000000000000000e+00, 5.000000000000000000e+00, 8.000000000000000000e+00,
         5.500000000000000000e+00, 4.500000000000000000e+00, 4.000000000000000000e+00, 8.000000000000000000e+00,
@@ -87,18 +87,18 @@ TEST(evd_cyclic_vectorize, eigenvector_check) {
         5.500000000000000000e+00, 6.000000000000000000e+00, 1.000000000000000000e+00, 2.000000000000000000e+00,
         4.500000000000000000e+00, 4.500000000000000000e+00, 4.000000000000000000e+00, 2.000000000000000000e+00,
         7.000000000000000000e+00};
-    aligned_vector<double> A_copy(n * n, 0);
-    aligned_vector<double> e(n);
-    aligned_vector<double> V(n * n, 0);
+    std::vector<double> A_copy(n * n, 0);
+    std::vector<double> e(n);
+    std::vector<double> V(n * n, 0);
 
     matrix_t Data_matr = {&A[0], n, n};
     matrix_t Data_matr_copy = {&A_copy[0], n, n};
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
 
-    evd_cyclic_vectorize(Data_matr, Data_matr_copy, E_vecs, E_vals, 10);
+    evd_cyclic_oneloop_row(Data_matr, Data_matr_copy, E_vecs, E_vals, 100);
 
-    aligned_vector<double> V_expect = {
+    std::vector<double> V_expect = {
         4.183471639051151714e-01,  4.111245337904025771e-02,  7.089492553079320691e-01,  -2.465472573146875179e-01,
         -5.098046880312467888e-01, 5.351174862492769080e-01,  2.123587416842354081e-01,  -3.608245211597456148e-01,
         -6.773537917555900734e-01, 2.820470642724520749e-01,  4.694747160408517250e-01,  2.236196547254168665e-01,
@@ -115,13 +115,13 @@ TEST(evd_cyclic_vectorize, eigenvector_check) {
     }
 }
 
-TEST(evd_cyclic_vectorize, random_matrix_big) {
+TEST(evd_cyclic_oneloop_row, random_matrix_big) {
     size_t n = 128;
 
-    aligned_vector<double> A(n * n, 0);
-    aligned_vector<double> A_copy(n * n, 0);
-    aligned_vector<double> e(n), e_expect(n);
-    aligned_vector<double> V(n * n, 0), V_expect(n * n, 0);
+    std::vector<double> A(n * n, 0);
+    std::vector<double> A_copy(n * n, 0);
+    std::vector<double> e(n), e_expect(n);
+    std::vector<double> V(n * n, 0), V_expect(n * n, 0);
 
     std::string cmd = "python scripts/evd_testdata.py " + std::to_string(n) + " " + std::to_string(n);
     std::stringstream ss(exec_cmd(cmd.c_str()));
@@ -133,7 +133,7 @@ TEST(evd_cyclic_vectorize, random_matrix_big) {
     matrix_t Data_matr_copy = {&A_copy[0], n, n};
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
-    evd_cyclic_vectorize(Data_matr, Data_matr_copy, E_vecs, E_vals, 10);
+    evd_cyclic_oneloop_row(Data_matr, Data_matr_copy, E_vecs, E_vals, 20);
 
     for (size_t i = 0; i < n; ++i) {
         ASSERT_NEAR(e[i], e_expect[i], 1e-7);

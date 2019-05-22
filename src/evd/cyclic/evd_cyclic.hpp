@@ -81,5 +81,9 @@ void evd_cyclic_unroll_outer(struct matrix_t Data_matr, struct matrix_t Data_mat
 void evd_cyclic_unroll_inner(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
                              struct vector_t e, int epoch = 20);
 
+void evd_cyclic_oneloop_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
+                                  struct vector_t e, int epoch = 20);
 void evd_cyclic_unroll_outer_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
                                        struct vector_t e, int epoch = 20);
+void evd_cyclic_oneloop_row(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t V,
+                            struct vector_t e, int epoch = 20);
