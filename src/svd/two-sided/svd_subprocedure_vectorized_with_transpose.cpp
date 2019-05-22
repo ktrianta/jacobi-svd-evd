@@ -189,7 +189,7 @@ size_t svd_subprocedure_vectorized_with_transpose(struct matrix_t Bmat, struct m
             }
         }
 
-        matrix_off_frobenius(Bmat, &off_norm);
+        matrix_off_frobenius_vectorized(Bmat, &off_norm);
         iter += 1;
     }
     matrix_transpose(Umat, Umat);

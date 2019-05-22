@@ -41,6 +41,7 @@ void matrix_copy(matrix_t Bmat, matrix_t Amat);
  */
 
 void matrix_off_frobenius(matrix_t m, double* off_norm);
+void matrix_off_frobenius_vectorized(matrix_t m, double* off_norm);
 
 /**
  * @brief Calcluates the frebonius norm of matrix m
@@ -49,3 +50,4 @@ void matrix_off_frobenius(matrix_t m, double* off_norm);
  */
 
 void matrix_frobenius(matrix_t m, double* norm, double* off_norm);
+void matrix_frobenius_vectorized(matrix_t m, double* norm, double* off_norm);
