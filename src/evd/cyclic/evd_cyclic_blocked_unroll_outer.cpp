@@ -155,7 +155,6 @@ size_t evd_cyclic_blocked_unroll_outer_less_copy(struct matrix_t Data_matr, stru
         }
         reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
         return oneloop_cost_evd(n, block_epoch);
-        ;
     }
 
     assert(n_blocks * block_size == n);
