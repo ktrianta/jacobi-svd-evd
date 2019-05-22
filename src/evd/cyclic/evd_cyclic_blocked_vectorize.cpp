@@ -209,7 +209,7 @@ size_t evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct 
     return blocked_less_copy_cost_without_subprocedure_evd(n, block_size, epoch) + sub_cost;
 }
 
-size_t evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
+size_t evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat, size_t) {
     size_t n = Bmat.rows;
     size_t iter = 0;
     const double tol = 1e-15;  // convergence tolerance
@@ -218,10 +218,8 @@ size_t evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
     double norm = 0.0;      // frobenius norm of matrix B
     double off_norm = 0.0;  // frobenius norm of the off-diagonal elements of matrix B
     matrix_identity(Vmat);
-    matrix_frobenius(Bmat, &norm, &off_norm);
 
-    while (off_norm > tol * tol * norm) {
-        iter++;
+    for (int ep = 1; ep <= epoch; ep++) {
         for (size_t i = 0; i < n - 1; ++i) {
             for (size_t j = i + 1; j < n; ++j) {
                 const double bii = B[n * i + i];
@@ -376,7 +374,6 @@ size_t evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat) {
                 }
             }
         }
-        matrix_off_frobenius(Bmat, &off_norm);
     }
     return subprocedure_cost(n, iter);
 }
