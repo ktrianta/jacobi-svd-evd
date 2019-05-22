@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <cassert>
-#include "evd_cost.hpp"
 #include "block.hpp"
+#include "evd_cost.hpp"
 #include "evd_cyclic.hpp"
 #include "matrix.hpp"
 #include "types.hpp"
