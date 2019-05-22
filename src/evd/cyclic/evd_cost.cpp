@@ -86,8 +86,8 @@ size_t subprocedure_cost(size_t b, size_t n_iter) {
     size_t muls = 25;
     size_t divs = 5;
     size_t sqrt = 3;
-    size_t vec_muls = 6 * b;
-    size_t vec_fmas = 12 * b;
+    size_t vec_adds = 6 * b;
+    size_t vec_muls = 12 * b;
 
     size_t freb_flops = 2 * (b - 1) * b;
 
