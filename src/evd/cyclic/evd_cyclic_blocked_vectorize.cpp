@@ -12,7 +12,7 @@
 #include "util.hpp"
 
 static inline size_t evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat, size_t block_epoch);
-static inline size_t evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat);
+static inline size_t evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat, size_t block_epoch);
 
 size_t evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy,
                                     struct matrix_t Eigen_vectors, struct vector_t Eigen_values, int epoch,
@@ -64,7 +64,7 @@ size_t evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t D
 
                 // evd_block_vector(Ablockmat, Vblockmat);
                 // Cant use this because our cost is wrong
-                sub_cost += evd_subprocedure_vectorized(Ablockmat, Vblockmat);
+                sub_cost += evd_subprocedure_vectorized(Ablockmat, Vblockmat, block_epoch);
 
                 matrix_transpose(Vblockmat, Vblockmat);
 
@@ -164,7 +164,7 @@ size_t evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct 
 
                 // evd_block_vector(Ablockmat, Vblockmat);
                 // We have the wrong cost for this.
-                sub_cost += evd_subprocedure_vectorized(Ablockmat, Vblockmat);
+                sub_cost += evd_subprocedure_vectorized(Ablockmat, Vblockmat, block_epoch);
 
                 for (size_t k_block = 0; k_block < n_blocks; ++k_block) {
                     mult_transpose_block(Vblockmat, 0, 0, Amat, i_block, k_block, M1mat, 0, 0, block_size);
@@ -209,17 +209,13 @@ size_t evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct 
     return blocked_less_copy_cost_without_subprocedure_evd(n, block_size, epoch) + sub_cost;
 }
 
-size_t evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat, size_t) {
+size_t evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat, size_t block_epoch) {
     size_t n = Bmat.rows;
-    size_t iter = 0;
-    const double tol = 1e-15;  // convergence tolerance
     double* B = Bmat.ptr;
     double* V = Vmat.ptr;
-    double norm = 0.0;      // frobenius norm of matrix B
-    double off_norm = 0.0;  // frobenius norm of the off-diagonal elements of matrix B
     matrix_identity(Vmat);
 
-    for (int ep = 1; ep <= epoch; ep++) {
+    for (size_t ep = 1; ep <= block_epoch; ep++) {
         for (size_t i = 0; i < n - 1; ++i) {
             for (size_t j = i + 1; j < n; ++j) {
                 const double bii = B[n * i + i];
@@ -375,7 +371,7 @@ size_t evd_subprocedure_vectorized(struct matrix_t Bmat, struct matrix_t Vmat, s
             }
         }
     }
-    return subprocedure_cost(n, iter);
+    return subprocedure_cost(n, block_epoch);
 }
 
 // Perform EVD for the block
