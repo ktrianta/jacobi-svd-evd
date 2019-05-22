@@ -1,8 +1,4 @@
-# add_executable(evd_cyclic_perf evd_cyclic_perf.cpp)
-# target_link_libraries(evd_cyclic_perf evd-cyclic-lib utils-lib perf-lib ${CMAKE_BINARY_DIR}/pcm/libPCM.a m)
-# install(TARGETS evd_cyclic_perf DESTINATION ${EVD_BENCHMARK_BIN_DIR})
 
-message("${Yellow}-- EVD Benchmarks:${ColourReset}")
 # Benchmark EVD base
 message("${Yellow}---- Base${ColourReset}")
 add_executable("evd-base" base_evd.cpp)

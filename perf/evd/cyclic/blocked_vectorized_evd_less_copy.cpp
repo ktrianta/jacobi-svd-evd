@@ -2,10 +2,10 @@
 #include <cassert>
 #include <iostream>
 #include <vector>
-#include "perf_test.hpp"
-#include "evd_cyclic.hpp"
-#include "types.hpp"
 #include "evd_cost.hpp"
+#include "evd_cyclic.hpp"
+#include "perf_test.hpp"
+#include "types.hpp"
 
 int main() {
     std::ios_base::sync_with_stdio(false);  // disable synchronization between C and C++ standard streams
@@ -29,8 +29,9 @@ int main() {
         std::cin >> A[i];
     }
 
-    size_t cost = blocked_less_copy_cost_with_subprocedure_evd(n, b, n_iter, individual_block_iter);
+    size_t cost = evd_cyclic_blocked_less_copy_vectorize(Data_matr, Data_matr_copy, E_vecs, E_vals, n_iter,
+                                                         individual_block_iter = 5, b);
     bench_func(evd_cyclic_blocked_less_copy_vectorize,
-               "evd_cyclic_blocked_vectorized_less_copy_version_with_subprocedure",
-               cost, Data_matr, Data_matr_copy, E_vecs, E_vals, n_iter);
+               "evd_cyclic_blocked_vectorized_less_copy_version_with_subprocedure", cost, Data_matr, Data_matr_copy,
+               E_vecs, E_vals, n_iter, individual_block_iter = 5, b);
 }
