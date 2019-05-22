@@ -29,7 +29,6 @@ size_t tol_cost(size_t n, size_t n_iter) {
     size_t freb_flops = 2 * (n - 1) * n;
 
     return n_iter * (top_ele * (adds + muls + divs + sqrt) + freb_flops);
-    ;
 }
 
 size_t oneloop_cost_evd(size_t n, size_t n_iter) {
