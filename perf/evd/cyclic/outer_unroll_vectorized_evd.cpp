@@ -2,10 +2,10 @@
 #include <cassert>
 #include <iostream>
 #include <vector>
-#include "perf_test.hpp"
-#include "evd_cyclic.hpp"
-#include "types.hpp"
 #include "evd_cost.hpp"
+#include "evd_cyclic.hpp"
+#include "perf_test.hpp"
+#include "types.hpp"
 
 int main() {
     std::ios_base::sync_with_stdio(false);  // disable synchronization between C and C++ standard streams

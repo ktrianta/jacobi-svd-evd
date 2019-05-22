@@ -1,3 +1,4 @@
 bin
 build
 test/testdata/*.txt
+**/__pycache__/*
