@@ -178,6 +178,111 @@ void mult_add_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, 
     }
 }
 
+static inline void inner_product_left_tr(size_t n, double* A, size_t lda, double* B, size_t ldb, double* C,
+                                         size_t ldc) {
+    double* C_1 = C;
+    double* C_2 = C_1 + ldc;
+    double* C_3 = C_2 + ldc;
+    double* C_4 = C_3 + ldc;
+
+    __m256d c[8];
+
+    c[0] = _mm256_setzero_pd();
+    c[1] = _mm256_setzero_pd();
+    c[2] = _mm256_setzero_pd();
+    c[3] = _mm256_setzero_pd();
+    c[4] = _mm256_setzero_pd();
+    c[5] = _mm256_setzero_pd();
+    c[6] = _mm256_setzero_pd();
+    c[7] = _mm256_setzero_pd();
+
+    for (size_t p = 0; p < n; p += 1) {
+        __m256d b = _mm256_load_pd(B);
+        __m256d b1 = _mm256_load_pd(B + 4);
+        B = B + ldb;
+
+        __m256d a = _mm256_load_pd(A);
+        __m256d a1 = _mm256_permute4x64_pd(a, 0);
+        __m256d a2 = _mm256_permute4x64_pd(a, 85);
+        __m256d a3 = _mm256_permute4x64_pd(a, 170);
+        __m256d a4 = _mm256_permute4x64_pd(a, 255);
+        A = A + lda;
+
+        c[0] = _mm256_fmadd_pd(a1, b, c[0]);
+        c[1] = _mm256_fmadd_pd(a1, b1, c[1]);
+        c[2] = _mm256_fmadd_pd(a2, b, c[2]);
+        c[3] = _mm256_fmadd_pd(a2, b1, c[3]);
+        c[4] = _mm256_fmadd_pd(a3, b, c[4]);
+        c[5] = _mm256_fmadd_pd(a3, b1, c[5]);
+        c[6] = _mm256_fmadd_pd(a4, b, c[6]);
+        c[7] = _mm256_fmadd_pd(a4, b1, c[7]);
+    }
+
+    _mm256_store_pd(C_1, c[0]);
+    _mm256_store_pd(C_1 + 4, c[1]);
+    _mm256_store_pd(C_2, c[2]);
+    _mm256_store_pd(C_2 + 4, c[3]);
+    _mm256_store_pd(C_3, c[4]);
+    _mm256_store_pd(C_3 + 4, c[5]);
+    _mm256_store_pd(C_4, c[6]);
+    _mm256_store_pd(C_4 + 4, c[7]);
+}
+
+static inline void inner_add_product_left_tr(size_t n, double* A, size_t lda, double* B, size_t ldb, double* C,
+                                             size_t ldc, double* D, size_t ldd) {
+    double* C_1 = C;
+    double* C_2 = C_1 + ldc;
+    double* C_3 = C_2 + ldc;
+    double* C_4 = C_3 + ldc;
+
+    double* D_1 = D;
+    double* D_2 = D_1 + ldd;
+    double* D_3 = D_2 + ldd;
+    double* D_4 = D_3 + ldd;
+
+    __m256d c[8];
+
+    c[0] = _mm256_load_pd(C_1);
+    c[1] = _mm256_load_pd(C_1 + 4);
+    c[2] = _mm256_load_pd(C_2);
+    c[3] = _mm256_load_pd(C_2 + 4);
+    c[4] = _mm256_load_pd(C_3);
+    c[5] = _mm256_load_pd(C_3 + 4);
+    c[6] = _mm256_load_pd(C_4);
+    c[7] = _mm256_load_pd(C_4 + 4);
+
+    for (size_t p = 0; p < n; p += 1) {
+        __m256d b = _mm256_load_pd(B);
+        __m256d b1 = _mm256_load_pd(B + 4);
+        B = B + ldb;
+
+        __m256d a = _mm256_load_pd(A);
+        __m256d a1 = _mm256_permute4x64_pd(a, 0);
+        __m256d a2 = _mm256_permute4x64_pd(a, 85);
+        __m256d a3 = _mm256_permute4x64_pd(a, 170);
+        __m256d a4 = _mm256_permute4x64_pd(a, 255);
+        A = A + lda;
+
+        c[0] = _mm256_fmadd_pd(a1, b, c[0]);
+        c[1] = _mm256_fmadd_pd(a1, b1, c[1]);
+        c[2] = _mm256_fmadd_pd(a2, b, c[2]);
+        c[3] = _mm256_fmadd_pd(a2, b1, c[3]);
+        c[4] = _mm256_fmadd_pd(a3, b, c[4]);
+        c[5] = _mm256_fmadd_pd(a3, b1, c[5]);
+        c[6] = _mm256_fmadd_pd(a4, b, c[6]);
+        c[7] = _mm256_fmadd_pd(a4, b1, c[7]);
+    }
+
+    _mm256_store_pd(D_1, c[0]);
+    _mm256_store_pd(D_1 + 4, c[1]);
+    _mm256_store_pd(D_2, c[2]);
+    _mm256_store_pd(D_2 + 4, c[3]);
+    _mm256_store_pd(D_3, c[4]);
+    _mm256_store_pd(D_3 + 4, c[5]);
+    _mm256_store_pd(D_4, c[6]);
+    _mm256_store_pd(D_4 + 4, c[7]);
+}
+
 // perform C = (A^T)B
 // for C_ij, use ith column of A and jth column of B
 void mult_transpose_block(struct matrix_t Amat, size_t blockA_row, size_t blockA_col, struct matrix_t Bmat,
@@ -192,12 +297,10 @@ void mult_transpose_block(struct matrix_t Amat, size_t blockA_row, size_t blockA
     size_t Abeg = blockA_row * block_size * nA + blockA_col * block_size;
     size_t Bbeg = blockB_row * block_size * nB + blockB_col * block_size;
     size_t Cbeg = blockC_row * block_size * nC + blockC_col * block_size;
-    for (size_t i = 0; i < block_size; ++i) {
-        for (size_t j = 0; j < block_size; ++j) {
-            C[Cbeg + i * nC + j] = 0.0;
-            for (size_t k = 0; k < block_size; ++k) {
-                C[Cbeg + i * nC + j] += A[Abeg + k * nA + i] * B[Bbeg + k * nB + j];
-            }
+
+    for (size_t i = 0; i < block_size; i += 8) {
+        for (size_t j = 0; j < block_size; j += 4) {
+            inner_product_left_tr(block_size, &A[Abeg + j], nA, &B[Bbeg + i], nB, &C[Cbeg + j * nC + i], nC);
         }
     }
 }
@@ -220,12 +323,11 @@ void mult_add_transpose_block(struct matrix_t Amat, size_t blockA_row, size_t bl
     size_t Bbeg = blockB_row * block_size * nB + blockB_col * block_size;
     size_t Cbeg = blockC_row * block_size * nC + blockC_col * block_size;
     size_t Dbeg = blockD_row * block_size * nD + blockD_col * block_size;
-    for (size_t i = 0; i < block_size; ++i) {
-        for (size_t j = 0; j < block_size; ++j) {
-            D[Dbeg + i * nD + j] = C[Cbeg + i * nC + j];
-            for (size_t k = 0; k < block_size; ++k) {
-                D[Dbeg + i * nD + j] += A[Abeg + k * nA + i] * B[Bbeg + k * nB + j];
-            }
+
+    for (size_t i = 0; i < block_size; i += 8) {
+        for (size_t j = 0; j < block_size; j += 4) {
+            inner_add_product_left_tr(block_size, &A[Abeg + j], nA, &B[Bbeg + i], nB, &C[Cbeg + j * nC + i], nC,
+                                      &D[Dbeg + j * nD + i], nD);
         }
     }
 }
