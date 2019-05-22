@@ -12,7 +12,7 @@ int main() {
     std::cin.tie(NULL);                     // untie cin from cout
 
     size_t n, n_iter = 10;
-    std::cin >> n >> n;
+    std::cin >> n;
     std::cerr << "Performance benchmark on array of size " << n << " by " << n << std::endl;
 
     aligned_vector<double> A(n * n);

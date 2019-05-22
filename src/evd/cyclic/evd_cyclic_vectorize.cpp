@@ -3,13 +3,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <cassert>
+#include "evd_cost.hpp"
 #include "evd_cyclic.hpp"
 #include "matrix.hpp"
 #include "types.hpp"
 #include "util.hpp"
 
-void evd_cyclic_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t Eigen_vectors,
-                          struct vector_t Eigen_values, int epoch) {
+size_t evd_cyclic_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_copy, struct matrix_t Eigen_vectors,
+                            struct vector_t Eigen_values, int epoch) {
     assert(Data_matr.rows == Data_matr.cols);
     double* A = Data_matr_copy.ptr;
     // Create a copy of the matrix to prevent modification of the original matrix
@@ -133,4 +134,5 @@ void evd_cyclic_vectorize(struct matrix_t Data_matr, struct matrix_t Data_matr_c
     }
 
     reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
+    return base_cost_evd(m, epoch);
 }

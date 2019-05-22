@@ -12,7 +12,7 @@ int main() {
     std::cin.tie(NULL);                     // untie cin from cout
 
     size_t n, n_iter = 10;
-    std::cin >> n >> n;
+    std::cin >> n;
     std::cerr << "Performance benchmark on array of size " << n << " by " << n << std::endl;
 
     aligned_vector<double> A(n * n);
@@ -29,7 +29,8 @@ int main() {
         std::cin >> A[i];
     }
 
-    size_t cost = blocked_cost_with_subprocedure_evd(n, b, n_iter, individual_block_iter);
+    size_t cost =
+        evd_cyclic_blocked_vectorize(Data_matr, Data_matr_copy, E_vecs, E_vals, n_iter, individual_block_iter = 5, b);
     bench_func(evd_cyclic_blocked_vectorize, "evd_cyclic_blocked_vectorized_version_with_subprocedure", cost, Data_matr,
-               Data_matr_copy, E_vecs, E_vals, n_iter);
+               Data_matr_copy, E_vecs, E_vals, n_iter, individual_block_iter = 5, b);
 }

@@ -12,7 +12,7 @@ int main() {
     std::cin.tie(NULL);                     // untie cin from cout
 
     size_t n, n_iter = 10;
-    std::cin >> n >> n;
+    std::cin >> n;
     std::cerr << "Performance benchmark on array of size " << n << " by " << n << std::endl;
 
     aligned_vector<double> A(n * n);
@@ -28,7 +28,7 @@ int main() {
         std::cin >> A[i];
     }
 
-    size_t cost = outer_unroll_vectorize_cost_evd(n, n_iter);
+    size_t cost = oneloop_cost_evd(n, n_iter);
     bench_func(evd_cyclic_unroll_outer_vectorize, "evd_cyclic_unrolled_outer_vectorized", cost, Data_matr,
                Data_matr_copy, E_vecs, E_vals, n_iter);
 }
