@@ -28,6 +28,5 @@ int main() {
         std::cin >> A[i];
     }
 
-    bench_func(evd_cyclic_unroll_outer, "evd_cyclic_unrolled_outer", Data_matr, Data_matr_copy, E_vecs, E_vals,
-               n_iter);
+    bench_func(evd_cyclic_unroll_outer, "evd_cyclic_unrolled_outer", Data_matr, Data_matr_copy, E_vecs, E_vals, n_iter);
 }

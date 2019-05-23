@@ -45,7 +45,7 @@ size_t base_cost(size_t n, size_t n_iter) {
 size_t run_jacobi(SVD&& svd, MatrixXd&& m, unsigned int flags) {
     svd.compute(m, flags);
     size_t n_iter = svd.getSweeps();
-    return base_cost(m.rows(),n_iter);
+    return base_cost(m.rows(), n_iter);
 }
 
 using SVDTolType = decltype(&run_jacobi);

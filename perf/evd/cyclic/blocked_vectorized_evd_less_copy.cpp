@@ -30,6 +30,6 @@ int main() {
     }
 
     bench_func(evd_cyclic_blocked_less_copy_vectorize,
-               "evd_cyclic_blocked_vectorized_less_copy_version_with_subprocedure", Data_matr, Data_matr_copy,
-               E_vecs, E_vals, n_iter, individual_block_iter = 5, b);
+               "evd_cyclic_blocked_vectorized_less_copy_version_with_subprocedure", Data_matr, Data_matr_copy, E_vecs,
+               E_vals, n_iter, individual_block_iter = 5, b);
 }

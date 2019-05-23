@@ -27,6 +27,6 @@ int main() {
     for (size_t i = 0; i < n * n; ++i) {
         std::cin >> A[i];
     }
-    
+
     bench_func(evd_cyclic_oneloop, "evd_cyclic_oneloop", Data_matr, Data_matr_copy, E_vecs, E_vals, n_iter);
 }

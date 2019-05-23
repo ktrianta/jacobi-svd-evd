@@ -28,6 +28,5 @@ int main() {
         std::cin >> A[i];
     }
 
-    bench_func(evd_cyclic_vectorize, "evd_cyclic_base_version", Data_matr, Data_matr_copy, E_vecs, E_vals,
-               n_iter);
+    bench_func(evd_cyclic_vectorize, "evd_cyclic_base_version", Data_matr, Data_matr_copy, E_vecs, E_vals, n_iter);
 }

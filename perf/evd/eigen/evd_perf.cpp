@@ -22,7 +22,6 @@ size_t run_evd(EVD&& evd, const MatrixXd& m, unsigned int flags) {
 
 using EVDTolType = decltype(&run_evd);
 
-
 std::vector<EVDTolType> tol_based_versions = {run_evd};
 std::vector<std::string> tol_based_names = {"evd_eigen"};
 

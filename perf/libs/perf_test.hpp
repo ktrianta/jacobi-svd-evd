@@ -66,7 +66,6 @@ perf_info measure_perf(Func fn, Args... args) {
     myInt64 start, end;
     std::vector<double> cycles_vec;
 
-
     // dont want this ouput in the output file.
     std::cout.setstate(std::ios_base::failbit);
     PCM* m = PCM::getInstance();
@@ -76,10 +75,10 @@ perf_info measure_perf(Func fn, Args... args) {
     SystemCounterState before_sstate = getSystemCounterState();
     size_t cost = fn(std::forward<Args>(args)...);
     SystemCounterState after_sstate = getSystemCounterState();
-    cycles =(double) stop_tsc(start);
+    cycles = (double) stop_tsc(start);
     bytes = getIORequestBytesFromMC(before_sstate, after_sstate);
 
-    if(cycles > (double) cycles_required * n_reps){
+    if (cycles > (double) cycles_required * n_reps) {
         perf_info info = {cycles, bytes, cost};
         return info;
     }
@@ -131,7 +130,7 @@ void bench_func(FuncType fn, const std::string& fn_name, Args... args) {
     std::cerr << "Performance:             " << cost / runtime << " flops/cycle (median)" << '\n';
     std::cerr << "Computational intensity: " << cost / bytes_accessed << " flops/byte (median)" << '\n';
 
-    std::cout << cost / runtime <<' ' << cost / bytes_accessed << ' ' << runtime << '\n';
+    std::cout << cost / runtime << ' ' << cost / bytes_accessed << ' ' << runtime << '\n';
 
     for (size_t j = 0; j < 10; ++j) std::cerr << '-';
     std::cerr << '\n' << std::endl;
