@@ -106,7 +106,7 @@ size_t svd_blocked_less_copy_transposed(struct matrix_t Amat, struct matrix_t Bm
             }
         }
 
-        matrix_off_frobenius(Bmat, &off_norm);
+        matrix_off_frobenius_vectorized(Bmat, &off_norm);
         iter++;
     }
 
