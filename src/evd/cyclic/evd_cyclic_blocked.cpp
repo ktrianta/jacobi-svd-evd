@@ -41,7 +41,7 @@ size_t evd_cyclic_blocked(struct matrix_t Data_matr, struct matrix_t Data_matr_c
 
     assert(n_blocks * block_size == n);
 
-    double* memory_block = (double*) malloc((4 + 4 + 1 + 1) * block_size * block_size * sizeof(double));
+    double* memory_block = (double*) aligned_alloc(32, (4 + 4 + 1 + 1) * block_size * block_size * sizeof(double));
     double* Ablock = memory_block;
     double* Vblock = Ablock + 4 * block_size * block_size;
     double* M1 = Vblock + 4 * block_size * block_size;
@@ -140,7 +140,7 @@ size_t evd_cyclic_blocked_less_copy(struct matrix_t Data_matr, struct matrix_t D
 
     assert(n_blocks * block_size == n);
 
-    double* memory_block = (double*) malloc((4 + 4 + 1 + 1) * block_size * block_size * sizeof(double));
+    double* memory_block = (double*) aligned_alloc(32, (4 + 4 + 1 + 1) * block_size * block_size * sizeof(double));
     double* Ablock = memory_block;
     double* Vblock = Ablock + 4 * block_size * block_size;
     double* M1 = Vblock + 4 * block_size * block_size;
