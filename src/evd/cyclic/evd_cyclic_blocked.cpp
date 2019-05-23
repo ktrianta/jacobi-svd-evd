@@ -135,7 +135,7 @@ size_t evd_cyclic_blocked_less_copy(struct matrix_t Data_matr, struct matrix_t D
             E[i] = A[i * n + i];
         }
         reorder_decomposition(Eigen_values, &Eigen_vectors, 1, greater);
-        return oneloop_cost_evd(n, block_epoch);
+        return base_cost_evd(n, block_epoch);
     }
 
     assert(n_blocks * block_size == n);

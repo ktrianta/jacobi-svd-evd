@@ -5,7 +5,6 @@
 #include "../../test_utils.hpp"
 #include "evd_cyclic.hpp"
 #include "gtest/gtest.h"
-#include "nevd.hpp"
 #include "types.hpp"
 
 TEST(evd_cyclic_blocked, identity_matrix) {
