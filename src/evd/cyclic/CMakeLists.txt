@@ -10,7 +10,6 @@ set(SOURCES
     evd_cyclic_blocked_unroll_outer.cpp
     evd_cyclic_blocked_vectorize.cpp
     evd_cyclic.hpp
-    nevd.cpp
     evd_cost.cpp
     )
 
