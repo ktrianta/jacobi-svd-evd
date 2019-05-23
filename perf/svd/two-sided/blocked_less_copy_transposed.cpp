@@ -28,6 +28,7 @@ int main() {
     }
 
     size_t block_size = 32;
-    bench_func(svd_blocked_less_copy, "svd_two_sided_blocked_less_copy", Data_matr, B_mat, U_mat, V_mat,
-               block_size);
+    size_t cost = svd_blocked_less_copy_transposed(Data_matr, B_mat, U_mat, V_mat, block_size);
+    bench_func(svd_blocked_less_copy_transposed, "svd_two_sided_blocked_less_copy_transposed", cost, Data_matr, B_mat,
+               U_mat, V_mat, block_size);
 }
