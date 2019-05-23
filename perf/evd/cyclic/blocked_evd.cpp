@@ -23,8 +23,8 @@ int main() {
     matrix_t Data_matr_copy = {&A_copy[0], n, n};
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
-    size_t b = 8, individual_block_iter = 5;
-    //Observe indivual_block_iter is hardcoded into evd_block.
+    size_t b = 16, individual_block_iter = 5;
+
     for (size_t i = 0; i < n * n; ++i) {
         std::cin >> A[i];
     }
