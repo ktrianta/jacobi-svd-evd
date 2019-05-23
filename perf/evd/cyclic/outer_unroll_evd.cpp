@@ -28,7 +28,6 @@ int main() {
         std::cin >> A[i];
     }
 
-    size_t cost = oneloop_cost_evd(n, n_iter);
-    bench_func(evd_cyclic_unroll_outer, "evd_cyclic_unrolled_outer", cost, Data_matr, Data_matr_copy, E_vecs, E_vals,
+    bench_func(evd_cyclic_unroll_outer, "evd_cyclic_unrolled_outer", Data_matr, Data_matr_copy, E_vecs, E_vals,
                n_iter);
 }

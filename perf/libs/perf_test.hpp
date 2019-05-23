@@ -52,11 +52,12 @@
  * @return std::vector containing n_reps many measured cycle values.
  */
 struct perf_info {
-    std::vector<double> cycles_vec;
+    double runtime;
     double bytes;
+    size_t cost;
 };
 
-template <size_t n_reps = 5, size_t cycles_required = static_cast<size_t>(1e9), size_t num_runs_initial = 1,
+template <size_t n_reps = 20, size_t cycles_required = static_cast<size_t>(1e9), size_t num_runs_initial = 1,
           typename Func, typename... Args>
 perf_info measure_perf(Func fn, Args... args) {
     double cycles = 0., bytes = 0.;
@@ -71,10 +72,17 @@ perf_info measure_perf(Func fn, Args... args) {
     PCM* m = PCM::getInstance();
     std::cout.clear();
 
+    start = start_tsc();
     SystemCounterState before_sstate = getSystemCounterState();
-    fn(std::forward<Args>(args)...);
+    size_t cost = fn(std::forward<Args>(args)...);
     SystemCounterState after_sstate = getSystemCounterState();
+    cycles =(double) stop_tsc(start);
     bytes = getIORequestBytesFromMC(before_sstate, after_sstate);
+
+    if(cycles > (double) cycles_required * n_reps){
+        perf_info info = {cycles, bytes, cost};
+        return info;
+    }
 
     // Warm-up phase: we determine a number of executions that allows
     // the code to be executed for at least cycles_required cycles.
@@ -104,20 +112,19 @@ perf_info measure_perf(Func fn, Args... args) {
         cycles = ((double) end) / num_runs;
         cycles_vec.push_back(cycles);
     }
-
-    perf_info info = {cycles_vec, bytes};
-
+    auto median_it = cycles_vec.begin() + cycles_vec.size() / 2;
+    std::nth_element(cycles_vec.begin(), median_it, cycles_vec.end());
+    double runtime = *median_it;
+    perf_info info = {runtime, bytes, cost};
     return info;
 }
 
 template <typename FuncType, typename... Args>
-void bench_func(FuncType fn, const std::string& fn_name, double cost, Args... args) {
+void bench_func(FuncType fn, const std::string& fn_name, Args... args) {
     perf_info info = measure_perf(fn, std::forward<Args>(args)...);
-    std::vector<double> cycles = info.cycles_vec;
-    auto median_it = cycles.begin() + cycles.size() / 2;
-    std::nth_element(cycles.begin(), median_it, cycles.end());
-    double runtime = *median_it;
+    double runtime = info.runtime;
     double bytes_accessed = info.bytes;
+    size_t cost = info.cost;
 
     std::cerr << fn_name << '\n';
     std::cerr << "Runtime:                 " << runtime << " cycles (median)\n";
@@ -134,10 +141,9 @@ void bench_func(FuncType fn, const std::string& fn_name, double cost, Args... ar
  * Benchmark all the given functions using the same set of parameters.
  */
 template <typename FuncType, typename... Args>
-void run_all(const std::vector<FuncType>& fn_vec, const std::vector<std::string>& fn_names,
-             const std::vector<double>& costs, Args... args) {
+void run_all(const std::vector<FuncType>& fn_vec, const std::vector<std::string>& fn_names, Args... args) {
     assert(fn_vec.size() == fn_names.size());
     for (size_t i = 0; i < fn_vec.size(); ++i) {
-        bench_func(fn_vec[i], fn_names[i], costs[i], std::forward<Args>(args)...);
+        bench_func(fn_vec[i], fn_names[i], std::forward<Args>(args)...);
     }
 }

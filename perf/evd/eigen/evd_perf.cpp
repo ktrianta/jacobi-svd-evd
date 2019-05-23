@@ -10,14 +10,18 @@
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXd;
 typedef Eigen::SelfAdjointEigenSolver<MatrixXd> EVD;
 
-void run_evd(EVD&& evd, const MatrixXd& m, unsigned int flags) { evd.compute(m, flags); }
-
-using EVDTolType = decltype(&run_evd);
-
-double base_cost(size_t n) {
+size_t base_cost(size_t n) {
     // https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html#adf397f6bce9f93c4b0139a47e261fc24
     return 9 * n * n * n;
 }
+
+size_t run_evd(EVD&& evd, const MatrixXd& m, unsigned int flags) {
+    evd.compute(m, flags);
+    return base_cost(m.rows());
+}
+
+using EVDTolType = decltype(&run_evd);
+
 
 std::vector<EVDTolType> tol_based_versions = {run_evd};
 std::vector<std::string> tol_based_names = {"evd_eigen"};
@@ -28,7 +32,7 @@ int main() {
 
     size_t n;
     std::cin >> n;
-    std::cout << "Performance benchmark on array of size " << n << " by " << n << std::endl;
+    std::cerr << "Performance benchmark on array of size " << n << " by " << n << std::endl;
 
     MatrixXd A(n, n);
     EVD evd;
@@ -39,6 +43,5 @@ int main() {
         }
     }
 
-    std::vector<double> costs = {base_cost(n)};
-    run_all(tol_based_versions, tol_based_names, costs, evd, A, Eigen::ComputeEigenvectors);
+    run_all(tol_based_versions, tol_based_names, evd, A, Eigen::ComputeEigenvectors);
 }

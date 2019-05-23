@@ -27,6 +27,5 @@ int main() {
         std::cin >> A[i];
     }
 
-    size_t cost = svd(Data_matr, B_mat, U_mat, V_mat);
-    bench_func(svd, "svd_two_sided", cost, Data_matr, B_mat, U_mat, V_mat);
+    bench_func(svd, "svd_two_sided", Data_matr, B_mat, U_mat, V_mat);
 }

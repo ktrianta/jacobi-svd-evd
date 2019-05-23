@@ -9,12 +9,7 @@
 
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXd;
 typedef Eigen::JacobiSVD<MatrixXd> SVD;
-
-void run_jacobi(SVD&& svd, MatrixXd&& m, unsigned int flags) { svd.compute(m, flags); }
-
-using SVDTolType = decltype(&run_jacobi);
-
-double base_cost(size_t n, size_t n_iter) {
+size_t base_cost(size_t n, size_t n_iter) {
     // Ops in real_2x2_jacobi svd
     double svd_2x2_wild = 6;
 
@@ -47,7 +42,13 @@ double base_cost(size_t n, size_t n_iter) {
     return flops;
 }
 
-using CostFuncType = decltype(&base_cost);
+size_t run_jacobi(SVD&& svd, MatrixXd&& m, unsigned int flags) {
+    svd.compute(m, flags);
+    size_t n_iter = svd.getSweeps();
+    return base_cost(m.rows(),n_iter);
+}
+
+using SVDTolType = decltype(&run_jacobi);
 
 std::vector<SVDTolType> tol_based_versions = {
     run_jacobi,
@@ -55,7 +56,6 @@ std::vector<SVDTolType> tol_based_versions = {
 std::vector<std::string> tol_based_names = {
     "svd_two_sided_eigen",
 };
-std::vector<CostFuncType> tol_based_cost_fns = {base_cost};
 
 int main() {
     size_t n;
@@ -75,13 +75,5 @@ int main() {
         }
     }
 
-    svd.compute(Ap, Eigen::ComputeFullU | Eigen::ComputeFullV);
-    size_t n_iter = svd.getSweeps();
-
-    std::vector<double> costs;
-    for (const auto& cost_fn : tol_based_cost_fns) {
-        costs.push_back(cost_fn(n, n_iter));
-    }
-
-    run_all(tol_based_versions, tol_based_names, costs, svd, Ap, Eigen::ComputeFullU | Eigen::ComputeFullV);
+    run_all(tol_based_versions, tol_based_names, svd, Ap, Eigen::ComputeFullU | Eigen::ComputeFullV);
 }

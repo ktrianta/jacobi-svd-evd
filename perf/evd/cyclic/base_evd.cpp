@@ -28,6 +28,5 @@ int main() {
         std::cin >> A[i];
     }
 
-    size_t cost = base_cost_evd(n, n_iter);
-    bench_func(evd_cyclic, "evd_cyclic_base_version", cost, Data_matr, Data_matr_copy, E_vecs, E_vals, n_iter);
+    bench_func(evd_cyclic, "evd_cyclic_base_version", Data_matr, Data_matr_copy, E_vecs, E_vals, n_iter);
 }
