@@ -230,29 +230,27 @@ static size_t evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat, size_
                 if (m % 4 != 0) n = m - (m % 4);
 
                 for (size_t i = 0; i < n; i += 4) {
-                    __m256d Ac_row, Ac_col, Ac_rcopy;
-                    __m256d sin_row, sin_col, cos_row, cos_col;
+                    __m256d A_row, A_col, A_rcopy;
+                    __m256d sin_row, sin_col;
 
                     // Compute the eigen values by updating the columns until convergence
-                    Ac_row = _mm256_set_pd(A[m * i + row], A[m * i + m + row], A[m * i + m * 2 + row],
-                                           A[m * i + m * 3 + row]);
-                    Ac_rcopy = Ac_row;
-                    Ac_col = _mm256_set_pd(A[m * i + col], A[m * i + m + col], A[m * i + m * 2 + col],
-                                           A[m * i + m * 3 + col]);
+                    A_row = _mm256_set_pd(A[m * i + row], A[m * i + m + row], A[m * i + m * 2 + row],
+                                          A[m * i + m * 3 + row]);
+                    A_rcopy = A_row;
+                    A_col = _mm256_set_pd(A[m * i + col], A[m * i + m + col], A[m * i + m * 2 + col],
+                                          A[m * i + m * 3 + col]);
 
-                    cos_row = _mm256_mul_pd(Ac_row, cos_vec);
-                    sin_col = _mm256_mul_pd(Ac_col, sin_vec);
-                    Ac_row = _mm256_sub_pd(cos_row, sin_col);
-                    double* Ac_row_updated = (double*) &Ac_row;
+                    sin_col = _mm256_mul_pd(A_col, sin_vec);
+                    A_row = _mm256_fmsub_pd(A_row, cos_vec, sin_col);
+                    double* Ac_row_updated = (double*) &A_row;
                     A[m * i + row] = Ac_row_updated[3];
                     A[m * i + m + row] = Ac_row_updated[2];
                     A[m * i + m * 2 + row] = Ac_row_updated[1];
                     A[m * i + m * 3 + row] = Ac_row_updated[0];
 
-                    cos_col = _mm256_mul_pd(Ac_col, cos_vec);
-                    sin_row = _mm256_mul_pd(Ac_rcopy, sin_vec);
-                    Ac_col = _mm256_add_pd(cos_col, sin_row);
-                    double* Ac_col_updated = (double*) &Ac_col;
+                    sin_row = _mm256_mul_pd(A_rcopy, sin_vec);
+                    A_col = _mm256_fmadd_pd(A_col, cos_vec, sin_row);
+                    double* Ac_col_updated = (double*) &A_col;
                     A[m * i + col] = Ac_col_updated[3];
                     A[m * i + m + col] = Ac_col_updated[2];
                     A[m * i + m * 2 + col] = Ac_col_updated[1];
@@ -269,37 +267,33 @@ static size_t evd_block_vector(struct matrix_t Amat, struct matrix_t Vmat, size_
 
                 for (size_t i = 0; i < n; i += 4) {
                     __m256d A_row, A_col, A_rcopy, V_row, V_col, V_rcopy;
-                    __m256d sin_row, sin_col, cos_row, cos_col;
+                    __m256d sin_row, sin_col;
 
                     // Compute the eigen values by updating the rows until convergence
-                    A_row = _mm256_loadu_pd(A + m * row + i);
+                    A_row = _mm256_load_pd(A + m * row + i);
                     A_rcopy = A_row;
-                    A_col = _mm256_loadu_pd(A + m * col + i);
+                    A_col = _mm256_load_pd(A + m * col + i);
 
-                    cos_row = _mm256_mul_pd(A_row, cos_vec);
                     sin_col = _mm256_mul_pd(A_col, sin_vec);
-                    A_row = _mm256_sub_pd(cos_row, sin_col);
-                    _mm256_storeu_pd(A + m * row + i, A_row);
+                    A_row = _mm256_fmsub_pd(A_row, cos_vec, sin_col);
+                    _mm256_store_pd(A + m * row + i, A_row);
 
-                    cos_col = _mm256_mul_pd(A_col, cos_vec);
                     sin_row = _mm256_mul_pd(A_rcopy, sin_vec);
-                    A_col = _mm256_add_pd(cos_col, sin_row);
-                    _mm256_storeu_pd(A + m * col + i, A_col);
+                    A_col = _mm256_fmadd_pd(A_col, cos_vec, sin_row);
+                    _mm256_store_pd(A + m * col + i, A_col);
 
                     // Compute the eigen vectors similarly by updating the eigen vector matrix
-                    V_row = _mm256_loadu_pd(V + m * row + i);
+                    V_row = _mm256_load_pd(V + m * row + i);
                     V_rcopy = V_row;
-                    V_col = _mm256_loadu_pd(V + m * col + i);
+                    V_col = _mm256_load_pd(V + m * col + i);
 
-                    cos_row = _mm256_mul_pd(V_row, cos_vec);
                     sin_col = _mm256_mul_pd(V_col, sin_vec);
-                    V_row = _mm256_sub_pd(cos_row, sin_col);
+                    V_row = _mm256_fmsub_pd(V_row, cos_vec, sin_col);
                     _mm256_storeu_pd(V + m * row + i, V_row);
 
-                    cos_col = _mm256_mul_pd(V_col, cos_vec);
                     sin_row = _mm256_mul_pd(V_rcopy, sin_vec);
-                    V_col = _mm256_add_pd(cos_col, sin_row);
-                    _mm256_storeu_pd(V + m * col + i, V_col);
+                    V_col = _mm256_fmadd_pd(V_col, cos_vec, sin_row);
+                    _mm256_store_pd(V + m * col + i, V_col);
                 }
 
                 if (m % 4 != 0) {
