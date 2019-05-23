@@ -57,7 +57,7 @@ struct perf_info {
     size_t cost;
 };
 
-template <size_t n_reps = 20, size_t cycles_required = static_cast<size_t>(1e9), size_t num_runs_initial = 1,
+template <size_t n_reps = 30, size_t cycles_required = static_cast<size_t>(1e9), size_t num_runs_initial = 1,
           typename Func, typename... Args>
 perf_info measure_perf(Func fn, Args... args) {
     double cycles = 0., bytes = 0.;
