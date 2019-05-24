@@ -1,2 +1,4 @@
 perf/resources/svd/*.txt filter=lfs diff=lfs merge=lfs -text
+perf/resources/svd-alt/*.txt filter=lfs diff=lfs merge=lfs -text
 perf/resources/evd/*.txt filter=lfs diff=lfs merge=lfs -text
+perf/resources/evd-alt/*.txt filter=lfs diff=lfs merge=lfs -text
