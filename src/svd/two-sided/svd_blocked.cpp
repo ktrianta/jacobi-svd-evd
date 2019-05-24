@@ -21,7 +21,7 @@ size_t svd_blocked(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t U
 
     size_t iter = 0;
     size_t block_iter = 0;
-    const double tol = 1e-15;  // convergence tolerance
+    const double tol = 1e-10;  // convergence tolerance
     const size_t n = Amat.rows;
     double norm = 0.0;      // frobenius norm of matrix B
     double off_norm = 0.0;  // frobenius norm of the off-diagonal elements of matrix B
