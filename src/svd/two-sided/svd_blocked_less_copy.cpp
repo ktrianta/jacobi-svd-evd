@@ -33,8 +33,8 @@ size_t svd_blocked_less_copy(struct matrix_t Amat, struct matrix_t Bmat, struct 
 
     const size_t n_blocks = n / block_size;
 
-    if (n < 2 * block_size) {
-        size_t block_iters = svd_subprocedure(Bmat, Umat, Vmat);
+    if (n <= 2 * block_size) {
+        size_t block_iters = svd_subprocedure_vectorized_with_transpose(Bmat, Umat, Vmat);
         return base_cost(n, block_iters);
     }
 

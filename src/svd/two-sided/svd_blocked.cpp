@@ -33,7 +33,7 @@ size_t svd_blocked(struct matrix_t Amat, struct matrix_t Bmat, struct matrix_t U
 
     const size_t n_blocks = n / block_size;
 
-    if (n < 2 * block_size) {
+    if (n <= 2 * block_size) {
         size_t block_iters = svd_subprocedure_vectorized(Bmat, Umat, Vmat);
         return base_cost(n, block_iters);
     }
