@@ -28,7 +28,7 @@ size_t evd_cyclic_blocked_unroll_outer(struct matrix_t Data_matr, struct matrix_
 
     matrix_identity(Eigen_vectors);
 
-    if (n < 2 * block_size) {
+    if (n <= 2 * block_size) {
         evd_block(Amat, Eigen_vectors, block_epoch);
 
         // Store the generated eigen values in the vector
@@ -128,7 +128,7 @@ size_t evd_cyclic_blocked_unroll_outer_less_copy(struct matrix_t Data_matr, stru
 
     matrix_identity(Eigen_vectors);
 
-    if (n < 2 * block_size) {
+    if (n <= 2 * block_size) {
         evd_block(Amat, Eigen_vectors, block_epoch);
 
         // Store the generated eigen values in the vector

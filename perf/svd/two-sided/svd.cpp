@@ -1,9 +1,9 @@
+#include "svd.hpp"
 #include <algorithm>
 #include <cassert>
 #include <iostream>
 #include <vector>
 #include "perf_test.hpp"
-#include "svd.hpp"
 #include "types.hpp"
 
 int main() {

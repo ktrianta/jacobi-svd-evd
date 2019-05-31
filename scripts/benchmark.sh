@@ -19,7 +19,7 @@ run_all () {
     benchmark=$(basename $bin)
     output="${results_dir}/$benchmark"
     rm "$output"  # delete previous benchmark output
-    for input in `ls -v ${resources_dir}/* | head -8`; do
+    for input in `ls -v ${resources_dir}/* | head -6`; do
         [ -f "$bin" ] && [ -x "$bin" ] && "$bin" < "$input" >> "$output"
     done
 }
