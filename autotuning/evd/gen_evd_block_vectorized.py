@@ -176,7 +176,7 @@ def gen_evd_block_vector(unroll_count):
     col_ops = [col_ops[0]] + [20 * ' ' + inst for inst in col_ops[1:]]
     function_code = re.sub("// UNROLLED_COL_OPS", "\n".join(col_ops), function_code)
 
-    # Add row row_operations
+    # Add row operations
     row_ops = gen_evd_row_operations(int(unroll_count), ["A", "V"], "m", "i")
     row_ops = [row_ops[0]] + [20 * ' ' + inst for inst in row_ops[1:]]
     function_code = re.sub("// UNROLLED_ROW_OPS", "\n".join(row_ops), function_code)

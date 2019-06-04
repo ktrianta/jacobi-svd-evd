@@ -369,6 +369,8 @@ TEST(evd_cyclic_blocked_vectorize, random_matrix_big) {
     matrix_t Data_matr_copy = {&A_copy[0], n, n};
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
+    // Note: to obtain a better convergence for unrolled versions,
+    // use n_iter = 40 and individual_block_iter = 20
     evd_cyclic_blocked_vectorize(Data_matr, Data_matr_copy, E_vecs, E_vals, 10);
 
     for (size_t i = 0; i < n; ++i) {
@@ -401,6 +403,8 @@ TEST(evd_cyclic_blocked_less_copy_vectorize, random_matrix_big) {
     matrix_t Data_matr_copy = {&A_copy[0], n, n};
     vector_t E_vals = {&e[0], n};
     matrix_t E_vecs = {&V[0], n, n};
+    // Note: to obtain a better convergence for unrolled versions,
+    // use n_iter = 40 and individual_block_iter = 20
     evd_cyclic_blocked_less_copy_vectorize(Data_matr, Data_matr_copy, E_vecs, E_vals, 10);
 
     for (size_t i = 0; i < n; ++i) {
