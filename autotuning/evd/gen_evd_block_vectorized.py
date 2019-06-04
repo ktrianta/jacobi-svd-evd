@@ -125,7 +125,6 @@ def gen_evd_block_vector(unroll_count):
 
         for (size_t row = 0; row < m; row++) {
             for (size_t col = row + 1; col < m; col++) {
-                size_t n = m;
                 __m256d sin_vec, cos_vec;
 
                 // Compute cos_t and sin_t for the rotation
@@ -134,36 +133,31 @@ def gen_evd_block_vector(unroll_count):
                 sin_vec = _mm256_set1_pd(sin_t);
                 cos_vec = _mm256_set1_pd(cos_t);
 
-                if (m % URC != 0) n = m - (m % URC);
-
+                size_t i;
                 // Compute the eigen values by updating the columns until convergence
-                for (size_t i = 0; i < n; i += URC) {
+                for (i = 0; i + URC - 1 < m; i += URC) {
                     // UNROLLED_COL_OPS
                 }
 
-                if (m % URC != 0) {
-                    for (size_t i = 0; i < m - n; i++) {
-                        double A_i_r = A[m * (n + i) + row];
-                        A[m * (n + i) + row] = cos_t * A[m * (n + i) + row] - sin_t * A[m * (n + i) + col];
-                        A[m * (n + i) + col] = cos_t * A[m * (n + i) + col] + sin_t * A_i_r;
-                    }
+                for (; i < m; i++) {
+                    double A_i_r = A[m * i + row];
+                    A[m * i + row] = cos_t * A[m * i + row] - sin_t * A[m * i + col];
+                    A[m * i + col] = cos_t * A[m * i + col] + sin_t * A_i_r;
                 }
 
                 // Compute the eigen values by updating the rows until convergence
-                for (size_t i = 0; i < n; i += URC) {
+                for (i = 0; i + URC - 1 < m; i += URC) {
                     // UNROLLED_ROW_OPS
                 }
 
-                if (m % URC != 0) {
-                    for (size_t i = 0; i < m - n; i++) {
-                        double A_r_i = A[m * row + n + i];
-                        A[m * row + n + i] = cos_t * A[m * row + n + i] - sin_t * A[m * col + n + i];
-                        A[m * col + n + i] = cos_t * A[m * col + n + i] + sin_t * A_r_i;
+                for (; i < m; i++) {
+                    double A_r_i = A[m * row + i];
+                    A[m * row + i] = cos_t * A[m * row + i] - sin_t * A[m * col + i];
+                    A[m * col + i] = cos_t * A[m * col + i] + sin_t * A_r_i;
 
-                        double V_r_i = V[m * row + n + i];
-                        V[m * row + n + i] = cos_t * V[m * row + n + i] - sin_t * V[m * col + n + i];
-                        V[m * col + n + i] = cos_t * V[m * col + n + i] + sin_t * V_r_i;
-                    }
+                    double V_r_i = V[m * row + i];
+                    V[m * row + i] = cos_t * V[m * row + i] - sin_t * V[m * col + i];
+                    V[m * col + i] = cos_t * V[m * col + i] + sin_t * V_r_i;
                 }
             }
         }
