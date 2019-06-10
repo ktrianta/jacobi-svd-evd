@@ -11,7 +11,7 @@
 #          and a timeout of 1 hour for every execution the whole benchmarking
 #          process will take at most 4 hours.
 
-timeout_duration=5  # timeout of 1 hour (3600 seconds)
+timeout_duration=3600  # timeout of 1 hour (3600 seconds)
 
 run_all () {
     bin=$1
@@ -34,7 +34,7 @@ run_all () {
         # If there is already a benchmark datafile for this benchmark, rename
         # it by introducing the current datetime to the end of its filename.
         dt=$(date '+%s')
-        renamed_output="${output}_${dt}"
+        renamed_output="${output}-${dt}"
         mv "$output" "$renamed_output"
         echo "Renamed old benchmark results '$output' to '$renamed_output'."
     fi
