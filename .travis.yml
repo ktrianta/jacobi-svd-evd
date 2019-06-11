@@ -70,6 +70,9 @@ matrix:
           env:
             - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
+git:
+    lfs_skip_smudge: true
+
 before_install:
     - eval "${MATRIX_EVAL}"
 
