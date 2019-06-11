@@ -18,7 +18,7 @@ perf_src_paths = [pathjoin(EVD_PERF_SRC_DIR, name) for name in perf_src_names]
 
 bin_paths = [pathjoin(EVD_BIN_DIR, name) for name in ["evd-blocked-vectorized", "evd-blocked-less-copy-vectorized"]]
 
-block_size_list = [8, 16, 32, 64, 128]
+block_size_list = [16, 32, 64, 128]
 unrolling_cnt_list = [1, 2, 3]
 for file_path, perf_src_name, perf_src_path, bin_path in zip(file_paths, perf_src_names, perf_src_paths, bin_paths):
     for block_size in block_size_list:
@@ -30,10 +30,10 @@ for file_path, perf_src_name, perf_src_path, bin_path in zip(file_paths, perf_sr
 
             replace_unrolling(file_path, unrolling_cnt)
             subprocess.call(['sed', '-i', f's/size_t block_size.*/size_t block_size = {block_size};/g', perf_src_path])
-            if unrolling_cnt in [2, 3]:
-                # Increase the epoch count when unroll count > 1
-                subprocess.call(['sed', '-i', f's/size_t n_iter.*/size_t n_iter = 40;/g', perf_src_path])
-                subprocess.call(['sed', '-i', f's/size_t individual_block_iter.*/size_t individual_block_iter = 20;/g', perf_src_path])
+            # Increase the epoch count when unroll count > 1 if more precison is required by uncommenting the lines below
+            #if unrolling_cnt in [2, 3]:
+                #subprocess.call(['sed', '-i', f's/size_t n_iter.*/size_t n_iter = 20;/g', perf_src_path])
+                #subprocess.call(['sed', '-i', f's/size_t individual_block_iter.*/size_t individual_block_iter = 10;/g', perf_src_path])
             subprocess.run(['./scripts/build.sh'], shell=True)
             print(f'Running benchmark {bin_path}')
             subprocess.call(['./scripts/benchmark.sh', f'{bin_path}'])
