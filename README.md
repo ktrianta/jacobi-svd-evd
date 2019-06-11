@@ -110,8 +110,16 @@ python scripts/plot_perf.py input_sizes perf1 perf2 perf3
 To save the resulting plot as a .eps file, you can remove the comment at the last line of the script.
 
 ## Autotuning
-Curretnly, autotuning is implemented only for SVD. It searches for the optimal block size and the optimal unrolling
+This automated infrastructure  searches for the optimal block size and the optimal unrolling
 amount for the vectorized subprocedures using grid search. Search for the parameters by running
+the commands given below:
+
+For SVD:
 ```
 python autotuning/svd/try_params.py &> output.txt
+
+```
+For Symmetric EVD:
+```
+python autotuning/evd/try_params.py &> output.txt
 ```
