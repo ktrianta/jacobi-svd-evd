@@ -97,14 +97,14 @@ two characters of every line they print. Therefore, finding your debug output ca
 `ctest -V | grep //`.
 
 ## Generating Benchmarking Inputs
-There are two python scripts for generating benchmarking inputs `scripts/evd_input_testdata.py` and
-`scripts/svd_input_testdata.py`. In the following example we generate two matrices with double
+There are two python scripts for generating benchmarking inputs `scripts/evd_benchmark_data.py` and
+`scripts/svd_benchmark_data.py`. In the following example we generate two matrices with double
 precision floating point numbers, one symmetric of size 1024 by 1024 for our evd benchmark and one
 of size 1024 by 2048 for our svd benchmark.
 
 ```bash
-python evd_input_testdata.py 1024 > benchmark_1024x1024.txt
-python svd_input_testdata.py 1024 2048 > benchmark_1024x2048.txt
+python evd_benchmark_data.py 1024 > evd_benchmark_1024x1024.txt
+python svd_benchmark_data.py 1024 2048 > svd_benchmark_1024x2048.txt
 ```
 
 ## Performance Benchmarking
