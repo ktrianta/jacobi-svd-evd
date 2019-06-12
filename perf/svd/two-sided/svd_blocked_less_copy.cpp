@@ -27,7 +27,7 @@ int main() {
         std::cin >> A[i];
     }
 
-    size_t block_size = 128;
+    size_t block_size = 32;
     size_t cost = svd_blocked_less_copy(Data_matr, B_mat, U_mat, V_mat, block_size);
     bench_func(svd_blocked_less_copy, "svd_two_sided_blocked_less_copy", cost, Data_matr, B_mat, U_mat, V_mat,
                block_size);
