@@ -70,6 +70,9 @@ matrix:
           env:
             - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
+git:
+    lfs_skip_smudge: true
+
 before_install:
     - eval "${MATRIX_EVAL}"
 
@@ -77,9 +80,10 @@ install:
     - pip install --user cpplint numpy
 
 script:
-    - chmod +x scripts/build.sh scripts/lint.sh
+    - chmod +x scripts/lint.sh scripts/build.sh scripts/test.sh
     - scripts/lint.sh
     - scripts/build.sh -DCMAKE_C_COMPILER="${C}" -DCMAKE_CXX_COMPILER="${CXX}"
+    - scripts/test.sh
 
 notifications:
     email: false

@@ -21,7 +21,7 @@ size_t svd_blocked_less_copy_transposed(struct matrix_t Amat, struct matrix_t Bm
 
     size_t iter = 0;
     size_t block_iter = 0;
-    const double tol = 1e-14;  // convergence tolerance
+    const double tol = 1e-10;  // convergence tolerance
     const size_t n = Amat.rows;
     double norm = 0.0;      // frobenius norm of matrix B
     double off_norm = 0.0;  // frobenius norm of the off-diagonal elements of matrix B
@@ -33,7 +33,7 @@ size_t svd_blocked_less_copy_transposed(struct matrix_t Amat, struct matrix_t Bm
 
     const size_t n_blocks = n / block_size;
 
-    if (n < 2 * block_size) {
+    if (n <= 2 * block_size) {
         size_t block_iters = svd_subprocedure_vectorized_rowwise(Bmat, Vmat, Umat);
         matrix_transpose(Umat, Umat);
         matrix_transpose(Vmat, Vmat);

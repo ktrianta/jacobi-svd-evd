@@ -28,7 +28,7 @@ size_t evd_cyclic_blocked_vectorize(struct matrix_t Data_matr, struct matrix_t D
     size_t sub_cost = 0;
     matrix_identity(Eigen_vectors);
 
-    if (n < 2 * block_size) {
+    if (n <= 2 * block_size) {
         evd_block_vector(Amat, Eigen_vectors, block_epoch);
 
         // Store the generated eigen values in the vector
@@ -126,7 +126,7 @@ size_t evd_cyclic_blocked_less_copy_vectorize(struct matrix_t Data_matr, struct 
 
     matrix_identity(Eigen_vectors);
 
-    if (n < 2 * block_size) {
+    if (n <= 2 * block_size) {
         evd_block_vector(Amat, Eigen_vectors, block_epoch);
 
         // Store the generated eigen values in the vector
