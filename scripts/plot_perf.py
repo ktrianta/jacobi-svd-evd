@@ -49,17 +49,17 @@ ax.plot(cpu_x, cpu_y, linewidth=3, label=r'peak performance bound', color='r', a
 for name, perf in zip(test_names, test_perfs):
     basename = ntpath.basename(name)  # remove the path and keep only the basename of the file
     basename = basename.replace("-", " ")  # replace dashes with spaces
-    if basename == "base" or basename == "svd-base":
+    if basename == "base" or basename == "svd base":
         line, = ax.plot(input_sizes[:len(perf)], perf, '-o', label=basename, color="#1f77b4")
-    elif basename == "eigen" or basename == "svd-eigen":
+    elif basename == "eigen" or basename == "svd eigen":
         line, = ax.plot(input_sizes[:len(perf)], perf, '-o', label=basename, color="#e377c2")
-    elif basename == "base-vectorized":
+    elif basename == "base vectorized":
         line, = ax.plot(input_sizes[:len(perf)], perf, '-o', label=basename, color="#ff7f0e")
-    elif basename == "blocked-vectorized":
+    elif basename == "blocked vectorized":
         line, = ax.plot(input_sizes[:len(perf)], perf, '-o', label=basename, color="#2ca02c")
-    elif basename == "blocked-vectorized-less-data":
+    elif basename == "blocked vectorized less data":
         line, = ax.plot(input_sizes[:len(perf)], perf, '-o', label=basename, color="#d62728")
-    elif basename == "blocked-vectorized-less-data-opt-mult":
+    elif basename == "blocked vectorized less data opt mult":
         line, = ax.plot(input_sizes[:len(perf)], perf, '-o', label=basename, color="#8c564b")
     else:
         line, = ax.plot(input_sizes[:len(perf)], perf, '-o', label=basename)
